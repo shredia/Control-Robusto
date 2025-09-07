@@ -31,17 +31,17 @@ J = 1;
   %%Lo mismo pero con 3 ecuaciones en vez de 4
 
   %%Matriz que calculé en plano de park
-A = [-R/L Nr*Wm Km*Iq;
-     -Nr*Wm -R/L (-Km/L)-Nr*Id;
-      0 Km/J -B/J];
+% A = [-R/L Nr*Wm Km*Iq;
+%      -Nr*Wm -R/L (-Km/L)-Nr*Id;
+%       0 Km/J -B/J];
 
- %%Matriz del paper
-% A = [-R/L 0 Km/L 0;
-%      0 -R/L (-Km/L) 0;
-%      -Km/J Km/J -B/J 0];
+%  %%Matriz del paper
+% A = [-R/L 0 Km/L ;
+%      0 -R/L (-Km/L) ;
+%      -Km/J Km/J -B/J ];
 
 
-B = [1/L 1/L 0 ];
+B = [1/L;1/L;0];
 
 C = [1 0 0 ;0 1 0];
 
@@ -54,5 +54,8 @@ C = [1 0 0 ;0 1 0];
 
 D = [0 0];
 
-matriz_observavilidad = [C;C*A;C*A*A;C*A*A*A]
-observavilidad = rank(matriz_observavilidad)
+matriz_observabilidad = [C;C*A;C*A*A;C*A*A*A]
+observavilidad = rank(matriz_observabilidad)
+
+matriz_controlabilidad = [B A*B A*A*B A*A*A*B]
+controlabilidad = rank(matriz_controlabilidad)
