@@ -19,14 +19,14 @@ J = 1;
 %       0 Km/J -B/J 0;
 %       0 0 1 0];
  %%Matriz del paper
-% A = [-R/L 0 Km/L 0;
-%      0 -R/L (-Km/L) 0;
-%      -Km/J Km/J -B/J 0;
-%       0 0 1 0];
-% 
-% B = [1/L 1/L 0 0];
-% 
-% C = [1 0 0 0;0 1 0 0];
+A = [-R/L 0 Km/L 0;
+     0 -R/L (-Km/L) 0;
+     -Km/J Km/J -B/J 0;
+      0 0 1 0];
+
+B = [1/L;1/L;0;0];
+
+C = [1 0 0 0;0 1 0 0];
 
   %%Lo mismo pero con 3 ecuaciones en vez de 4
 
@@ -41,9 +41,9 @@ J = 1;
 %      -Km/J Km/J -B/J ];
 
 
-B = [1/L;1/L;0];
-
-C = [1 0 0 ;0 1 0];
+% B = [1/L;1/L;0];
+% 
+% C = [1 0 0 ;0 1 0];
 
 
 
