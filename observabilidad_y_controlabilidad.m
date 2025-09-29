@@ -1,17 +1,19 @@
 clear;
 clc;
-R =  3.4;
-L = 6/1000;
-Nr = 50;
-Km = 10;
-Tl = 1;
-B = 5/10000;
+R =  3.4; %% [Ohms]
+L = 6/1000; %% [L]
+Nr = 50; %%Relación entre torque electrico y mecánico
+Km = 10; %%que era esto? xd
+Tl = 1; %%
+B = 5/10000; %%roce
 Wm = 1; %vueltas por segundo
-Iq = Tl/Km;
-Id = 0;
-Vd = 0;
+Iq = Tl/Km; %%Corriente Q
+Id = 0; %%Corriente D
+Vd = 0; 
 Vq = Tl*R/Km;
-J = 1;
+J = 1; 
+
+
 
   %%Matriz que calculé en plano de park
 % A = [-R/L Nr*Wm Km*Iq 0;
