@@ -12,7 +12,7 @@ Id = 0; %%Corriente D
 Vd = 0; 
 Vq = Tl*R/Km;
 J = 8/1000; %%inercia del motor
-We = 100;
+We = 0;
 tetha = 90;
 
 
