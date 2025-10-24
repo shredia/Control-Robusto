@@ -166,12 +166,15 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         {
 
             const double p = 50;
-            const double ud_ff =R*Id[0] - p*Wm*Lq*Iq[0];
-            const double uq_ff =R*Iq[0] + p*Wm*Ld*Id[0] + p*Wm*Ke;
+            /*const double ud_ff =R*Id[0] - p*Wm*Lq*Iq[0];
+            const double uq_ff =R*Iq[0] + p*Wm*Ld*Id[0] + p*Wm*Ke;*/
+
+            const double ud_ff = -p*Wm*Lq*Iq[0];
+            const double uq_ff =  p*Wm*(Ld*Id[0]+Ke);
 
             /* Salida total a evaluar/saturar */
-            double ud_tot_trial = ud_ctrl_trial + ud_ff;
-            double uq_tot_trial = uq_ctrl_trial + uq_ff;
+            double ud_tot_trial = (1/R)*ud_ctrl_trial + ud_ff;
+            double uq_tot_trial = (1/R)*uq_ctrl_trial + uq_ff;
 
             /* Anti-windup incremental (clamping) decide con salida TOTAL */
             /* Si saturaría y el incremento del PI empuja hacia fuera, no integres */
