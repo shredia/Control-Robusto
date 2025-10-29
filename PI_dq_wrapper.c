@@ -48,6 +48,7 @@ static double clamp(double v, double vmin, double vmax){
 #define u_13_width 1
 #define u_14_width 1
 #define u_15_width 1
+#define u_16_width 1
 #define y_width 1
 #define y_1_width 1
 #define y_2_width 1
@@ -68,7 +69,7 @@ static double clamp(double v, double vmin, double vmax){
 void PI_dq_Start_wrapper(void)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
-    ek2_d = ek1_d = ek_d = 0.0;
+ek2_d = ek1_d = ek_d = 0.0;
     ek2_q = ek1_q = ek_q = 0.0;
     ek2_w = ek1_w = ek_w = 0.0;
     ud = 0.0;
@@ -95,6 +96,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 			const real_T *Theta_ext,
 			const real_T *Kp_wm,
 			const real_T *Ki_wm,
+			const real_T *Tl_Tdm,
 			real_T *Ud,
 			real_T *Uq,
 			real_T *Id,
@@ -139,12 +141,17 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         double idr = clamp(Wm_ref[0], -Wm_max, Wm_max);
         ek_w = Wm_ref[0] - Wm;
         }
+    /*  Aplicamos Desacople de velocidad mecánica */
+
+      const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0]);
+
     /*  Aplicamos errores PID discretos*/
         
      /*K1 y K2 de Wm */
     const double k1_w = (Kp_w*T) + (Ki_w*T*T);
     const double k2_w = -(Kp_w*T);
-    const double Iq_ref = (1.0/T)*(k1_w*ek_w + k2_w*ek1_w)/Ke;
+    double Iq_ref = (1.0/T)*(k1_w*ek_w + k2_w*ek1_w)/Ke;
+    Iq_ref = Iq_ref + Iq_ff;
     const double Id_ref = 0;
 
 
@@ -188,8 +195,8 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         {
 
             const double p = 50;
-            const double ud_ff = + p*Wm*Lq*Iq[0];
-            const double uq_ff = - p*Wm*Ld*Id[0] - p*Wm*Ke;
+            const double ud_ff = - p*Wm*Lq*Iq[0];
+            const double uq_ff = + p*Wm*Ld*Id[0] + p*Wm*Ke;
 
             /* Salida total a evaluar/saturar */
             double ud_tot_trial = ud_ctrl_trial + ud_ff;

@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Sun Oct 19 20:23:34 2025
+ * Created: Wed Oct 29 18:18:56 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     16
+#define NUM_INPUTS                     17
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 Ia
@@ -355,6 +355,26 @@
 #define IN_15_FRACTIONLENGTH           9
 #define IN_15_BIAS                     0
 #define IN_15_SLOPE                    0.125
+
+/* Input Port  16 */
+#define IN_PORT_16_NAME                Tl_Tdm
+#define INPUT_16_DIMS_ND               {1,1}
+#define INPUT_16_NUM_ELEMS             1
+#define INPUT_16_WIDTH                 1
+#define INPUT_DIMS_16_COL              1
+#define INPUT_16_DTYPE                 real_T
+#define INPUT_16_COMPLEX               COMPLEX_NO
+#define INPUT_16_UNIT                  ""
+#define IN_16_BUS_BASED                0
+#define IN_16_BUS_NAME
+#define IN_16_DIMS                     1-D
+#define INPUT_16_FEEDTHROUGH           1
+#define IN_16_ISSIGNED                 0
+#define IN_16_WORDLENGTH               8
+#define IN_16_FIXPOINTSCALING          1
+#define IN_16_FRACTIONLENGTH           9
+#define IN_16_BIAS                     0
+#define IN_16_SLOPE                    0.125
 #define NUM_OUTPUTS                    4
 
 /* Output Port  0 */
@@ -468,6 +488,7 @@ extern void PI_dq_Outputs_wrapper(const real_T *Ia,
   const real_T *Theta_ext,
   const real_T *Kp_wm,
   const real_T *Ki_wm,
+  const real_T *Tl_Tdm,
   real_T *Ud,
   real_T *Uq,
   real_T *Id,
@@ -605,6 +626,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortComplexSignal(S, 15, INPUT_15_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 15, INPUT_15_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 15, 1);/*direct input signal access*/
+
+  /* Input Port 16 */
+  ssSetInputPortWidth(S, 16, INPUT_16_NUM_ELEMS);
+  ssSetInputPortDataType(S, 16, SS_DOUBLE);
+  ssSetInputPortComplexSignal(S, 16, INPUT_16_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 16, INPUT_16_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 16, 1);/*direct input signal access*/
 
   /*
    * Configure the Units for Input Ports
@@ -755,6 +783,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for input port Ki_wm of S-Function PI_dq");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_16_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 16, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port Tl_Tdm of S-Function PI_dq");
       return;
     }
 
@@ -944,13 +981,15 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real_T *Theta_ext = (real_T *) ssGetInputPortRealSignal(S, 13);
   const real_T *Kp_wm = (real_T *) ssGetInputPortRealSignal(S, 14);
   const real_T *Ki_wm = (real_T *) ssGetInputPortRealSignal(S, 15);
+  const real_T *Tl_Tdm = (real_T *) ssGetInputPortRealSignal(S, 16);
   real_T *Ud = (real_T *) ssGetOutputPortRealSignal(S, 0);
   real_T *Uq = (real_T *) ssGetOutputPortRealSignal(S, 1);
   real_T *Id = (real_T *) ssGetOutputPortRealSignal(S, 2);
   real_T *Iq = (real_T *) ssGetOutputPortRealSignal(S, 3);
   PI_dq_Outputs_wrapper(Ia, Ib, Wm_ref, Wm_ext, Kp_current, Ki_current,
                         Kd_current, sample_time_ext, Vdc_ext, R_ext, Ld_ext,
-                        Lq_ext, Ke_ext, Theta_ext, Kp_wm, Ki_wm, Ud, Uq, Id, Iq);
+                        Lq_ext, Ke_ext, Theta_ext, Kp_wm, Ki_wm, Tl_Tdm, Ud, Uq,
+                        Id, Iq);
 }
 
 /* Function: mdlTerminate =====================================================
