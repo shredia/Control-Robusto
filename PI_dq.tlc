@@ -1,5 +1,5 @@
 %% File : PI_dq.tlc
-%% Created : Wed Oct 29 18:18:56 2025
+%% Created : Sat Nov 01 18:47:11 2025
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -63,7 +63,8 @@
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
-			%<doubleType> *Iq);
+			%<doubleType> *Iq,
+			%<doubleType> *Iq_ref_aux);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -101,7 +102,8 @@
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
-			%<doubleType> *Iq);
+			%<doubleType> *Iq,
+			%<doubleType> *Iq_ref_aux);
     extern void PI_dq_Terminate_wrapper(void);
     void PI_dq_Start_wrapper_accel(void){
     PI_dq_Start_wrapper();
@@ -126,7 +128,8 @@
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
-			%<doubleType> *Iq){
+			%<doubleType> *Iq,
+			%<doubleType> *Iq_ref_aux){
     PI_dq_Outputs_wrapper(Ia,
 			Ib,
 			Wm_ref,
@@ -147,7 +150,8 @@
 			Ud,
 			Uq,
 			Id,
-			Iq);
+			Iq,
+			Iq_ref_aux);
     }
 
     %closefile cFile
@@ -185,7 +189,8 @@
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
-			%<doubleType> *Iq);
+			%<doubleType> *Iq,
+			%<doubleType> *Iq_ref_aux);
 
     SFB_EXTERN_C void PI_dq_Terminate_wrapper(void);
 
@@ -238,11 +243,12 @@
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   %assign py2 = LibBlockOutputSignalAddr(2, "", "", 0)
   %assign py3 = LibBlockOutputSignalAddr(3, "", "", 0)
+  %assign py4 = LibBlockOutputSignalAddr(4, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    PI_dq_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<py0>, %<py1>, %<py2>, %<py3>);
+    PI_dq_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
   %else
-    PI_dq_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<py0>, %<py1>, %<py2>, %<py3>);
+    PI_dq_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
   %endif
 
   %%

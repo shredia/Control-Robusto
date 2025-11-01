@@ -53,6 +53,7 @@ static double clamp(double v, double vmin, double vmax){
 #define y_1_width 1
 #define y_2_width 1
 #define y_3_width 1
+#define y_4_width 1
 
 /*
  * Create external references here.  
@@ -100,7 +101,8 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 			real_T *Ud,
 			real_T *Uq,
 			real_T *Id,
-			real_T *Iq)
+			real_T *Iq,
+			real_T *Iq_ref_aux)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 /* Parámetros on-line */
@@ -133,27 +135,28 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 
 
       Id[0] =  Ia[0]*c + Ib[0]*s;
-      Iq[0] = -Ia[0]*s + Ib[0]*c;
+      Iq[0] =  -Ia[0]*s + Ib[0]*c;
       /* ---- Errores Wm ---- */
     ek2_w = ek1_w;
     ek1_w = ek_w;
         {
-        double idr = clamp(Wm_ref[0], -Wm_max, Wm_max);
-        ek_w = Wm_ref[0] - Wm;
+        double wdr = clamp(Wm_ref[0], -Wm_max, Wm_max);
+        ek_w = wdr - Wm;
         }
     /*  Aplicamos Desacople de velocidad mecánica */
 
-      const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0]);
+     const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0]);
+     
 
     /*  Aplicamos errores PID discretos*/
         
      /*K1 y K2 de Wm */
     const double k1_w = (Kp_w*T) + (Ki_w*T*T);
     const double k2_w = -(Kp_w*T);
-    double Iq_ref = (1.0/T)*(k1_w*ek_w + k2_w*ek1_w)/Ke;
+    double Iq_ref = (1.0/T)*((k1_w*ek_w + k2_w*ek1_w));
     Iq_ref = Iq_ref + Iq_ff;
     const double Id_ref = 0;
-
+    Iq_ref_aux[0] = Iq_ref; /*salida auxiliar para leer la señal de referencia*/
 
     /* ---- Errores d ---- */
     ek2_d = ek1_d;
@@ -194,9 +197,14 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         /* uq_ff = R*iq + we*Ld*id + we*Ke */
         {
 
-            const double p = 50;
-            const double ud_ff = - p*Wm*Lq*Iq[0];
-            const double uq_ff = + p*Wm*Ld*Id[0] + p*Wm*Ke;
+            const double p = 25;
+            const double We = Wm*p;
+            const double ud_ff = R*Id[0] -We*Lq*Iq[0];
+            const double uq_ff = R*Iq[0] + We*(Id[0]*Ld +Ke);
+            /*const double ud_ff = - p*Wm*Lq*Iq[0];
+            const double uq_ff = + (p*Wm*Ld*Id[0] + p*Wm*Ke); */
+            /*onst double ud_ff = 0;
+            const double uq_ff = 0;*/
 
             /* Salida total a evaluar/saturar */
             double ud_tot_trial = ud_ctrl_trial + ud_ff;

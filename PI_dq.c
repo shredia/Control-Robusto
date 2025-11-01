@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Wed Oct 29 18:18:56 2025
+ * Created: Sat Nov 01 18:47:11 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -375,7 +375,7 @@
 #define IN_16_FRACTIONLENGTH           9
 #define IN_16_BIAS                     0
 #define IN_16_SLOPE                    0.125
-#define NUM_OUTPUTS                    4
+#define NUM_OUTPUTS                    5
 
 /* Output Port  0 */
 #define OUT_PORT_0_NAME                Ud
@@ -452,6 +452,25 @@
 #define OUT_3_FRACTIONLENGTH           3
 #define OUT_3_BIAS                     0
 #define OUT_3_SLOPE                    0.125
+
+/* Output Port  4 */
+#define OUT_PORT_4_NAME                Iq_ref_aux
+#define OUTPUT_4_DIMS_ND               {1,1}
+#define OUTPUT_4_NUM_ELEMS             1
+#define OUTPUT_4_WIDTH                 1
+#define OUTPUT_DIMS_4_COL              1
+#define OUTPUT_4_DTYPE                 real_T
+#define OUTPUT_4_COMPLEX               COMPLEX_NO
+#define OUTPUT_4_UNIT                  ""
+#define OUT_4_BUS_BASED                0
+#define OUT_4_BUS_NAME
+#define OUT_4_DIMS                     1-D
+#define OUT_4_ISSIGNED                 1
+#define OUT_4_WORDLENGTH               8
+#define OUT_4_FIXPOINTSCALING          1
+#define OUT_4_FRACTIONLENGTH           3
+#define OUT_4_BIAS                     0
+#define OUT_4_SLOPE                    0.125
 #define NPARAMS                        0
 #define SAMPLE_TIME_0                  INHERITED_SAMPLE_TIME
 #define NUM_DISC_STATES                0
@@ -492,7 +511,8 @@ extern void PI_dq_Outputs_wrapper(const real_T *Ia,
   real_T *Ud,
   real_T *Uq,
   real_T *Id,
-  real_T *Iq);
+  real_T *Iq,
+  real_T *Iq_ref_aux);
 
 /*====================*
  * S-function methods *
@@ -822,6 +842,11 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetOutputPortDataType(S, 3, SS_DOUBLE);
   ssSetOutputPortComplexSignal(S, 3, OUTPUT_3_COMPLEX);
 
+  /* Output Port 4 */
+  ssSetOutputPortWidth(S, 4, OUTPUT_4_NUM_ELEMS);
+  ssSetOutputPortDataType(S, 4, SS_DOUBLE);
+  ssSetOutputPortComplexSignal(S, 4, OUTPUT_4_COMPLEX);
+
   /*
    * Configure the Units for Output Ports
    */
@@ -863,6 +888,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for output port Iq of S-Function PI_dq");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, OUTPUT_4_UNIT, &outUnitIdReg);
+    if (outUnitIdReg != INVALID_UNIT_ID) {
+      ssSetOutputPortUnit(S, 4, outUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for output port Iq_ref_aux of S-Function PI_dq");
       return;
     }
 
@@ -986,10 +1020,11 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real_T *Uq = (real_T *) ssGetOutputPortRealSignal(S, 1);
   real_T *Id = (real_T *) ssGetOutputPortRealSignal(S, 2);
   real_T *Iq = (real_T *) ssGetOutputPortRealSignal(S, 3);
+  real_T *Iq_ref_aux = (real_T *) ssGetOutputPortRealSignal(S, 4);
   PI_dq_Outputs_wrapper(Ia, Ib, Wm_ref, Wm_ext, Kp_current, Ki_current,
                         Kd_current, sample_time_ext, Vdc_ext, R_ext, Ld_ext,
                         Lq_ext, Ke_ext, Theta_ext, Kp_wm, Ki_wm, Tl_Tdm, Ud, Uq,
-                        Id, Iq);
+                        Id, Iq, Iq_ref_aux);
 }
 
 /* Function: mdlTerminate =====================================================
