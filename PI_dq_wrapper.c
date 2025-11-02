@@ -154,9 +154,9 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
     const double k1_w = (Kp_w*T) + (Ki_w*T*T);
     const double k2_w = -(Kp_w*T);
     double Iq_ref = (1.0/T)*((k1_w*ek_w + k2_w*ek1_w));
-    Iq_ref = Iq_ref + Iq_ff;
+    Iq_ref = Iq_ref - Iq_ff;
     const double Id_ref = 0;
-    Iq_ref_aux[0] = Iq_ref; /*salida auxiliar para leer la señal de referencia*/
+
 
     /* ---- Errores d ---- */
     ek2_d = ek1_d;
@@ -171,6 +171,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
     ek1_q = ek_q;
     {
         double iqr = clamp(Iq_ref, -Imax, Imax);
+        Iq_ref_aux[0] = iqr; /*salida auxiliar para leer la señal de referencia*/
         ek_q = iqr - Iq[0];
     }
 
