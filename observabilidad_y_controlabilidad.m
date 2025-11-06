@@ -1,63 +1,45 @@
-clear;
-clc;
-R =  3.4; %% [Ohms]
-L = 6/1000; %% [L]
-Nr = 50; %%Relación entre torque electrico y mecánico
-Km = 10; %%que era esto? xd
-Tl = 1; %%
-B = 5/10000; %%roce
-Wm = 1; %vueltas por segundo
-Iq = Tl/Km; %%Corriente Q
-Id = 0; %%Corriente D
-Vd = 0; 
-Vq = Tl*R/Km;
-J = 1; 
+%% === Sistema no lineal y cálculo de Jacobianos ===
+clear; clc;
+syms R L Kt Va Vb Ia Ib We Wm Tx J Th Nr % Variables simbólicas
 
+% --- Ecuaciones del sistema ---
+f1 = (Va - R*Ia +Kt*Nr*Wm*sin(Th))/L;                % d(Id)/dt
+f2 = (Vb - R*Ib - Kt*Nr*Wm*sin(Th))/L;        % d(Iq)/dt
+f3 = (Kt*(Ib*cos(Nr*Th)-Ia*sin(Nr*Th)) - Tx)/J;                         % d(Wm)/dt
+f4 = Wm;                                     % d(Th)/dt  (si se usa velocidad eléctrica)
+f5 = 0;                                      % d(Tx)/dt (constante o perturbación lenta)
 
+f = [f1; f2; f3; f4; f5];                    % Vector de funciones
+x = [Ia; Ib; Wm; Th; Tx];                    % Vector de estados
+u = [Va; Vb];                                % Vector de entradas
 
-  %%Matriz que calculé en plano de park
-% A = [-R/L Nr*Wm Km*Iq 0;
-%      -Nr*Wm -R/L (-Km/L)-Nr*Id 0;
-%       0 Km/J -B/J 0;
-%       0 0 1 0];
- %%Matriz del paper
-A = [-R/L 0 Km/L 0;
-     0 -R/L (-Km/L) 0;
-     -Km/J Km/J -B/J 0;
-      0 0 1 0];
+% --- Jacobianos ---
+A = jacobian(f, x);  % Matriz A = ∂f/∂x
+B = jacobian(f, u);  % Matriz B = ∂f/∂u
 
-B = [1/L;1/L;0;0];
+% --- Matriz de observación (por ejemplo, medición de Id e Iq) ---
+C = [1 0 0 0 0;
+     0 1 0 0 0];
 
-C = [1 0 0 0;0 1 0 0];
+D = zeros(2,2);
 
-  %%Lo mismo pero con 3 ecuaciones en vez de 4
+% --- Resultados ---
+disp('Matriz A = ');
+pretty(A)
+disp('Matriz B = ');
+pretty(B)
+%disp('Matriz C = ');
+%disp(C)
+%disp('Matriz D = ');
+%disp(D)
 
-  %%Matriz que calculé en plano de park
-% A = [-R/L Nr*Wm Km*Iq;
-%      -Nr*Wm -R/L (-Km/L)-Nr*Id;
-%       0 Km/J -B/J];
+% --- Ver observabilidad y controlabilidad ---
+matriz_observabilidad = [C; C*A; C*A^2; C*A^3];
+%pretty(matriz_observabilidad);
+obs_rank = rank(matriz_observabilidad);
+disp(['Rango observabilidad: ', num2str(obs_rank)]);
 
-%  %%Matriz del paper
-% A = [-R/L 0 Km/L ;
-%      0 -R/L (-Km/L) ;
-%      -Km/J Km/J -B/J ];
-
-
-% B = [1/L;1/L;0];
-% 
-% C = [1 0 0 ;0 1 0];
-
-
-
-
-
-
-
-
-D = [0 0];
-
-matriz_observabilidad = [C;C*A;C*A*A;C*A*A*A]
-observavilidad = rank(matriz_observabilidad)
-
-matriz_controlabilidad = [B A*B A*A*B A*A*A*B]
-controlabilidad = rank(matriz_controlabilidad)
+matriz_controlabilidad = [B A*B A^2*B A^3*B];
+%pretty(matriz_controlabilidad);
+ctrl_rank = rank(matriz_controlabilidad);
+disp(['Rango controlabilidad: ', num2str(ctrl_rank)]);
