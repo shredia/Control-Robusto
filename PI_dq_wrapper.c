@@ -49,6 +49,7 @@ static double clamp(double v, double vmin, double vmax){
 #define u_14_width 1
 #define u_15_width 1
 #define u_16_width 1
+#define u_17_width 1
 #define y_width 1
 #define y_1_width 1
 #define y_2_width 1
@@ -98,6 +99,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 			const real_T *Kp_wm,
 			const real_T *Ki_wm,
 			const real_T *Tl_Tdm,
+			const real_T *B,
 			real_T *Ud,
 			real_T *Uq,
 			real_T *Id,
@@ -139,13 +141,13 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
       /* ---- Errores Wm ---- */
     ek2_w = ek1_w;
     ek1_w = ek_w;
-        {
+        
         double wdr = clamp(Wm_ref[0], -Wm_max, Wm_max);
         ek_w = wdr - Wm;
-        }
+        
     /*  Aplicamos Desacople de velocidad mecánica */
 
-     const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0]);
+     const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0] + B[0]*wdr);
      
 
     /*  Aplicamos errores PID discretos*/

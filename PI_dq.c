@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Wed Nov 05 18:32:10 2025
+ * Created: Fri Nov 07 16:56:33 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     17
+#define NUM_INPUTS                     18
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 Ia
@@ -375,6 +375,26 @@
 #define IN_16_FRACTIONLENGTH           9
 #define IN_16_BIAS                     0
 #define IN_16_SLOPE                    0.125
+
+/* Input Port  17 */
+#define IN_PORT_17_NAME                B
+#define INPUT_17_DIMS_ND               {1,1}
+#define INPUT_17_NUM_ELEMS             1
+#define INPUT_17_WIDTH                 1
+#define INPUT_DIMS_17_COL              1
+#define INPUT_17_DTYPE                 real_T
+#define INPUT_17_COMPLEX               COMPLEX_NO
+#define INPUT_17_UNIT                  ""
+#define IN_17_BUS_BASED                0
+#define IN_17_BUS_NAME
+#define IN_17_DIMS                     1-D
+#define INPUT_17_FEEDTHROUGH           1
+#define IN_17_ISSIGNED                 0
+#define IN_17_WORDLENGTH               8
+#define IN_17_FIXPOINTSCALING          1
+#define IN_17_FRACTIONLENGTH           9
+#define IN_17_BIAS                     0
+#define IN_17_SLOPE                    0.125
 #define NUM_OUTPUTS                    5
 
 /* Output Port  0 */
@@ -508,6 +528,7 @@ extern void PI_dq_Outputs_wrapper(const real_T *Ia,
   const real_T *Kp_wm,
   const real_T *Ki_wm,
   const real_T *Tl_Tdm,
+  const real_T *B,
   real_T *Ud,
   real_T *Uq,
   real_T *Id,
@@ -653,6 +674,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortComplexSignal(S, 16, INPUT_16_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 16, INPUT_16_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 16, 1);/*direct input signal access*/
+
+  /* Input Port 17 */
+  ssSetInputPortWidth(S, 17, INPUT_17_NUM_ELEMS);
+  ssSetInputPortDataType(S, 17, SS_DOUBLE);
+  ssSetInputPortComplexSignal(S, 17, INPUT_17_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 17, INPUT_17_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 17, 1);/*direct input signal access*/
 
   /*
    * Configure the Units for Input Ports
@@ -812,6 +840,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for input port Tl_Tdm of S-Function PI_dq");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_17_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 17, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port B of S-Function PI_dq");
       return;
     }
 
@@ -1016,6 +1053,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real_T *Kp_wm = (real_T *) ssGetInputPortRealSignal(S, 14);
   const real_T *Ki_wm = (real_T *) ssGetInputPortRealSignal(S, 15);
   const real_T *Tl_Tdm = (real_T *) ssGetInputPortRealSignal(S, 16);
+  const real_T *B = (real_T *) ssGetInputPortRealSignal(S, 17);
   real_T *Ud = (real_T *) ssGetOutputPortRealSignal(S, 0);
   real_T *Uq = (real_T *) ssGetOutputPortRealSignal(S, 1);
   real_T *Id = (real_T *) ssGetOutputPortRealSignal(S, 2);
@@ -1023,8 +1061,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real_T *Iq_ref_aux = (real_T *) ssGetOutputPortRealSignal(S, 4);
   PI_dq_Outputs_wrapper(Ia, Ib, Wm_ref, Wm_ext, Kp_current, Ki_current,
                         Kd_current, sample_time_ext, Vdc_ext, R_ext, Ld_ext,
-                        Lq_ext, Ke_ext, Theta_ext, Kp_wm, Ki_wm, Tl_Tdm, Ud, Uq,
-                        Id, Iq, Iq_ref_aux);
+                        Lq_ext, Ke_ext, Theta_ext, Kp_wm, Ki_wm, Tl_Tdm, B, Ud,
+                        Uq, Id, Iq, Iq_ref_aux);
 }
 
 /* Function: mdlTerminate =====================================================

@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Thu Nov 06 03:10:00 2025
+ * Created: Fri Nov 07 17:22:01 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -293,7 +293,6 @@
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 #include "simstruc.h"
 
-extern void ekf_Start_wrapper(void);
 extern void ekf_Outputs_wrapper(const real_T *Va,
   const real_T *Vb,
   const real_T *R,
@@ -666,7 +665,6 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
  */
 static void mdlStart(SimStruct *S)
 {
-  ekf_Start_wrapper();
 }
 
 #endif                                 /*  MDL_START */

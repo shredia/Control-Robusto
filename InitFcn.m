@@ -1,5 +1,6 @@
 %%configuración
-
+clear;
+clc;
 f_carrier = 20e3;
 frecuency_simulation = 10*f_carrier;
 sample_time = 1/(frecuency_simulation);
@@ -20,20 +21,13 @@ Kt = P*Psi;
 
 R =  3.4; %% [Ohms]
 L = 6/1000; %% [L]
-B = 5/10000; %%roce
+B = 5/1000; %%roce
 J = 4.7/1000000; %%inercia del motor
 
 
-Vdc = 12;
+Vdc = 24;
 
 
-
-%%Referencia
-W_ref = 300;
-time_start_slope_iq = 0.01;
-time_stop_slope_iq = 0.06;
-t_slope = time_stop_slope_iq - time_start_slope_iq;
-slope_Iq = W_ref/t_slope;
 
 %%Ganancias KPI corriente
 shi_corriente = 0.707;
@@ -46,7 +40,7 @@ Ki_corriente = (wn_corriente^2) * L;
 %%Ganancias KPI velocidad
 shi_w = 0.707;
 
-wn_w = 20*wn_corriente;
+wn_w = wn_corriente/20;
 Kp_w = (2*shi_w*wn_w*J)/Kt;
 Ki_w = (wn_w^2)*J/Kt;
 

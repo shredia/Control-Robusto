@@ -41,11 +41,12 @@
 #define TWO_PI (2.0 * M_PI)
 
 /* ---------- Utilidades ---------- */
-static inline double wrap_2pi(double a) {
-    a = fmod(a, TWO_PI);
-    if (a < 0.0) a += TWO_PI;
-    return a;
+static inline double wrap_2pi(double angle) {
+    angle = fmod(angle + M_PI, TWO_PI);
+    if (angle < 0.0) angle += TWO_PI;
+    return angle - M_PI;
 }
+
 
 /* === Variables globales persistentes === */
 static double x_prev[5] = {0.0, 0.0, 0.0, 0.0, 0.0};   // [Id, Iq, Wm, theta_m, Tx]
@@ -75,18 +76,9 @@ static double Q[5][5] = {
         {1e-4, 0},
         {0, 1e-4}
     };
+static double B = 0.01;
 /* %%%-SFUNWIZ_wrapper_externs_Changes_END --- EDIT HERE TO _BEGIN */
 
-/*
- * Start function
- *
- */
-void ekf_Start_wrapper(void)
-{
-/* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
- 
-/* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
-}
 /*
  * Output function
  *
@@ -115,13 +107,14 @@ double Tx_k = x_prev[4];
 // === CONSTANTES Y VARIABLES AUXILIARES ===
 double We_k  = (*Nr) * Wm_k;     // Velocidad eléctrica
 double th_e_k = (*Nr) * th_m_k;  // Ángulo eléctrico
+    th_e_k = wrap_2pi(th_e_k);
 
 // === ECUACIONES DIFERENCIALES ===
 // ¡Ojo! Corrijo: las funciones trigonométricas deben ir en minúsculas (sin “Th” mayúscula).
 // También se usa Wm_k (no Wm), y todo debe multiplicarse con el operador * explícito.
-double dia_dt = ((*Va) - (*R) * Ia_k + (*Kt) * (*Nr) * Wm_k * sin(th_e_k)) / (*L);
-double dib_dt = ((*Vb) - (*R) * Ib_k - (*Kt) * (*Nr) * Wm_k * cos(th_e_k)) / (*L);
-double dwm_dt = ((*Kt) * (Ib_k * cos(th_e_k) - Ia_k * sin(th_e_k)) - Tx_k) / (*J);
+double dia_dt = ((*Va) - (*R) * Ia_k + (*Kt)  * Wm_k * sin(th_e_k)) / (*L);
+double dib_dt = ((*Vb) - (*R) * Ib_k - (*Kt)  * Wm_k * cos(th_e_k)) / (*L);
+double dwm_dt = ((*Kt)* (Ib_k * cos(th_e_k) - Ia_k * sin(th_e_k)) -B*Wm_k - Tx_k) / (*J);
 double dth_m_dt = Wm_k;
 double dTx_dt = 0.0;
 
@@ -132,6 +125,11 @@ x_pred[2] = Wm_k + (*Ts) * dwm_dt;
 x_pred[3] = th_m_k + (*Ts) * dth_m_dt;
 x_pred[4] = Tx_k + (*Ts) * dTx_dt;
 
+    //ajustamos los angulos
+x_pred[3] = wrap_2pi(x_pred[3]);  
+th_e_k = (*Nr) * x_pred[3];
+th_e_k = wrap_2pi(th_e_k);
+
 // === JACOBIANO A ===
 // Correcciones:
 // - Todas las variables deben tener el operador * para los punteros.
@@ -141,10 +139,10 @@ x_pred[4] = Tx_k + (*Ts) * dTx_dt;
 // - Evita errores de signos y productos.
 
 double A[5][5] = {
-    { -(*R)/(*L),  0.0,   (*Kt)*(*Nr)*sin(th_e_k)/(*L),   (*Kt)*(*Nr)*Wm_k*cos(th_e_k)/(*L),   0.0 },
-    {  0.0,       -(*R)/(*L),  -(*Kt)*(*Nr)*cos(th_e_k)/(*L),  (*Kt)*(*Nr)*Wm_k*sin(th_e_k)/(*L),  0.0 },
-    { -(*Kt)*sin(th_e_k)/(*J),  -(*Kt)*cos(th_e_k)/(*J),   0.0,
-      -(*Kt)*(*Nr)/(*J)*(Ia_k*cos(th_e_k)+Ib_k*sin(th_e_k)),  -1.0/(*J) },
+    { -(*R)/(*L),  0.0,   (*Kt)*sin(th_e_k)/(*L),   (*Kt)*(*Nr)*Wm_k*cos(th_e_k)/(*L),   0.0 },
+    {  0.0,          -(*R)/(*L),  -(*Kt)*sin(th_e_k)/(*L),  -(*Kt)*(*Nr)*Wm_k*cos(th_e_k)/(*L),  0.0 },
+    { -(*Kt)*sin(th_e_k)/(*J),  (*Kt)*cos(th_e_k)/(*J),   -B/(*J),
+      -((*Kt)*(*Nr)/(*J))*(Ia_k*cos(th_e_k)+Ib_k*sin(th_e_k)),  -1.0/(*J) },
     {  0.0,  0.0,  1.0,  0.0,  0.0 },
     {  0.0,  0.0,  0.0,  0.0,  0.0 }
 };

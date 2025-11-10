@@ -1,5 +1,5 @@
 %% File : ekf.tlc
-%% Created : Thu Nov 06 03:10:00 2025
+%% Created : Fri Nov 07 17:22:01 2025
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -42,7 +42,6 @@
     #else
     #define SFB_EXTERN_C extern
     #endif
-    SFB_EXTERN_C void ekf_Start_wrapper_accel(void);
     SFB_EXTERN_C void ekf_Outputs_wrapper_accel(const %<doubleType> *Va,
 			const %<doubleType> *Vb,
 			const %<doubleType> *R,
@@ -85,9 +84,6 @@
 			%<doubleType> *x_pred_out,
 			%<doubleType> *x_corr_out);
     extern void ekf_Terminate_wrapper(void);
-    void ekf_Start_wrapper_accel(void){
-    ekf_Start_wrapper();
-    }
     void ekf_Outputs_wrapper_accel(const %<doubleType> *Va,
 			const %<doubleType> *Vb,
 			const %<doubleType> *R,
@@ -153,18 +149,6 @@
 %endfunction
 
 
-%% Function: Start ============================================================
-%%
-%function Start(block, system) Output
-   /* %<Type> Block: %<Name> */
-  
-  %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    ekf_Start_wrapper_accel();
-  %else
-    ekf_Start_wrapper();
-  %endif
-
-%endfunction
 %% Function: Outputs ==========================================================
 %%
 %% Purpose:
