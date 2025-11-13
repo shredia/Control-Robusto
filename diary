@@ -1,0 +1,209 @@
+slbuild('Simulacion_stepper')
+### Starting build procedure for: Simulacion_stepper
+### Generating code and artifacts to 'Model specific' folder structure
+### Generating code into build folder: D:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Simulacion_stepper_grt_rtw
+### Build procedure for Simulacion_stepper aborted due to an error.
+
+Build Summary
+
+Top model targets built:
+
+Model               Action  Rebuild Reason                                    
+==============================================================================
+Simulacion_stepper  Failed  Code generation information file does not exist.  
+
+0 of 1 models built (0 models already up to date)
+Build duration: 0h 0m 3.5572s
+{Error using tlc_c
+Error due to multiple causes.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>i_buildProcedure', 'C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m', 771)" style="font-weight:bold">coder.internal.ModelBuilder>i_buildProcedure</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771,0)">line 771</a>)
+rtwtypesStyle, isInvokingMathCnnLibForConvBlk] = tlc_c(hCodegenMgr,...
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder.make_rtw', 'C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m', 135)" style="font-weight:bold">coder.internal.ModelBuilder.make_rtw</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',135,0)">line 135</a>)
+                [modelBuildResult, mainObjFolder] = i_buildProcedure...
+
+Error in build_target
+
+Error in build_target
+
+Error in build_standalone_rtw_target
+
+Error in slbuild_private
+
+Error in slbuild_private
+
+Error in sl_feval
+
+Error in coder.internal.codegenAndCompile
+
+Error in slbuild
+
+Error in slbuild - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+Caused by:
+    Error using tlc_c
+    Data type mismatch. '<a href="matlab:slprivate('open_and_hilite_port_hyperlink', 'hilite', ['Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1'], 'Inport', 3);">Input Port 3</a>' of '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1','error')">Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1</a>' expects a signal of data type 'double'. However, it is driven by a signal of data type
+    'single'. - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+    Error using tlc_c
+    Data type mismatch. '<a href="matlab:slprivate('open_and_hilite_port_hyperlink', 'hilite', ['Simulacion_stepper/Triggered Subsystem1/Constant'], 'Outport', 1);">Output Port 1</a>' of '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Constant','error')">Simulacion_stepper/Triggered Subsystem1/Constant</a>' is a signal of data type 'single'. However, it is driving a signal of data type 'double'. - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+} 
+find_system('Simulacion_stepper','RegExp','on','DataType','single')
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Ia','error')">Simulacion_stepper/Triggered Subsystem/Ia</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Ib','error')">Simulacion_stepper/Triggered Subsystem/Ib</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Wm_ref','error')">Simulacion_stepper/Triggered Subsystem/Wm_ref</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You
+can get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Wm','error')">Simulacion_stepper/Triggered Subsystem/Wm</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Theta','error')">Simulacion_stepper/Triggered Subsystem/Theta</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You
+can get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Tl_Tdm','error')">Simulacion_stepper/Triggered Subsystem/Tl_Tdm</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You
+can get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Out1','error')">Simulacion_stepper/Triggered Subsystem/Out1</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Out2','error')">Simulacion_stepper/Triggered Subsystem/Out2</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Out3','error')">Simulacion_stepper/Triggered Subsystem/Out3</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Out4','error')">Simulacion_stepper/Triggered Subsystem/Out4</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem/Out5','error')">Simulacion_stepper/Triggered Subsystem/Out5</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Va','error')">Simulacion_stepper/Triggered Subsystem1/Va</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Vb','error')">Simulacion_stepper/Triggered Subsystem1/Vb</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Ia','error')">Simulacion_stepper/Triggered Subsystem1/Ia</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Ib','error')">Simulacion_stepper/Triggered Subsystem1/Ib</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You can
+get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/x_pred','error')">Simulacion_stepper/Triggered Subsystem1/x_pred</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You
+can get/set the data type using parameter 'OutDataTypeStr' instead.] 
+[Warning: The block parameter 'DataType' on '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/x_corr','error')">Simulacion_stepper/Triggered Subsystem1/x_corr</a>' has been deprecated. Getting/Setting the value of this parameter is no longer allowed. You
+can get/set the data type using parameter 'OutDataTypeStr' instead.] 
+
+ans =
+
+  0×1 empty <a href="matlab:helpPopup('cell')" style="font-weight:bold">cell</a> array
+
+
+helpPopup('cell')
+model = 'Simulacion_stepper';
+open_system(model);
+
+% Encuentra todos los bloques con parámetro OutDataTypeStr
+blocks = find_system(model, 'RegExp', 'on', 'OutDataTypeStr', '.*');
+
+fprintf('Bloques encontrados: %d\n', numel(blocks));
+Bloques encontrados: 81
+
+for i = 1:numel(blocks)
+    dtype = get_param(blocks{i}, 'OutDataTypeStr');
+    
+    % Mostrar los que no son double
+    if ~strcmp(dtype, 'double')
+        fprintf('Cambiando %s de %s a double\n', blocks{i}, dtype);
+        set_param(blocks{i}, 'OutDataTypeStr', 'double');
+    end
+end
+Cambiando Simulacion_stepper/Gain de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain1 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain2 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain3 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain4 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain5 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Gain6 de Inherit: Inherit via internal rule a double
+Cambiando Simulacion_stepper/Mod de Inherit: Same as first input a double
+Cambiando Simulacion_stepper/Mod1 de Inherit: Same as first input a double
+Cambiando Simulacion_stepper/Mod2 de Inherit: Same as first input a double
+Cambiando Simulacion_stepper/Mod3 de Inherit: Same as first input a double
+Cambiando Simulacion_stepper/Mod4 de Inherit: Same as first input a double
+Cambiando Simulacion_stepper/Mux2 de Inherit: auto a double
+Cambiando Simulacion_stepper/Mux3 de Inherit: auto a double
+Cambiando Simulacion_stepper/NOT de boolean a double
+{Invalid data type specification in '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/NOT','error')">Simulacion_stepper/NOT</a>'.
+Caused by:
+    'double' specifies a built-in data type for parameter 'OutDataTypeStr' which does not support it.
+} 
+open_and_hilite_hyperlink ('Simulacion_stepper/NOT','error')
+slbuild('Simulacion_stepper')
+### Starting build procedure for: Simulacion_stepper
+### Generating code and artifacts to 'Model specific' folder structure
+### Generating code into build folder: D:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Simulacion_stepper_grt_rtw
+### Build procedure for Simulacion_stepper aborted due to an error.
+
+Build Summary
+
+Top model targets built:
+
+Model               Action  Rebuild Reason                                    
+==============================================================================
+Simulacion_stepper  Failed  Code generation information file does not exist.  
+
+0 of 1 models built (0 models already up to date)
+Build duration: 0h 0m 2.8843s
+{Error using tlc_c
+Error due to multiple causes.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>i_buildProcedure', 'C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m', 771)" style="font-weight:bold">coder.internal.ModelBuilder>i_buildProcedure</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771,0)">line 771</a>)
+rtwtypesStyle, isInvokingMathCnnLibForConvBlk] = tlc_c(hCodegenMgr,...
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder.make_rtw', 'C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m', 135)" style="font-weight:bold">coder.internal.ModelBuilder.make_rtw</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',135,0)">line 135</a>)
+                [modelBuildResult, mainObjFolder] = i_buildProcedure...
+
+Error in build_target
+
+Error in build_target
+
+Error in build_standalone_rtw_target
+
+Error in slbuild_private
+
+Error in slbuild_private
+
+Error in sl_feval
+
+Error in coder.internal.codegenAndCompile
+
+Error in slbuild
+
+Error in slbuild - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+Caused by:
+    Error using tlc_c
+    Data type mismatch. '<a href="matlab:slprivate('open_and_hilite_port_hyperlink', 'hilite', ['Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1'], 'Inport', 3);">Input Port 3</a>' of '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1','error')">Simulacion_stepper/Triggered Subsystem1/C//C++ Code Block1</a>' expects a signal of data type 'double'. However, it is driven by a signal of data
+    type 'single'. - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+    Error using tlc_c
+    Data type mismatch. '<a href="matlab:slprivate('open_and_hilite_port_hyperlink', 'hilite', ['Simulacion_stepper/Triggered Subsystem1/Constant'], 'Outport', 1);">Output Port 1</a>' of '<a href="matlab:open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Constant','error')">Simulacion_stepper/Triggered Subsystem1/Constant</a>' is a signal of data type 'single'. However, it is driving a signal of data type 'double'. - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);">Show complete stack trace</a>
+} 
+interactive_actions_helper.displayMStack([struct('file','C:\Program Files\MATLAB\R2024a\toolbox\rtw\rtw\tlc_c.p','line',0,'name','tlc_c'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',771,'name','coder.internal.ModelBuilder>i_buildProcedure'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m','line',135,'name','coder.internal.ModelBuilder>ModelBuilder.make_rtw'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_target.p','line',0,'name','build_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\build_standalone_rtw_target.p','line',0,'name','build_standalone_rtw_target'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\private\slbuild_private.p','line',0,'name','slbuild_private'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\sl_feval.p','line',0,'name','sl_feval'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild'),struct('file','C:\Program Files\MATLAB\R2024a\toolbox\simulink\core\general\slbuild.p','line',0,'name','slbuild')]);
+
+Displaying stack trace:
+Error using tlc_c
+	   • In tlc_c
+	   • In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>i_buildProcedure','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771)">coder.internal.ModelBuilder>i_buildProcedure</a> (<a href="matlab:opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771)">line 771</a>)
+	   • In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>ModelBuilder.make_rtw','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',135)">coder.internal.ModelBuilder>ModelBuilder.make_rtw</a> (<a href="matlab:opentoline('C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',135)">line 135</a>)
+	   • In build_target
+	   • In build_target
+	   • In build_standalone_rtw_target
+	   • In slbuild_private
+	   • In slbuild_private
+	   • In sl_feval
+	   • In coder.internal.codegenAndCompile
+	   • In slbuild
+	   • In slbuild
+matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>i_buildProcedure','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771)
+matlab.lang.internal.introspective.errorDocCallback('coder.internal.ModelBuilder>i_buildProcedure','C:\Program Files\MATLAB\R2024a\toolbox\coder\simulinkcoder_core\+coder\+internal\ModelBuilder.m',771)
+open_and_hilite_hyperlink ('Simulacion_stepper/Triggered Subsystem1/Constant','error')
+set_param('MyModel','DataTypeOverride','Off')
+{Invalid Simulink object name: 'MyModel'.
+Caused by:
+    The block diagram 'MyModel' is not loaded.
+} 
+InitFcn
+set_param('simulacion_stepper','DataTypeOverride','Off')
+{Invalid Simulink object name: 'simulacion_stepper'.
+Caused by:
+    The block diagram 'simulacion_stepper' is not loaded. The closest match is 'Simulacion_stepper'.
+} 
+set_param('Simulacion_stepper','DataTypeOverride','Off')

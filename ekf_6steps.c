@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon Nov 10 17:37:23 2025
+ * Created: Thu Nov 13 14:30:07 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -286,14 +286,13 @@
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             0
 #define CREATE_DEBUG_MEXFILE           0
-#define SAVE_CODE_ONLY                 1
+#define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
 /* %%%-SFUNWIZ_defines_Changes_END --- EDIT HERE TO _BEGIN */
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 #include "simstruc.h"
 
-extern void ekf_6steps_Start_wrapper(void);
 extern void ekf_6steps_Outputs_wrapper(const real_T *Va,
   const real_T *Vb,
   const real_T *R,
@@ -666,7 +665,6 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
  */
 static void mdlStart(SimStruct *S)
 {
-  ekf_6steps_Start_wrapper();
 }
 
 #endif                                 /*  MDL_START */

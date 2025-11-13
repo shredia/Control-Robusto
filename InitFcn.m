@@ -1,4 +1,5 @@
 %%configuración
+clearvars;
 clear;
 clc;
 f_carrier = 20e3;

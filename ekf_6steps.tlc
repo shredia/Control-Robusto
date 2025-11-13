@@ -1,5 +1,5 @@
 %% File : ekf_6steps.tlc
-%% Created : Mon Nov 10 17:37:23 2025
+%% Created : Thu Nov 13 14:30:07 2025
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -42,7 +42,6 @@
     #else
     #define SFB_EXTERN_C extern
     #endif
-    SFB_EXTERN_C void ekf_6steps_Start_wrapper_accel(void);
     SFB_EXTERN_C void ekf_6steps_Outputs_wrapper_accel(const %<doubleType> *Va,
 			const %<doubleType> *Vb,
 			const %<doubleType> *R,
@@ -85,9 +84,6 @@
 			%<doubleType> *x_pred_out,
 			%<doubleType> *x_corr_out);
     extern void ekf_6steps_Terminate_wrapper(void);
-    void ekf_6steps_Start_wrapper_accel(void){
-    ekf_6steps_Start_wrapper();
-    }
     void ekf_6steps_Outputs_wrapper_accel(const %<doubleType> *Va,
 			const %<doubleType> *Vb,
 			const %<doubleType> *R,
@@ -153,18 +149,6 @@
 %endfunction
 
 
-%% Function: Start ============================================================
-%%
-%function Start(block, system) Output
-   /* %<Type> Block: %<Name> */
-  
-  %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    ekf_6steps_Start_wrapper_accel();
-  %else
-    ekf_6steps_Start_wrapper();
-  %endif
-
-%endfunction
 %% Function: Outputs ==========================================================
 %%
 %% Purpose:
