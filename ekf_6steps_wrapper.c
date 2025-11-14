@@ -134,22 +134,58 @@ static double CkT[5][2] = {
 };
 
 static double Qk[5][5] = {
-    {  1.0,  0.0,  0.0,  0.0,  0.0 },
-    {  0.0,  1.0,  0.0,  0.0,  0.0 },
-    {  0.0,  0.0,  1.0,  0.0,  0.0 },
-    {  0.0,  0.0,  0.0,  1.0,  0.0 },
-    {  0.0,  0.0,  0.0,  0.0,  1.0 }
+    {  5e-4,  0.0,  0.0,  0.0,  0.0 },
+    {  0.0,  5e-4,  0.0,  0.0,  0.0 },
+    {  0.0,  0.0,  1e-6,  0.0,  0.0 },
+    {  0.0,  0.0,  0.0,  1e-10,  0.0 },
+    {  0.0,  0.0,  0.0,  0.0,  1e-6 }
 };
 
 //Covarianza del sensor, confiabilidad del sensor +- ,etc
 static double sum_v[2][2] = { 
-    { 1.0, 0.0},
-    { 0.0, 1.0}
+    { 1e-4, 0.0},
+    { 0.0, 1e-4}
 };
    
-static double B = 0.01;
+static double B = 0.0005;
 /* %%%-SFUNWIZ_wrapper_externs_Changes_END --- EDIT HERE TO _BEGIN */
 
+/*
+ * Start function
+ *
+ */
+void ekf_6steps_Start_wrapper(void)
+{
+/* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
+int i, j;   // <-- DECLARAR AQUÍ
+
+    // === ESTADO INICIAL ===
+    x_hat_more[0] = 0.0;   // Id
+    x_hat_more[1] = 0.0;   // Iq
+    x_hat_more[2] = 0.0;   // Wm
+    x_hat_more[3] = 0.0;   // theta
+    x_hat_more[4] = 0.0;   // Tx
+
+    // === MATRIZ DE COVARIANZA P0 ===
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 5; j++) {
+            sum_more[i][j] = 0.0;
+            sum_less[i][j] = 0.0;
+        }
+    }
+
+    sum_more[0][0] = 1e-2;
+    sum_more[1][1] = 1e-2;
+    sum_more[2][2] = 1e-1;
+    sum_more[3][3] = 5.0;
+    sum_more[4][4] = 1.0;
+
+    // x_hat_less debe iniciar igual que x_hat_more
+    for (i = 0; i < 5; i++) {
+        x_hat_less[i] = x_hat_more[i];
+    }
+/* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
+}
 /*
  * Output function
  *
@@ -175,20 +211,23 @@ double Wm_k =   x_hat_more[2];
 double th_m_k = x_hat_more[3];
 double Tx_k =   x_hat_more[4];
 
-double th_e_k = wrap_2pi((*Nr) * th_m_k);
+double th_e_k = (*Nr) * th_m_k;
+double s = sin(th_e_k);
+double c = cos(th_e_k);
 //calculamos las derivadas por EDO
 //  x_hat_less (k) = f(x_hat_more (k-1),u(k-1),w(k-1))
-x_dot_hat_less[0] = ((*Va) - (*R) * Ia_k + (*Kt)  * Wm_k * sin(th_e_k)) / (*L);
-x_dot_hat_less[1] = ((*Vb) - (*R) * Ib_k - (*Kt)  * Wm_k * cos(th_e_k)) / (*L);
-x_dot_hat_less[2] = ((*Kt)* (Ib_k * cos(th_e_k) - Ia_k * sin(th_e_k)) -B*Wm_k - Tx_k) / (*J);
-x_dot_hat_less[3] = wrap_2pi(Wm_k);
+x_dot_hat_less[0] = ((*Va) - (*R) * Ia_k + (*Kt)  * Wm_k * s) / (*L);
+x_dot_hat_less[1] = ((*Vb) - (*R) * Ib_k - (*Kt)  * Wm_k * c) / (*L);
+x_dot_hat_less[2] = ((*Kt)* (Ib_k * c - Ia_k * s) -B*Wm_k - Tx_k) / (*J);
+x_dot_hat_less[3] = Wm_k;
 x_dot_hat_less[4] = 0.0;
  //Integramos mediante euler 
-x_hat_less[0] = x_hat_less[0] + (*Ts)*x_dot_hat_less[0]; 
-x_hat_less[1] = x_hat_less[1] + (*Ts)*x_dot_hat_less[1];
-x_hat_less[2] = x_hat_less[2] + (*Ts)*x_dot_hat_less[2];
-x_hat_less[3] = x_hat_less[3] + (*Ts)*x_dot_hat_less[3];
-x_hat_less[4] = x_hat_less[4] + (*Ts)*x_dot_hat_less[4];
+x_hat_less[0] = x_hat_more[0] + (*Ts)*x_dot_hat_less[0]; 
+x_hat_less[1] = x_hat_more[1] + (*Ts)*x_dot_hat_less[1];
+x_hat_less[2] = x_hat_more[2] + (*Ts)*x_dot_hat_less[2];
+x_hat_less[3] = x_hat_more[3] + (*Ts)*x_dot_hat_less[3];
+x_hat_less[4] = x_hat_more[4] + (*Ts)*x_dot_hat_less[4];
+
 
      //Salida corregida
        x_pred_out[0] = x_hat_less[0];
@@ -203,12 +242,15 @@ x_hat_less[4] = x_hat_less[4] + (*Ts)*x_dot_hat_less[4];
     //esto se transforma en x(k) = A_hat (k-1) x_niato_more (k-1) A_hat T (k-1) + B_hat (k-1) W_niato (k-1)
     //ahora, podemos encontrar la matriz de covarianza sum_less = A_hat*sum_more*A_hat T + B_hat*sum*B_hat T
     // Cómo no sabemos la relación entre B y Sum, simplemente definimos una matriz diagonal Qk, el cual representará la confianza en el modelo
-
+    
+    double RL = -(*R)/(*L);
+    double uno = (*Kt)*s;
+    double dos = (*Kt)*c;
     double A[5][5] = {
-    { -(*R)/(*L),  0.0,   (*Kt)*sin(th_e_k)/(*L),   (*Kt)*(*Nr)*Wm_k*cos(th_e_k)/(*L),   0.0 },
-    {  0.0,          -(*R)/(*L),  -(*Kt)*sin(th_e_k)/(*L),  -(*Kt)*(*Nr)*Wm_k*cos(th_e_k)/(*L),  0.0 },
-    { -(*Kt)*sin(th_e_k)/(*J),  (*Kt)*cos(th_e_k)/(*J),   -B/(*J),
-      -((*Kt)*(*Nr)/(*J))*(Ia_k*cos(th_e_k)+Ib_k*sin(th_e_k)),  -1.0/(*J) },
+    { RL,  0.0,   uno/(*L),   dos*(*Nr)*Wm_k/(*L),   0.0 },
+    {  0.0,          RL,  -dos/(*L),  uno*(*Nr)*Wm_k/(*L),  0.0 },
+    { -uno/(*J),  dos/(*J),   -B/(*J),
+      -((*Kt)*(*Nr)/(*J))*(Ia_k*c+Ib_k*s),  -1.0/(*J) },
     {  0.0,  0.0,  1.0,  0.0,  0.0 },
     {  0.0,  0.0,  0.0,  0.0,  0.0 }
 };
@@ -229,8 +271,8 @@ x_hat_less[4] = x_hat_less[4] + (*Ts)*x_dot_hat_less[4];
     
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            A_hat[i][j] = I[i][j] + Ts[0] * A[i][j];
-             A_hat_T[j][i] = A_hat[i][j];
+            A_hat[i][j] = I[i][j] + Ts[0] * A[i][j]; //calculamos A_hat discreto
+             A_hat_T[j][i] = A_hat[i][j]; //calculamos transpuesta A_hat discreto 
         }
     }
    
@@ -295,16 +337,21 @@ for (int i = 0; i < 5; i++) {
     y_niato[0] = Ia_medido[0] - y_hat[0];
     y_niato[1] = Ib_medido[0] - y_hat[1];
     //Calculamos la multiplicacion de la matriz Lk*y_niato [5x2][2x1]
-    double temp_6[5][1];
+    double temp_6[5][1]; 
     matmul_f64(&Lk[0][0],y_niato,&temp_6[0][0],5,2,1);
+    double delta_theta = temp_6[3][0];
+
+// límite de corrección por paso
+if (delta_theta >  0.005) delta_theta =  0.005;   // ~1.1°
+if (delta_theta < -0.005) delta_theta = -0.005;
     
     //sumamos finalmente x_hat_more = x_hat_less + Lk*(y_niato)
     x_hat_more[0] = x_hat_less[0] + temp_6[0][0];
     x_hat_more[1] = x_hat_less[1] + temp_6[1][0];
     x_hat_more[2] = x_hat_less[2] + temp_6[2][0];
-    x_hat_more[3] = wrap_2pi(x_hat_less[3] + temp_6[3][0]);
+    x_hat_more[3] = x_hat_less[3] + temp_6[3][0];
     x_hat_more[4] = x_hat_less[4] + temp_6[4][0];   
-     
+    
     //Salida corregida
        x_corr_out[0] = x_hat_more[0];
        x_corr_out[1] = x_hat_more[1];

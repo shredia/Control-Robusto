@@ -4,7 +4,7 @@ syms R L Kt Va Vb Ia Ib We Wm Tx J Th_m Nr B % Variables simbólicas
 
 % --- Ecuaciones del sistema ---
 f1 = (Va - R*Ia + Kt*Wm*sin(Nr*Th_m))/L;                % d(Id)/dt
-f2 = (Vb - R*Ib - Kt*Wm*sin(Nr*Th_m))/L;        % d(Iq)/dt
+f2 = (Vb - R*Ib - Kt*Wm*cos(Nr*Th_m))/L;        % d(Iq)/dt
 f3 = (Kt*(Ib*cos(Nr*Th_m)-Ia*sin(Nr*Th_m)) -B*Wm - Tx)/J;                         % d(Wm)/dt
 f4 = Wm;                                     % d(Th)/dt  (si se usa velocidad eléctrica)
 f5 = 0;                                      % d(Tx)/dt (constante o perturbación lenta)
