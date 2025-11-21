@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Fri Nov 14 13:01:21 2025
+ * Created: Fri Nov 21 12:06:28 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -235,10 +235,10 @@
 #define IN_9_FRACTIONLENGTH            9
 #define IN_9_BIAS                      0
 #define IN_9_SLOPE                     0.125
-#define NUM_OUTPUTS                    2
+#define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
-#define OUT_PORT_0_NAME                x_pred_out
+#define OUT_PORT_0_NAME                x_corr_out
 #define OUTPUT_0_DIMS_ND               {5,1}
 #define OUTPUT_0_NUM_ELEMS             5
 #define OUTPUT_0_WIDTH                 5
@@ -255,25 +255,6 @@
 #define OUT_0_FRACTIONLENGTH           3
 #define OUT_0_BIAS                     0
 #define OUT_0_SLOPE                    0.125
-
-/* Output Port  1 */
-#define OUT_PORT_1_NAME                x_corr_out
-#define OUTPUT_1_DIMS_ND               {5,1}
-#define OUTPUT_1_NUM_ELEMS             5
-#define OUTPUT_1_WIDTH                 5
-#define OUTPUT_DIMS_1_COL              1
-#define OUTPUT_1_DTYPE                 real_T
-#define OUTPUT_1_COMPLEX               COMPLEX_NO
-#define OUTPUT_1_UNIT                  ""
-#define OUT_1_BUS_BASED                0
-#define OUT_1_BUS_NAME
-#define OUT_1_DIMS                     2-D
-#define OUT_1_ISSIGNED                 1
-#define OUT_1_WORDLENGTH               8
-#define OUT_1_FIXPOINTSCALING          1
-#define OUT_1_FRACTIONLENGTH           3
-#define OUT_1_BIAS                     0
-#define OUT_1_SLOPE                    0.125
 #define NPARAMS                        0
 #define SAMPLE_TIME_0                  INHERITED_SAMPLE_TIME
 #define NUM_DISC_STATES                0
@@ -304,7 +285,6 @@ extern void ekf_6steps_Outputs_wrapper(const real_T *Va,
   const real_T *Ia_medido,
   const real_T *Ib_medido,
   const real_T *Nr,
-  real_T *x_pred_out,
   real_T *x_corr_out);
 
 /*====================*
@@ -514,15 +494,6 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetOutputPortDataType(S, 0, SS_DOUBLE);
   ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
 
-  /* Output Port 1 */
-  outputDimsInfo.numDims = 2;
-  outputDimsInfo.width = OUTPUT_1_NUM_ELEMS;
-  int_T out1Dims[] = OUTPUT_1_DIMS_ND;
-  outputDimsInfo.dims = out1Dims;
-  ssSetOutputPortDimensionInfo(S, 1, &outputDimsInfo);
-  ssSetOutputPortDataType(S, 1, SS_DOUBLE);
-  ssSetOutputPortComplexSignal(S, 1, OUTPUT_1_COMPLEX);
-
   /*
    * Configure the Units for Output Ports
    */
@@ -534,15 +505,6 @@ static void mdlInitializeSizes(SimStruct *S)
     ssRegisterUnitFromExpr(S, OUTPUT_0_UNIT, &outUnitIdReg);
     if (outUnitIdReg != INVALID_UNIT_ID) {
       ssSetOutputPortUnit(S, 0, outUnitIdReg);
-    } else {
-      ssSetLocalErrorStatus(S,
-                            "Invalid Unit provided for output port x_pred_out of S-Function ekf_6steps");
-      return;
-    }
-
-    ssRegisterUnitFromExpr(S, OUTPUT_1_UNIT, &outUnitIdReg);
-    if (outUnitIdReg != INVALID_UNIT_ID) {
-      ssSetOutputPortUnit(S, 1, outUnitIdReg);
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for output port x_corr_out of S-Function ekf_6steps");
@@ -608,15 +570,6 @@ static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
   portDimsInfo.numDims = 2;
   if (ssGetOutputPortNumDimensions(S, 0) == (-1)) {
     ssSetOutputPortDimensionInfo(S, 0, &portDimsInfo);
-  }
-
-  /* Setting default dimensions for output port 1 */
-  portDimsInfo.width = OUTPUT_1_NUM_ELEMS;
-  dims[0] = OUTPUT_1_NUM_ELEMS;
-  dims[1] = 1;
-  portDimsInfo.numDims = 2;
-  if (ssGetOutputPortNumDimensions(S, 1) == (-1)) {
-    ssSetOutputPortDimensionInfo(S, 1, &portDimsInfo);
   }
 
   return;
@@ -686,10 +639,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real_T *Ia_medido = (real_T *) ssGetInputPortRealSignal(S, 7);
   const real_T *Ib_medido = (real_T *) ssGetInputPortRealSignal(S, 8);
   const real_T *Nr = (real_T *) ssGetInputPortRealSignal(S, 9);
-  real_T *x_pred_out = (real_T *) ssGetOutputPortRealSignal(S, 0);
-  real_T *x_corr_out = (real_T *) ssGetOutputPortRealSignal(S, 1);
+  real_T *x_corr_out = (real_T *) ssGetOutputPortRealSignal(S, 0);
   ekf_6steps_Outputs_wrapper(Va, Vb, R, L, Kt, J, Ts, Ia_medido, Ib_medido, Nr,
-    x_pred_out, x_corr_out);
+    x_corr_out);
 }
 
 /* Function: mdlTerminate =====================================================

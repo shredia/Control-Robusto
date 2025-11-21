@@ -29,7 +29,6 @@
 #define u_8_width 1
 #define u_9_width 1
 #define y_width 5
-#define y_1_width 5
 
 /*
  * Create external references here.  
@@ -52,7 +51,7 @@ static inline double wrap_2pi(double angle) {
 
 #define N 5
 
-void matmul5x5(double A[N][N], double B[N][N], double C[N][N]) {
+static void matmul5x5(double A[N][N], double B[N][N], double C[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             double sum = 0.0;
@@ -63,7 +62,7 @@ void matmul5x5(double A[N][N], double B[N][N], double C[N][N]) {
         }
     }
 }
-void transpose5x5(double A[N][N], double AT[N][N]) {
+static void transpose5x5(double A[N][N], double AT[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             AT[j][i] = A[i][j];
@@ -71,7 +70,7 @@ void transpose5x5(double A[N][N], double AT[N][N]) {
     }
 }
 
-void matmul_f64(const double *A,
+static void matmul_f64(const double *A,
                 const double *B,
                 double *C,
                 int m, int n, int p) //usamos las matrices C = A*B, A: mxn B:nxp C:mxp
@@ -134,17 +133,17 @@ static double CkT[5][2] = {
 };
 
 static double Qk[5][5] = {
-    {  5e-4,  0.0,  0.0,  0.0,  0.0 },
-    {  0.0,  5e-4,  0.0,  0.0,  0.0 },
+    {  1e-4,  0.0,  0.0,  0.0,  0.0 },
+    {  0.0,  1e-4,  0.0,  0.0,  0.0 },
     {  0.0,  0.0,  1e-6,  0.0,  0.0 },
     {  0.0,  0.0,  0.0,  1e-10,  0.0 },
-    {  0.0,  0.0,  0.0,  0.0,  1e-6 }
+    {  0.0,  0.0,  0.0,  0.0,  1e-10 }
 };
 
 //Covarianza del sensor, confiabilidad del sensor +- ,etc
 static double sum_v[2][2] = { 
-    { 1e-4, 0.0},
-    { 0.0, 1e-4}
+    { 5e-4, 0.0},
+    { 0.0, 5e-4}
 };
    
 static double B = 0.0005;
@@ -174,11 +173,11 @@ int i, j;   // <-- DECLARAR AQUÍ
         }
     }
 
-    sum_more[0][0] = 1e-2;
-    sum_more[1][1] = 1e-2;
-    sum_more[2][2] = 1e-1;
-    sum_more[3][3] = 5.0;
-    sum_more[4][4] = 1.0;
+    sum_more[0][0] = 1e-4;
+    sum_more[1][1] = 1e-4;
+    sum_more[2][2] = 1e-2;
+    sum_more[3][3] = 1e-6;
+    sum_more[4][4] = 1e-6;
 
     // x_hat_less debe iniciar igual que x_hat_more
     for (i = 0; i < 5; i++) {
@@ -200,7 +199,6 @@ void ekf_6steps_Outputs_wrapper(const real_T *Va,
 			const real_T *Ia_medido,
 			const real_T *Ib_medido,
 			const real_T *Nr,
-			real_T *x_pred_out,
 			real_T *x_corr_out)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
@@ -226,15 +224,11 @@ x_hat_less[0] = x_hat_more[0] + (*Ts)*x_dot_hat_less[0];
 x_hat_less[1] = x_hat_more[1] + (*Ts)*x_dot_hat_less[1];
 x_hat_less[2] = x_hat_more[2] + (*Ts)*x_dot_hat_less[2];
 x_hat_less[3] = x_hat_more[3] + (*Ts)*x_dot_hat_less[3];
+x_hat_less[3] = wrap_2pi(x_hat_less[3]);
 x_hat_less[4] = x_hat_more[4] + (*Ts)*x_dot_hat_less[4];
 
 
-     //Salida corregida
-       x_pred_out[0] = x_hat_less[0];
-       x_pred_out[1] = x_hat_less[1];
-       x_pred_out[2] = x_hat_less[2];
-       x_pred_out[3] = x_hat_less[3];
-       x_pred_out[4] = x_hat_less[4];
+  
 // === 1B: Jacobiano ===
     //calculamos jacobiano en función de los estados 
     //x_niato_less (k) = x(k) - x_hat_less(k)
@@ -350,6 +344,7 @@ if (delta_theta < -0.005) delta_theta = -0.005;
     x_hat_more[1] = x_hat_less[1] + temp_6[1][0];
     x_hat_more[2] = x_hat_less[2] + temp_6[2][0];
     x_hat_more[3] = x_hat_less[3] + temp_6[3][0];
+    x_hat_more[3] = wrap_2pi(x_hat_more[3]);
     x_hat_more[4] = x_hat_less[4] + temp_6[4][0];   
     
     //Salida corregida

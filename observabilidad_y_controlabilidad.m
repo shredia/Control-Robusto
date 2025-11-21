@@ -5,11 +5,10 @@ syms R L Kt Va Vb Ia Ib We Wm Tx J Th_m Nr B % Variables simbólicas
 % --- Ecuaciones del sistema ---
 f1 = (Va - R*Ia + Kt*Wm*sin(Nr*Th_m))/L;                % d(Id)/dt
 f2 = (Vb - R*Ib - Kt*Wm*cos(Nr*Th_m))/L;        % d(Iq)/dt
-f3 = (Kt*(Ib*cos(Nr*Th_m)-Ia*sin(Nr*Th_m)) -B*Wm - Tx)/J;                         % d(Wm)/dt
-f4 = Wm;                                     % d(Th)/dt  (si se usa velocidad eléctrica)
-f5 = 0;                                      % d(Tx)/dt (constante o perturbación lenta)
-f = [f1; f2; f3; f4; f5];                    % Vector de funciones
-x = [Ia; Ib; Wm; Th_m; Tx];                    % Vector de estados
+f3 = (Kt*(Ib*cos(Nr*Th_m)-Ia*sin(Nr*Th_m)) -B*Wm - Tx   )/J;                         % d(Wm)/dt
+f4 = Wm;                                     % d(Th)/dt  (si se usa velocidad eléctrica)                                     % d(Tx)/dt (constante o perturbación lenta)
+f = [f1; f2; f3; f4];                    % Vector de funciones
+x = [Ia; Ib; Wm; Th_m];                    % Vector de estados
 u = [Va; Vb];                                % Vector de entradas
 
 % --- Jacobianos ---
@@ -17,8 +16,8 @@ A = jacobian(f, x);  % Matriz A = ∂f/∂x
 B = jacobian(f, u);  % Matriz B = ∂f/∂u
 
 % --- Matriz de observación (por ejemplo, medición de Id e Iq) ---
-C = [1 0 0 0 0;
-     0 1 0 0 0];
+C = [1 0 0 0 ;
+     0 1 0 0 ];
 
 D = zeros(2,2);
 

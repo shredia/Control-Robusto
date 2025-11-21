@@ -1,0 +1,8 @@
+﻿-I"D:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto"
+-I"D:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Simulacion_stepper_grt_rtw"
+-I"C:\Program Files\MATLAB\R2024a\extern\include"
+-I"C:\Program Files\MATLAB\R2024a\simulink\include"
+-I"C:\Program Files\MATLAB\R2024a\rtw\c\src"
+-I"C:\Program Files\MATLAB\R2024a\rtw\c\src\ext_mode\common"
+-I"C:\Program Files\MATLAB\R2024a\toolbox\physmod\powersys\facts\facts"
+-I"C:\Program Files\MATLAB\R2024a\toolbox\physmod\powersys\DR\DR"
