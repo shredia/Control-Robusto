@@ -148,7 +148,7 @@ static double Wcov[N];//covarianza
 void SPKF_Start_wrapper(void)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
-double alpha = 1e-4;
+    double alpha = 1e-4;
     double beta  = 2.0;
     double kappa = 1.0;
 

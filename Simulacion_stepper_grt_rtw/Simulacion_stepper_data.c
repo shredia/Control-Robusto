@@ -7,9 +7,9 @@
  *
  * Code generation for model "Simulacion_stepper".
  *
- * Model version              : 1.34
+ * Model version              : 1.44
  * Simulink Coder version : 24.1 (R2024a) 19-Nov-2023
- * C source code generated on : Wed Nov 19 16:44:22 2025
+ * C source code generated on : Mon Nov 24 00:43:23 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -23,54 +23,54 @@
 /* Block parameters (default storage) */
 P_Simulacion_stepper_T Simulacion_stepper_P = {
   /* Variable: B
-   * Referenced by: '<S17>/Constant'
+   * Referenced by:
+   *   '<S22>/Constant'
+   *   '<S23>/Constant'
+   *   '<S23>/Constant25'
    */
   0.0005,
 
   /* Variable: J
    * Referenced by:
-   *   '<S18>/Constant15'
-   *   '<S18>/Constant3'
-   *   '<S18>/Constant9'
+   *   '<S23>/Constant22'
+   *   '<S23>/Constant29'
    */
   4.7E-6,
 
   /* Variable: Ki_corriente
-   * Referenced by: '<S17>/Constant3'
+   * Referenced by: '<S22>/Constant3'
    */
   192666.66666666663,
 
   /* Variable: Ki_w
-   * Referenced by: '<S17>/Constant11'
+   * Referenced by: '<S22>/Constant11'
    */
   182936.02693602687,
 
   /* Variable: Kp_corriente
-   * Referenced by: '<S17>/Constant2'
+   * Referenced by: '<S22>/Constant2'
    */
   44.675999999999995,
 
   /* Variable: Kp_w
-   * Referenced by: '<S17>/Constant1'
+   * Referenced by: '<S22>/Constant1'
    */
   2.2823959595959589,
 
   /* Variable: Kt
    * Referenced by:
-   *   '<S17>/Constant10'
-   *   '<S18>/Constant14'
-   *   '<S18>/Constant2'
-   *   '<S18>/Constant8'
+   *   '<S22>/Constant10'
+   *   '<S23>/Constant20'
+   *   '<S23>/Constant27'
    */
   0.33,
 
   /* Variable: L
    * Referenced by:
-   *   '<S17>/Constant8'
-   *   '<S17>/Constant9'
-   *   '<S18>/Constant1'
-   *   '<S18>/Constant13'
-   *   '<S18>/Constant7'
+   *   '<S22>/Constant8'
+   *   '<S22>/Constant9'
+   *   '<S23>/Constant23'
+   *   '<S23>/Constant30'
    */
   0.006,
 
@@ -80,19 +80,17 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
    *   '<Root>/Gain3'
    *   '<Root>/Gain6'
    *   '<Root>/Gain7'
-   *   '<Root>/Gain9'
-   *   '<S18>/Constant11'
-   *   '<S18>/Constant17'
-   *   '<S18>/Constant5'
+   *   '<Root>/Gain8'
+   *   '<S23>/Constant24'
+   *   '<S23>/Constant31'
    */
   50.0,
 
   /* Variable: R
    * Referenced by:
-   *   '<S17>/Constant7'
-   *   '<S18>/Constant12'
-   *   '<S18>/Constant18'
-   *   '<S18>/Constant6'
+   *   '<S22>/Constant7'
+   *   '<S23>/Constant21'
+   *   '<S23>/Constant28'
    */
   3.4,
 
@@ -105,84 +103,78 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
    * Referenced by:
    *   '<Root>/Gain'
    *   '<Root>/Gain1'
-   *   '<S17>/Constant6'
-   *   '<S24>/DC'
-   *   '<S25>/DC'
+   *   '<S22>/Constant6'
+   *   '<S29>/DC'
+   *   '<S30>/DC'
    */
   24.0,
 
   /* Variable: sample_time
    * Referenced by:
-   *   '<S17>/Constant5'
-   *   '<S18>/Constant10'
-   *   '<S18>/Constant16'
-   *   '<S18>/Constant4'
+   *   '<S22>/Constant5'
+   *   '<S23>/Constant19'
+   *   '<S23>/Constant26'
    */
   5.0E-6,
 
-  /* Computed Parameter: X_SPKF_Y0
-   * Referenced by: '<S18>/X_SPKF'
+  /* Computed Parameter: ekf_4var1_Y0
+   * Referenced by: '<S23>/ekf_4var1'
    */
   0.0,
 
   /* Computed Parameter: ekf_5var_Y0
-   * Referenced by: '<S18>/ekf_5var'
-   */
-  0.0,
-
-  /* Computed Parameter: ekf_4var_Y0
-   * Referenced by: '<S18>/ekf_4var'
+   * Referenced by: '<S23>/ekf_5var'
    */
   0.0,
 
   /* Computed Parameter: Out1_Y0
-   * Referenced by: '<S17>/Out1'
+   * Referenced by: '<S22>/Out1'
    */
   0.0,
 
   /* Computed Parameter: Out2_Y0
-   * Referenced by: '<S17>/Out2'
+   * Referenced by: '<S22>/Out2'
    */
   0.0,
 
   /* Computed Parameter: Out3_Y0
-   * Referenced by: '<S17>/Out3'
+   * Referenced by: '<S22>/Out3'
    */
   0.0,
 
   /* Computed Parameter: Out4_Y0
-   * Referenced by: '<S17>/Out4'
+   * Referenced by: '<S22>/Out4'
    */
   0.0,
 
   /* Computed Parameter: Out5_Y0
-   * Referenced by: '<S17>/Out5'
+   * Referenced by: '<S22>/Out5'
    */
   0.0,
 
   /* Expression: 0
-   * Referenced by: '<S17>/Constant4'
+   * Referenced by: '<S22>/Constant4'
    */
   0.0,
 
   /* Expression: zeros(16,1)
-   * Referenced by: '<S91>/SwitchCurrents'
+   * Referenced by: '<S99>/SwitchCurrents'
    */
   { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
     0.0 },
 
   /* Computed Parameter: DiscreteTimeIntegrator_gainval
-   * Referenced by: '<S85>/Discrete-Time Integrator'
+   * Referenced by: '<S90>/Discrete-Time Integrator'
    */
   5.0E-6,
 
   /* Expression: 0
-   * Referenced by: '<S85>/Discrete-Time Integrator'
+   * Referenced by: '<S90>/Discrete-Time Integrator'
    */
   0.0,
 
   /* Expression: S.D
-   * Referenced by: '<S89>/State-Space'
+   * Referenced by: '<S97>/State-Space'
    */
   { -50000.0, 0.0, 50000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 50000.0, 0.0, -50000.0, 0.0,
     0.0, 0.0, 0.0, 0.0, 50000.0, 0.0, 50000.0, 0.0, 0.0, 0.0, 0.0, -50000.0, 0.0,
@@ -223,7 +215,7 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
     0.0, 0.0 },
 
   /* Expression: 1
-   * Referenced by: '<S82>/eliminate warning with bus selector'
+   * Referenced by: '<S87>/eliminate warning with bus selector'
    */
   1.0,
 
@@ -243,29 +235,29 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
   30.0,
 
   /* Computed Parameter: DiscreteTimeIntegrator1_gainval
-   * Referenced by: '<S84>/Discrete-Time Integrator1'
+   * Referenced by: '<S89>/Discrete-Time Integrator1'
    */
   5.0E-6,
 
   /* Expression: w0
-   * Referenced by: '<S84>/Discrete-Time Integrator1'
+   * Referenced by: '<S89>/Discrete-Time Integrator1'
    */
   0.0,
 
   /* Computed Parameter: DiscreteTimeIntegrator_gainva_k
-   * Referenced by: '<S84>/Discrete-Time Integrator'
+   * Referenced by: '<S89>/Discrete-Time Integrator'
    */
   5.0E-6,
 
   /* Expression: SM.theta0
-   * Referenced by: '<S84>/Discrete-Time Integrator'
+   * Referenced by: '<S89>/Discrete-Time Integrator'
    */
   0.0,
 
-  /* Expression: 0
+  /* Expression: 250/1000
    * Referenced by: '<Root>/Constant'
    */
-  0.0,
+  0.25,
 
   /* Expression: 4
    * Referenced by: '<Root>/Gain5'
@@ -278,32 +270,32 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
   0.0,
 
   /* Expression: sps.Delay
-   * Referenced by: '<S86>/Constant3'
+   * Referenced by: '<S91>/Constant3'
    */
   0.0,
 
   /* Expression: sps.Period
-   * Referenced by: '<S86>/Constant1'
+   * Referenced by: '<S91>/Constant1'
    */
   5.0E-5,
 
   /* Expression: sps.Freq
-   * Referenced by: '<S86>/1\ib1'
+   * Referenced by: '<S91>/1\ib1'
    */
   20000.0,
 
   /* Expression: [0 2 0]
-   * Referenced by: '<S86>/1-D Lookup Table'
+   * Referenced by: '<S91>/1-D Lookup Table'
    */
   { 0.0, 2.0, 0.0 },
 
   /* Expression: [0 .5 1]
-   * Referenced by: '<S86>/1-D Lookup Table'
+   * Referenced by: '<S91>/1-D Lookup Table'
    */
   { 0.0, 0.5, 1.0 },
 
   /* Expression: 1
-   * Referenced by: '<S86>/Constant2'
+   * Referenced by: '<S91>/Constant2'
    */
   1.0,
 
@@ -312,83 +304,68 @@ P_Simulacion_stepper_T Simulacion_stepper_P = {
    */
   0.0,
 
-  /* Expression: 2*pi
-   * Referenced by: '<Root>/Constant6'
-   */
-  6.2831853071795862,
-
-  /* Expression: 2*pi
+  /* Expression: 24
    * Referenced by: '<Root>/Constant1'
    */
-  6.2831853071795862,
-
-  /* Expression: 2*pi
-   * Referenced by: '<Root>/Constant2'
-   */
-  6.2831853071795862,
-
-  /* Expression: 2*pi
-   * Referenced by: '<Root>/Constant3'
-   */
-  6.2831853071795862,
+  24.0,
 
   /* Expression: SM.p
-   * Referenced by: '<S83>/p'
+   * Referenced by: '<S88>/p'
    */
   50.0,
 
   /* Expression: [0  -pi/2]
-   * Referenced by: '<S82>/Constant'
+   * Referenced by: '<S87>/Constant'
    */
   { 0.0, -1.5707963267948966 },
 
   /* Expression: 2*pi
-   * Referenced by: '<S83>/Constant1'
+   * Referenced by: '<S88>/Constant1'
    */
   6.2831853071795862,
 
   /* Expression: -SM.p*Psim
-   * Referenced by: '<S83>/pxPsim'
+   * Referenced by: '<S88>/pxPsim'
    */
   -0.33,
 
   /* Expression: 4
-   * Referenced by: '<S83>/2'
+   * Referenced by: '<S88>/2'
    */
   4.0,
 
   /* Expression: -Tdm
-   * Referenced by: '<S85>/Tdm'
+   * Referenced by: '<S90>/Tdm'
    */
   -0.0,
 
   /* Expression: B
-   * Referenced by: '<S84>/B'
+   * Referenced by: '<S89>/B'
    */
   0.0005,
 
   /* Expression: 1/J
-   * Referenced by: '<S84>/1//J'
+   * Referenced by: '<S89>/1//J'
    */
   212765.95744680852,
 
   /* Expression: R
-   * Referenced by: '<S85>/R'
+   * Referenced by: '<S90>/R'
    */
   3.4,
 
   /* Expression: 1/L
-   * Referenced by: '<S85>/1//L'
+   * Referenced by: '<S90>/1//L'
    */
   166.66666666666666,
 
   /* Expression: 1
-   * Referenced by: '<S19>/do not delete this gain'
+   * Referenced by: '<S24>/do not delete this gain'
    */
   1.0,
 
   /* Expression: 1
-   * Referenced by: '<S20>/do not delete this gain'
+   * Referenced by: '<S25>/do not delete this gain'
    */
   1.0
 };

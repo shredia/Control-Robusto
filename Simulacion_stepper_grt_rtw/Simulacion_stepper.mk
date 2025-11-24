@@ -2,7 +2,7 @@
 ## Makefile generated for component 'Simulacion_stepper'. 
 ## 
 ## Makefile     : Simulacion_stepper.mk
-## Generated on : Wed Nov 19 16:44:52 2025
+## Generated on : Mon Nov 24 00:44:02 2025
 ## Final product: $(RELATIVE_PATH_TO_ANCHOR)\Simulacion_stepper.exe
 ## Product type : executable
 ## 
@@ -190,7 +190,7 @@ DEFINES = $(DEFINES_BUILD_ARGS) $(DEFINES_CUSTOM) $(DEFINES_OPTS) $(DEFINES_STAN
 ## SOURCE FILES
 ###########################################################################
 
-SRCS = $(MATLAB_ROOT)\rtw\c\src\rt_logging.c $(START_DIR)\Simulacion_stepper_grt_rtw\Simulacion_stepper.c $(START_DIR)\Simulacion_stepper_grt_rtw\Simulacion_stepper_data.c $(START_DIR)\Simulacion_stepper_grt_rtw\rtGetNaN.c $(START_DIR)\Simulacion_stepper_grt_rtw\rt_nonfinite.c $(START_DIR)\PI_dq_wrapper.c $(START_DIR)\SPKF_wrapper.c $(START_DIR)\ekf_6steps_wrapper.c $(START_DIR)\ekf_6steps_4vars_wrapper.c
+SRCS = $(MATLAB_ROOT)\rtw\c\src\rt_logging.c $(START_DIR)\Simulacion_stepper_grt_rtw\Simulacion_stepper.c $(START_DIR)\Simulacion_stepper_grt_rtw\Simulacion_stepper_data.c $(START_DIR)\Simulacion_stepper_grt_rtw\rtGetInf.c $(START_DIR)\Simulacion_stepper_grt_rtw\rtGetNaN.c $(START_DIR)\Simulacion_stepper_grt_rtw\rt_nonfinite.c $(START_DIR)\PI_dq_wrapper.c
 
 MAIN_SRC = $(MATLAB_ROOT)\rtw\c\src\common\rt_main.c
 
@@ -200,7 +200,7 @@ ALL_SRCS = $(SRCS) $(MAIN_SRC)
 ## OBJECTS
 ###########################################################################
 
-OBJS = rt_logging.obj Simulacion_stepper.obj Simulacion_stepper_data.obj rtGetNaN.obj rt_nonfinite.obj PI_dq_wrapper.obj SPKF_wrapper.obj ekf_6steps_wrapper.obj ekf_6steps_4vars_wrapper.obj
+OBJS = rt_logging.obj Simulacion_stepper.obj Simulacion_stepper_data.obj rtGetInf.obj rtGetNaN.obj rt_nonfinite.obj PI_dq_wrapper.obj
 
 MAIN_OBJ = rt_main.obj
 
@@ -449,6 +449,10 @@ Simulacion_stepper_data.obj : "$(START_DIR)\Simulacion_stepper_grt_rtw\Simulacio
 	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\Simulacion_stepper_grt_rtw\Simulacion_stepper_data.c"
 
 
+rtGetInf.obj : "$(START_DIR)\Simulacion_stepper_grt_rtw\rtGetInf.c"
+	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\Simulacion_stepper_grt_rtw\rtGetInf.c"
+
+
 rtGetNaN.obj : "$(START_DIR)\Simulacion_stepper_grt_rtw\rtGetNaN.c"
 	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\Simulacion_stepper_grt_rtw\rtGetNaN.c"
 
@@ -463,18 +467,6 @@ rt_main.obj : "$(MATLAB_ROOT)\rtw\c\src\common\rt_main.c"
 
 PI_dq_wrapper.obj : "$(START_DIR)\PI_dq_wrapper.c"
 	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\PI_dq_wrapper.c"
-
-
-SPKF_wrapper.obj : "$(START_DIR)\SPKF_wrapper.c"
-	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\SPKF_wrapper.c"
-
-
-ekf_6steps_wrapper.obj : "$(START_DIR)\ekf_6steps_wrapper.c"
-	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\ekf_6steps_wrapper.c"
-
-
-ekf_6steps_4vars_wrapper.obj : "$(START_DIR)\ekf_6steps_4vars_wrapper.c"
-	$(CC) $(CFLAGS) -Fo"$@" "$(START_DIR)\ekf_6steps_4vars_wrapper.c"
 
 
 ###########################################################################

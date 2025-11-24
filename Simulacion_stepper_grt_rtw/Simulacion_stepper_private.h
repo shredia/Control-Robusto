@@ -7,9 +7,9 @@
  *
  * Code generation for model "Simulacion_stepper".
  *
- * Model version              : 1.34
+ * Model version              : 1.44
  * Simulink Coder version : 24.1 (R2024a) 19-Nov-2023
- * C source code generated on : Wed Nov 19 16:44:22 2025
+ * C source code generated on : Mon Nov 24 00:43:23 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -23,8 +23,8 @@
 #include "rtwtypes.h"
 #include "builtin_typeid_types.h"
 #include "multiword_types.h"
-#include "Simulacion_stepper_types.h"
 #include "Simulacion_stepper.h"
+#include "Simulacion_stepper_types.h"
 #include "rtw_continuous.h"
 #include "rtw_solver.h"
 #include <math.h>
@@ -81,70 +81,6 @@
 #define SFB_EXTERN_C                   extern
 #endif
 
-SFB_EXTERN_C void ekf_6steps_Start_wrapper(void);
-SFB_EXTERN_C void ekf_6steps_Outputs_wrapper(const real_T *Va,
-  const real_T *Vb,
-  const real_T *R,
-  const real_T *L,
-  const real_T *Kt,
-  const real_T *J,
-  const real_T *Ts,
-  const real_T *Ia_medido,
-  const real_T *Ib_medido,
-  const real_T *Nr,
-  real_T *x_corr_out);
-SFB_EXTERN_C void ekf_6steps_Terminate_wrapper(void);
-
-#undef SFB_EXTERN_C
-#ifdef __cplusplus
-#define SFB_EXTERN_C                   extern "C"
-#else
-#define SFB_EXTERN_C                   extern
-#endif
-
-SFB_EXTERN_C void ekf_6steps_4vars_Start_wrapper(void);
-SFB_EXTERN_C void ekf_6steps_4vars_Outputs_wrapper(const real_T *Va,
-  const real_T *Vb,
-  const real_T *R,
-  const real_T *L,
-  const real_T *Kt,
-  const real_T *J,
-  const real_T *Ts,
-  const real_T *Ia_medido,
-  const real_T *Ib_medido,
-  const real_T *Nr,
-  real_T *x_corr_out);
-SFB_EXTERN_C void ekf_6steps_4vars_Terminate_wrapper(void);
-
-#undef SFB_EXTERN_C
-#ifdef __cplusplus
-#define SFB_EXTERN_C                   extern "C"
-#else
-#define SFB_EXTERN_C                   extern
-#endif
-
-SFB_EXTERN_C void SPKF_Start_wrapper(void);
-SFB_EXTERN_C void SPKF_Outputs_wrapper(const real_T *Va,
-  const real_T *Vb,
-  const real_T *R,
-  const real_T *L,
-  const real_T *Kt,
-  const real_T *J,
-  const real_T *Ts,
-  const real_T *Ia_medido,
-  const real_T *Ib_medido,
-  const real_T *Nr,
-  real_T *x,
-  real_T *x_aux);
-SFB_EXTERN_C void SPKF_Terminate_wrapper(void);
-
-#undef SFB_EXTERN_C
-#ifdef __cplusplus
-#define SFB_EXTERN_C                   extern "C"
-#else
-#define SFB_EXTERN_C                   extern
-#endif
-
 SFB_EXTERN_C void PI_dq_Start_wrapper(void);
 SFB_EXTERN_C void PI_dq_Outputs_wrapper(const real_T *Ia,
   const real_T *Ib,
@@ -177,5 +113,10 @@ extern real_T rt_remd_snf(real_T u0, real_T u1);
 extern real_T rt_modd_snf(real_T u0, real_T u1);
 extern real_T look1_pbinlxmpw(real_T u0, const real_T bp0[], const real_T table[],
   uint32_T prevIndex[], uint32_T maxIndex);
+extern int32_T div_nde_s32_floor(int32_T numerator, int32_T denominator);
+extern void Simulacion_stepp_MATLABFunction(real_T rtu_u,
+  B_MATLABFunction_Simulacion_s_T *localB);
+extern void Simulacion_step_MATLABFunction1(real_T rtu_u,
+  B_MATLABFunction1_Simulacion__T *localB);
 
 #endif                                 /* Simulacion_stepper_private_h_ */

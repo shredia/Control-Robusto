@@ -1,5 +1,5 @@
 /*
- * rtGetNaN.c
+ * rtGetInf.h
  *
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
@@ -18,17 +18,14 @@
  * Validation result: Not run
  */
 
+#ifndef rtGetInf_h_
+#define rtGetInf_h_
+#include "rt_nonfinite.h"
 #include "rtwtypes.h"
-#include "rtGetNaN.h"
 
-/* Return rtNaN needed by the generated code. */
-real_T rtGetNaN(void)
-{
-  return rtNaN;
-}
+extern real_T rtGetInf(void);
+extern real32_T rtGetInfF(void);
+extern real_T rtGetMinusInf(void);
+extern real32_T rtGetMinusInfF(void);
 
-/* Return rtNaNF needed by the generated code. */
-real32_T rtGetNaNF(void)
-{
-  return rtNaNF;
-}
+#endif                                 /* rtGetInf_h_ */
