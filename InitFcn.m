@@ -14,7 +14,7 @@ N_teeths = N_steps/N_phases; %%Cantidad de dientes del rotor
 P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1; %%Corriente nominal del torque 
-Tdm = 0;%%18/1000;%%Torque para que no se mueva el rotor
+Tdm = 17/1000;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  330/1000; %%Torque máximo para mantener la posición
 Psi = Thold/(P*I_nom);
 Kt = P*Psi;
