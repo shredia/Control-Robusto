@@ -1,0 +1,8 @@
+﻿rt_logging.obj
+Simulacion_stepper.obj
+Simulacion_stepper_data.obj
+rtGetInf.obj
+rtGetNaN.obj
+rt_nonfinite.obj
+rt_main.obj
+PI_dq_wrapper.obj
