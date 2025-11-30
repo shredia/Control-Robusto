@@ -24,7 +24,8 @@ static double ek2_d=0, ek1_d=0, ek_d=0; /*errores corriente d */
 static double ek2_q=0, ek1_q=0, ek_q=0; /*errores corriente q */
 static double ek2_w=0, ek1_w=0, ek_w=0; /*errores velocidad */
 static double ud=0, uq=0;               /*Salidas voltaje */
-
+static double k = 0.557;
+static double u_w;
 /* ==== UTILS ==== */
 static double clamp(double v, double vmin, double vmax){
     if(v<vmin) return vmin;
@@ -50,6 +51,7 @@ static double clamp(double v, double vmin, double vmax){
 #define u_15_width 1
 #define u_16_width 1
 #define u_17_width 1
+#define u_18_width 1
 #define y_width 1
 #define y_1_width 1
 #define y_2_width 1
@@ -76,6 +78,7 @@ ek2_d = ek1_d = ek_d = 0.0;
     ek2_w = ek1_w = ek_w = 0.0;
     ud = 0.0;
     uq = 0.0;
+    u_w = 0.0;
 /* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
 }
 /*
@@ -100,6 +103,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 			const real_T *Ki_wm,
 			const real_T *Tl_Tdm,
 			const real_T *B,
+			const real_T *Kt_ext,
 			real_T *Ud,
 			real_T *Uq,
 			real_T *Id,
@@ -115,20 +119,23 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
     
     const double T   = sample_time_ext[0];
     const double Vdc = Vdc_ext[0];
+    const double Vmax = k*Vdc;
     const double Imax = 1.0; /* 1 A por fase */
-    const double Wm_max = 80;
+    const double Wm_max = 74;
 
     /* parámetros Kp,Kd y Ki ára corriente y velocidad */
      const double Kp_c  = Kp_current[0];
      const double Ki_c = Ki_current[0];
      const double Kp_w  = Kp_wm[0];
      const double Ki_w = Ki_wm[0];
+    
     /* Parámetros del motor */
 
     const double R   = R_ext[0];
     const double Ld  = Ld_ext[0];
     const double Lq  = Lq_ext[0];
     const double Ke  = Ke_ext[0];
+    const double Kt = Kt_ext[0];
 
     /* Lecturas de variables*/
      const double Wm  = Wm_ext[0];
@@ -147,7 +154,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         
     /*  Aplicamos Desacople de velocidad mecánica */
 
-     const double Iq_ff = (1.0/Ke)*(Tl_Tdm[0] + B[0]*wdr);
+     const double Iq_ff = (1.0/Kt)*(Tl_Tdm[0] + B[0]*wdr);
      
 
     /*  Aplicamos errores PID discretos*/
@@ -155,8 +162,9 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
      /*K1 y K2 de Wm */
     const double k1_w = (Kp_w*T) + (Ki_w*T*T);
     const double k2_w = -(Kp_w*T);
-    double Iq_ref = (1.0/T)*((k1_w*ek_w + k2_w*ek1_w));
-    Iq_ref = Iq_ref - Iq_ff;
+    double du_w = (1.0/T)*((k1_w*ek_w + k2_w*ek1_w));
+    u_w = u_w+du_w;
+    double Iq_ref = u_w - Iq_ff;
     const double Id_ref = 0;
 
 
@@ -200,13 +208,13 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
         /* uq_ff = R*iq + we*Ld*id + we*Ke */
         {
 
-            const double p = 25;
+            const double p = 50;
             const double We = Wm*p;
             const double ud_ff = R*Id[0] -We*Lq*Iq[0];
             const double uq_ff = R*Iq[0] + We*(Id[0]*Ld +Ke);
             /*const double ud_ff = - p*Wm*Lq*Iq[0];
             const double uq_ff = + (p*Wm*Ld*Id[0] + p*Wm*Ke); */
-            /*onst double ud_ff = 0;
+            /*const double ud_ff = 0;
             const double uq_ff = 0;*/
 
             /* Salida total a evaluar/saturar */
@@ -215,14 +223,14 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 
             /* Anti-windup incremental (clamping) decide con salida TOTAL */
             /* Si saturaría y el incremento del PI empuja hacia fuera, no integres */
-            if (!((ud_tot_trial >  Vdc && (ud_ctrl_trial - ud) > 0.0) ||
-                  (ud_tot_trial < -Vdc && (ud_ctrl_trial - ud) < 0.0)))
+            if (!((ud_tot_trial >  Vmax && (ud_ctrl_trial - ud) > 0.0) ||
+                  (ud_tot_trial < -Vmax && (ud_ctrl_trial - ud) < 0.0)))
             {
                 ud = ud_ctrl_trial;
             }
 
-            if (!((uq_tot_trial >  Vdc && (uq_ctrl_trial - uq) > 0.0) ||
-                  (uq_tot_trial < -Vdc && (uq_ctrl_trial - uq) < 0.0)))
+            if (!((uq_tot_trial >  Vmax && (uq_ctrl_trial - uq) > 0.0) ||
+                  (uq_tot_trial < -Vmax && (uq_ctrl_trial - uq) < 0.0)))
             {
                 uq = uq_ctrl_trial;
             }
@@ -232,14 +240,14 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
             uq_tot_trial = uq + uq_ff;
 
             /* Saturación por eje */
-            ud_tot_trial = clamp(ud_tot_trial, -Vdc, Vdc);
-            uq_tot_trial = clamp(uq_tot_trial, -Vdc, Vdc);
+            ud_tot_trial = clamp(ud_tot_trial, -Vmax, Vmax);
+            uq_tot_trial = clamp(uq_tot_trial, -Vmax, Vmax);
 
-            /* Saturación vectorial: ||U|| <= Vdc */
+            /* Saturación vectorial: ||U|| <= k*Vdc */
             {
                 double Umag = sqrt(ud_tot_trial*ud_tot_trial + uq_tot_trial*uq_tot_trial);
-                if (Umag > Vdc && Umag > 0.0){
-                    double s = Vdc/Umag;
+                if (Umag > Vmax && Umag > 0.0){
+                    double s = Vmax/Umag;
                     ud_tot_trial *= s;
                     uq_tot_trial *= s;
                 }

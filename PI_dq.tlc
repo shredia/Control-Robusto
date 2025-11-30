@@ -1,5 +1,5 @@
 %% File : PI_dq.tlc
-%% Created : Fri Nov 07 16:56:33 2025
+%% Created : Sun Nov 30 18:04:44 2025
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -61,6 +61,7 @@
 			const %<doubleType> *Ki_wm,
 			const %<doubleType> *Tl_Tdm,
 			const %<doubleType> *B,
+			const %<doubleType> *Kt_ext,
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
@@ -101,6 +102,7 @@
 			const %<doubleType> *Ki_wm,
 			const %<doubleType> *Tl_Tdm,
 			const %<doubleType> *B,
+			const %<doubleType> *Kt_ext,
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
@@ -128,6 +130,7 @@
 			const %<doubleType> *Ki_wm,
 			const %<doubleType> *Tl_Tdm,
 			const %<doubleType> *B,
+			const %<doubleType> *Kt_ext,
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
@@ -151,6 +154,7 @@
 			Ki_wm,
 			Tl_Tdm,
 			B,
+			Kt_ext,
 			Ud,
 			Uq,
 			Id,
@@ -191,6 +195,7 @@
 			const %<doubleType> *Ki_wm,
 			const %<doubleType> *Tl_Tdm,
 			const %<doubleType> *B,
+			const %<doubleType> *Kt_ext,
 			%<doubleType> *Ud,
 			%<doubleType> *Uq,
 			%<doubleType> *Id,
@@ -245,6 +250,7 @@
   %assign pu15 = LibBlockInputSignalAddr(15, "", "", 0)
   %assign pu16 = LibBlockInputSignalAddr(16, "", "", 0)
   %assign pu17 = LibBlockInputSignalAddr(17, "", "", 0)
+  %assign pu18 = LibBlockInputSignalAddr(18, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   %assign py2 = LibBlockOutputSignalAddr(2, "", "", 0)
@@ -252,9 +258,9 @@
   %assign py4 = LibBlockOutputSignalAddr(4, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    PI_dq_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<pu17>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
+    PI_dq_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<pu17>, %<pu18>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
   %else
-    PI_dq_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<pu17>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
+    PI_dq_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<pu11>, %<pu12>, %<pu13>, %<pu14>, %<pu15>, %<pu16>, %<pu17>, %<pu18>, %<py0>, %<py1>, %<py2>, %<py3>, %<py4>);
   %endif
 
   %%

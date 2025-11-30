@@ -18,7 +18,7 @@ Tdm = 17/1000;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  330/1000; %%Torque máximo para mantener la posición
 Psi = Thold/(P*I_nom);
 Kt = P*Psi;
-
+Ke = Psi;
 
 R =  3.4; %% [Ohms]
 L = 6/1000; %% [L]
@@ -33,7 +33,7 @@ Vdc = 24;
 %%Ganancias KPI corriente
 shi_corriente = 0.707;
 tau_corriente = L/R;
-wn_corriente = 10/tau_corriente;
+wn_corriente = 20/tau_corriente;
 Kp_corriente = 2*shi_corriente*wn_corriente*L-R;
 Ki_corriente = (wn_corriente^2) * L;
 
@@ -41,7 +41,7 @@ Ki_corriente = (wn_corriente^2) * L;
 %%Ganancias KPI velocidad
 shi_w = 0.707;
 
-wn_w = wn_corriente/20;
+wn_w = wn_corriente/10;
 Kp_w = (2*shi_w*wn_w*J)/Kt;
 Ki_w = (wn_w^2)*J/Kt;
 
