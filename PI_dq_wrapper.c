@@ -24,7 +24,7 @@ static double ek2_d=0, ek1_d=0, ek_d=0; /*errores corriente d */
 static double ek2_q=0, ek1_q=0, ek_q=0; /*errores corriente q */
 static double ek2_w=0, ek1_w=0, ek_w=0; /*errores velocidad */
 static double ud=0, uq=0;               /*Salidas voltaje */
-static double k = 0.557;
+
 static double u_w;
 /* ==== UTILS ==== */
 static double clamp(double v, double vmin, double vmax){
@@ -73,7 +73,7 @@ static double clamp(double v, double vmin, double vmax){
 void PI_dq_Start_wrapper(void)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
-ek2_d = ek1_d = ek_d = 0.0;
+    ek2_d = ek1_d = ek_d = 0.0;
     ek2_q = ek1_q = ek_q = 0.0;
     ek2_w = ek1_w = ek_w = 0.0;
     ud = 0.0;
@@ -119,7 +119,7 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
     
     const double T   = sample_time_ext[0];
     const double Vdc = Vdc_ext[0];
-    const double Vmax = k*Vdc;
+    const double Vmax = Vdc;
     const double Imax = 1.0; /* 1 A por fase */
     const double Wm_max = 74;
 
@@ -210,8 +210,8 @@ void PI_dq_Outputs_wrapper(const real_T *Ia,
 
             const double p = 50;
             const double We = Wm*p;
-            const double ud_ff = R*Id[0] -We*Lq*Iq[0];
-            const double uq_ff = R*Iq[0] + We*(Id[0]*Ld +Ke);
+            const double ud_ff =  -We*Lq*Iq[0];
+            const double uq_ff =  + We*(Id[0]*Ld +Ke);
             /*const double ud_ff = - p*Wm*Lq*Iq[0];
             const double uq_ff = + (p*Wm*Ld*Id[0] + p*Wm*Ke); */
             /*const double ud_ff = 0;

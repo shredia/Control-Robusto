@@ -2,9 +2,6 @@
 clearvars;
 clear;
 clc;
-f_carrier = 20e3;
-frecuency_simulation = 10*f_carrier;
-sample_time = 1/(frecuency_simulation);
 
 %%%Parámetros físicos del motor
 Step_angle = 1.8; %%pasos en grados del motor
@@ -22,26 +19,42 @@ Ke = Psi;
 
 R =  3.4; %% [Ohms]
 L = 6/1000; %% [L]
-B = 5/1000; %%roce
+B = 5/10000; %%roce
 J = 4.7/1000000; %%inercia del motor
 
 
 Vdc = 24;
 
+% f_carrier = 20e3;
+% frecuency_simulation = 40e3;
+fp = round(R/(2*pi*L)/10)*10 
+fbw = 500
+wd = round(fbw*2*pi/100)*100
+f_carrier = 20e3
+frecuency_simulation = 40e3
+sample_time = 1/(frecuency_simulation);
+Ts_ekf2 = 1e-3;
+
+%%Ganancias PID Id
+
+
+Kp_d = wd*L;
+Ki_d = wd*R;
 
 
 %%Ganancias KPI corriente
-shi_corriente = 0.707;
-tau_corriente = L/R;
-wn_corriente = 20/tau_corriente;
-Kp_corriente = 2*shi_corriente*wn_corriente*L-R;
-Ki_corriente = (wn_corriente^2) * L;
+
+
+Kp_q = wd*L;
+Ki_q = wd*R;
 
 
 %%Ganancias KPI velocidad
-shi_w = 0.707;
 
-wn_w = wn_corriente/10;
-Kp_w = (2*shi_w*wn_w*J)/Kt;
-Ki_w = (wn_w^2)*J/Kt;
+shi_w = 1;
+K_w = Kt/B;
+tau_w = J/B;
+wn_w = wd/10;
+Kp_w = (2*shi_w*wn_w*tau_w-1)/K_w;
+Ki_w = (wn_w^2)*tau_w/K_w;
 
