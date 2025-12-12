@@ -51,10 +51,14 @@ Ki_q = wd*R;
 
 %%Ganancias KPI velocidad
 
-shi_w = 1;
+shi_w = 0.3;
 K_w = Kt/B;
 tau_w = J/B;
-wn_w = wd/10;
-Kp_w = (2*shi_w*wn_w*tau_w-1)/K_w;
-Ki_w = (wn_w^2)*tau_w/K_w;
+wn_w = wd/10
+Kp_w = (2*shi_w*wn_w*tau_w*J)/Kt;
+Ki_w = (wn_w^2)*J/Kt;
 
+
+B0 = 3*wn_w -(B/J);
+B1 = 3*wn_w^2 -(B0*B/J);
+B2 = -(J/P)*(wn_w^3);
