@@ -16,7 +16,7 @@ Thold =  330/1000; %%Torque máximo para mantener la posición
 Psi = Thold/(P*I_nom);
 Kt = P*Psi;
 Ke = Psi;
-
+max_step_rate = 3000;
 R =  3.4; %% [Ohms]
 L = 6/1000; %% [L]
 B = 5/10000; %%roce
