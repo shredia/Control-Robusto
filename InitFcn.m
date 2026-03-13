@@ -26,9 +26,14 @@ J_internal = 4.7/1000000; %%inercia del motor
 J_external = J_internal*1;
 B_external = B_internal*1;
 %%Variables del modelo (Variables que asumo más grandes) 
-J_var = J_internal*10;
-B_var = B_internal*10;
+J_var = J_internal*3;
+B_var = B_internal*5;
 
+B_real = B_internal + B_external;
+J_real = J_internal + J_external;
+
+J_rate = J_var/J_real
+B_rate = B_var/B_real
 %%Variables de roce que desconozco
 Tc = 0.002; %%Coulomb friction
 Tba = 2.5*Tc; %%Breakwat friction
@@ -65,7 +70,7 @@ Ki_d = wd*R;
 Kp_q = wd*L;
 Ki_q = wd*R;
 
-shi_w = 1.5;
+shi_w = 4;
 wn_w = 2*pi*f_Wm
 
 Kp_w = (2*shi_w*wn_w*J_var)/Kt;

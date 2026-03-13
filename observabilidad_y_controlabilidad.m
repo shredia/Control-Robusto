@@ -5,7 +5,7 @@ syms R L Kt Va Vb Ia Ib We Wm Tl J Th_m Nr B a b Wa Wb Ke Tx Te% Variables simb√
 % --- Ecuaciones del sistema ---
 f1_1 = (Va - R*Ia + Ke*Wm*sin(Nr*Th_m))/L;                % d(Id)/dt
 f2_1 = (Vb - R*Ib - Ke*Wm*cos(Nr*Th_m))/L;        % d(Iq)/dt
-f3_1 = (Kt*(Ib*cos(Nr*Th_m)-Ia*sin(Nr*Th_m)) )/J;                         % d(Wm)/dt
+f3_1 = (Kt*(Ib*cos(Nr*Th_m)-Ia*sin(Nr*Th_m)) -Tx -B*Wm)/J;                         % d(Wm)/dt
 f4_1 = Wm; 
 
 f1_2 = (Te-Tx)/J;                % d(Id)/dt
