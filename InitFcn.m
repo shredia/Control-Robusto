@@ -1,8 +1,9 @@
-%%configuración
-clearvars;
-clear;
-clc;
+Time_simulation = 0.5;
+t_ref = [0.0];
+w_ref = [45];
 
+Wm_ref = timeseries(w_ref, t_ref);
+Wm_ref = setinterpmethod(Wm_ref,'zoh');
 %%%Parámetros físicos del motor
 Step_angle = 1.8; %%pasos en grados del motor
 N_phases = 2; %%numero de phases
@@ -26,14 +27,14 @@ J_internal = 4.7/1000000; %%inercia del motor
 J_external = J_internal*1;
 B_external = B_internal*1;
 %%Variables del modelo (Variables que asumo más grandes) 
-J_var = J_internal*3;
-B_var = B_internal*5;
+J_var = J_internal*2;
+B_var = B_internal*2;
 
 B_real = B_internal + B_external;
 J_real = J_internal + J_external;
 
-J_rate = J_var/J_real
-B_rate = B_var/B_real
+J_rate = J_var/J_real;
+B_rate = B_var/B_real;
 %%Variables de roce que desconozco
 Tc = 0.002; %%Coulomb friction
 Tba = 2.5*Tc; %%Breakwat friction
@@ -77,7 +78,7 @@ Kp_w = (2*shi_w*wn_w*J_var)/Kt;
 Ki_w = (wn_w^2)*J_var/Kt;
 
 % Si B desconocido, no uses B0,B1 con (B/J) real
-BJ_hat = 0.5;     % o una estimación
+BJ_hat = B_var/J_var;     % o una estimación
 B0 = 3*wn_w - BJ_hat;
 B1 = 3*wn_w^2 - B0*BJ_hat;
 B2 = -(J_var/P)*(wn_w^3);
