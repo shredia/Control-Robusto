@@ -1,0 +1,58 @@
+\begin{thebibliography}{1}
+
+\bibitem{ArturoRojas-Moreno2018}
+F.~S.-R.~A. Rojas-Moreno, {\em Design of a novel 3DOF clinostat to produce
+  microgravity for bioengineering applications}.
+\newblock IEEE, 2018.
+
+\bibitem{Cacayurin2023}
+C.~R.~C. Cacayurin, J.~C. L.~D. Chavez, M.~C.~G. Lansangan, C.~B. Lucas,
+  J.~J.~D. Villanueva, R.~Concepcion, R.~J. Relano, and A.~Bandala, ``An
+  engineered design of 3-axis clinostat for simulated gravity experiments in
+  astrobotany,'' in {\em 2023 IEEE 15th International Conference on Humanoid,
+  Nanotechnology, Information Technology, Communication and Control,
+  Environment, and Management, HNICEM 2023}, Institute of Electrical and
+  Electronics Engineers Inc., 2023.
+
+\bibitem{Nicola2023}
+M.~Nicola and C.~I. Nicola, ``Improvement performances of sensorless control
+  for pmsm based on foc strategy using luenberger observer, sine cosine
+  algorithm, and rl-td3 agent,'' in {\em 2023 International Conference on
+  Electromechanical and Energy Systems, SIELMEN 2023 - Proceedings}, Institute
+  of Electrical and Electronics Engineers Inc., 2023.
+
+\bibitem{Nicola2024}
+C.~I. Nicola, M.~Nicola, A.~Iacob, and C.~Pîrvu, ``Pmsm sensorless control
+  system based on dtc using flc and luenberger-pll observer,'' in {\em
+  Proceedings - 2024 IEEE 6th Global Power, Energy and Communication
+  Conference, GPECOM 2024}, pp.~138--143, Institute of Electrical and
+  Electronics Engineers Inc., 2024.
+
+\bibitem{Lascu2020}
+C.~Lascu and G.~D. Andreescu, ``Pll position and speed observer with integrated
+  current observer for sensorless pmsm drives,'' {\em IEEE Transactions on
+  Industrial Electronics}, vol.~67, pp.~5990--5999, 7 2020.
+
+\bibitem{Yu2025}
+K.~Yu, F.~Xiang, J.~Su, W.~Zhu, and S.~Li, ``Simultaneous state and
+  disturbances estimation for sensorless pmsm control: Design and
+  experiments,'' {\em IEEE Transactions on Power Electronics}, vol.~40,
+  pp.~17750--17760, 2025.
+
+\bibitem{Shan-Mao2009}
+G.~Shan-Mao, H.~Feng-You, and Z.~Hui, ``Study on extend kalman filter at low
+  speed in sensorless pmsm drives,'' in {\em Proceedings - 2009 International
+  Conference on Electronic Computer Technology, ICECT 2009}, pp.~311--316,
+  2009.
+
+\bibitem{Helsing2022}
+R.~Helsing and T.~Sanchez, ``Modeling and control of a pmsm operating in low
+  speeds,'' tech. rep., 2022.
+
+\bibitem{Wang2025}
+D.~Wang, Z.~Wang, P.~Zhang, and L.~Niu, ``Optimized nonlinear high-frequency
+  injection for sensorless pmsm in low-speed industrial servo systems,''
+  pp.~982--986, Institute of Electrical and Electronics Engineers (IEEE), 11
+  2025.
+
+\end{thebibliography}

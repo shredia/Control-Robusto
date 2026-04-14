@@ -1,0 +1,139 @@
+\chapter{Marco teórico}
+En esta sección se presenta una revisión de los conceptos fundamentales relacionados con el control de motores paso a paso, así como una descripción de las principales técnicas de control robusto que se han desarrollado para sistemas con perturbaciones no medibles. Se abordarán también los desafíos específicos que plantea el control de un clinostato accionado por motores paso a paso, y se discutirán las estrategias más adecuadas para mitigar los efectos de las perturbaciones mecánicas variables.
+
+\section{Motor Stepper}
+Desde el punto de vista del control, los motores paso a paso pueden operar mediante secuencias discretas de excitación (control por pasos) o mediante excitaciones sinusoidales de corriente (microstepping), lo que permite reducir vibraciones mecánicas y rizado de torque. En este último caso, el comportamiento del motor se aproxima al de un motor síncrono de imanes permanentes, habilitando el uso de técnicas de control avanzadas basadas en la regulación de corrientes.
+
+Una de las principales características de los motores paso a paso es su capacidad para generar un torque elevado a bajas velocidades, lo que los hace atractivos para aplicaciones de posicionamiento y movimiento lento. No obstante, su operación a lazo abierto los hace sensibles a perturbaciones mecánicas y variaciones de carga, pudiendo presentarse errores de posición y velocidad cuando las condiciones de operación se apartan de las nominales.
+
+Estas características motivan el estudio de estrategias de control que permitan mejorar el desempeño dinámico del motor, particularmente en aplicaciones donde se requiere un movimiento continuo y estable bajo perturbaciones variables, como en el caso de los clinostatos.
+
+\section{Modelado electromecánico del motor}
+Para el diseño de estrategias de control robusto, es fundamental contar con un modelo preciso del sistema. El modelo electromecánico de un motor paso a paso puede describirse mediante un conjunto de ecuaciones diferenciales que relacionan las variables eléctricas (corrientes y voltajes) con las variables mecánicas (posición, velocidad y torque). En particular, el torque generado por el motor depende de la corriente en las bobinas y de la posición angular del rotor, lo que introduce una no linealidad en el sistema. Además, la presencia de perturbaciones mecánicas variables, como las que se presentan en el clinostato debido a la geometría del sistema de poleas, añade complejidad al modelado y al diseño de controladores robustos.
+
+Una aproximación común para el modelado de motores paso a paso es utilizar un modelo de segundo orden que capture la dinámica del sistema, incluyendo la inercia del rotor, la fricción y las perturbaciones externas. Este modelo puede ser utilizado para analizar la estabilidad del sistema y diseñar controladores que sean capaces de mantener un desempeño adecuado incluso en presencia de perturbaciones no medibles.
+
+\begin{equation}
+\label{eq:modelo_motor}
+\left\{
+\begin{aligned}
+    L \frac{d i_{a}}{dt} &= V_{a} - R i_{a} - e_{a}(\theta_{e}) \\
+    L \frac{d i_{b}}{dt} &= V_{b} - R i_{b} - e_{b}(\theta_{e}) \\
+    J \frac{d \omega_{m}}{dt} &= \tau_{em} - B \omega_{m} - \tau_{dm} - \tau_{load} \\
+    \frac{d \theta_{m}}{dt} &= \omega_{m} \\
+    \theta_{e} &= \theta_{m} \cdot N_{r}
+\end{aligned}
+\right.
+\end{equation}
+
+\section{Transformada de Park y Clarke}
+La transformada de Clarke es una transformada que permite, mediante una multiplicación de matrices, transformar toda la información que hay en un sistema trifásico en un sistema bifásico. Esta transformada es bastante útil, puesto que reduce la cantidad de información redundante, y adicionalmente, la salida de esta transformada es una salida ortogonal(es decir, son dos señales separadas en 90 grados). Debido a que nuestro motor stepper es bifásico, ya desfasado 90 grados, esta transformada se descarta como una opción para el control, pero es importante conocerla, puesto que es la base de la transformada de Park, que sí se utiliza en el control de motores paso a paso.
+
+La transformada de park tiene como objetivo transformar un sistema de referencia estacionario, a un sistema de referencia rotatorio.Esto es útil, puesto que en un sistema electrico alterno, existe información redundante en una gráfica sinoidal, dónde los valores más importantes serían la frecuencia y la amplitud, pero no el valor instantáneo. Al transformar a un sistema de referencia rotatorio, se obtiene una recta si la amplitud se mantiene constante, lo que facilita el análisis y el control del sistema. Además, esta transformada permite separar la información de torque y flujo en dos componentes ortogonales, lo que es fundamental para el diseño de controladores basados en la regulación de corrientes.
+
+\begin{equation}
+    \begin{bmatrix}
+        i_d \\
+        i_q
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        \cos(\theta) & \sin(\theta) \\
+        -\sin(\theta) & \cos(\theta)
+    \end{bmatrix}
+    \begin{bmatrix}
+        i_{\alpha} \\
+        i_{\beta}
+    \end{bmatrix}
+\end{equation}
+
+Otra de las ventajas que se tiene al utilizar esta transformada, es el ahorro computacional, puesto que se calcula solo una vez las funciones de seno y coseno, y luego se utilizan para calcular las señales de control, lo que es especialmente relevante en sistemas embebidos con recursos limitados.
+
+\section{FOC en motores steppers}
+Field orient control (FOC) es una técnica de control vectorial que se utiliza para controlar motores eléctricos, incluyendo motores paso a paso. Esta técnica se basa en la idea de controlar el flujo magnético y el torque del motor de manera independiente, lo que permite obtener un desempeño dinámico superior y una mayor eficiencia energética. En el caso de los motores paso a paso, el FOC se implementa utilizando la transformada de Park para separar las corrientes en componentes de flujo y torque, lo que facilita el diseño de controladores que puedan mantener un desempeño adecuado incluso en presencia de perturbaciones mecánicas variables.
+
+Puesto que nuestro motor tiene solamente 2 fases desfasados en 90 grados,uno puede aplicar de forma inmediata la transformada de Park, y obtener una señal de control para cada fase, lo que simplifica la implementación del FOC. 
+Al aplicar la transformada de Park a las ecuaciones (\ref{eq:modelo_motor}), se obtiene un modelo en el dominio de Park que puede ser utilizado para diseñar controladores basados en la regulación de corrientes. 
+
+\begin{equation}
+    \begin{bmatrix}
+        \dot{i_d} \\
+        \dot{i_q} \\
+        \dot{\omega_{m}} \\
+        \dot{\theta_{m}}
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        (V_{d} - R I_{d})\frac{1}{L} + \omega_{m} L N_{r} I_{q} \\
+        (V_{q} - R I_{q} + K_{e}\omega_{m} )\frac{1}{L} - \omega_{m} L N_{r} I_{d} \\
+        (K_{e} I_{q} - \tau_{load} - B\omega_{m} - \tau_{dtm} )\frac{1}{J} \\
+        \omega_{m}
+    \end{bmatrix}
+\end{equation}
+
+\section{Filtro de Kalman Extendido}
+
+Dado que una de las principales restricciones del sistema es la imposibilidad de medir directamente la velocidad mecánica, resulta necesario recurrir a técnicas de estimación basadas en observadores de estado. Un observador de estados es una herramienta de control que permite reconstruir variables internas del sistema que no son directamente medibles, a partir de un conjunto limitado de mediciones disponibles y de un modelo matemático que describe la dinámica del sistema.
+
+Dentro de este enfoque, los filtros de Kalman corresponden a una clase de observadores de estado de naturaleza probabilística, los cuales permiten estimar los estados del sistema combinando la información proveniente de las mediciones disponibles, las entradas aplicadas y la predicción del modelo, considerando explícitamente la presencia de ruido y perturbaciones.
+
+Para que un observador de estados sea capaz de reconstruir adecuadamente todas las variables de interés, el sistema debe cumplir ciertas condiciones estructurales, entre ellas la observabilidad. Esta propiedad puede analizarse a través del modelo del sistema y depende del punto de operación considerado, lo que resulta particularmente relevante en sistemas no lineales o con parámetros variables, como los sistemas de accionamiento eléctrico.
+
+Para el caso específico de un motor paso a paso, la observabilidad considerando solo la lectura de variables como las corrientes y el voltaje aplicado, puede verse comprometida en ciertas regiones de operación, especialmente a bajas velocidades o en presencia de perturbaciones mecánicas variables. Esto se debe a que la dinámica del sistema puede volverse menos sensible a las variaciones de los estados internos, lo que dificulta la capacidad del observador para distinguir entre diferentes configuraciones del sistema. En estas condiciones, el diseño de un filtro de Kalman extendido (EKF) puede resultar insuficiente para garantizar una estimación precisa de la velocidad, lo que a su vez afecta el desempeño del controlador basado en esta estimación. Por esta razón, es necesario considerar estrategias adicionales que permitan mejorar la observabilidad del sistema, como la inyección de señales de alta frecuencia.
+
+\section{High Frecuency Injection}
+Este método utiliza la inyección de señales de alta frecuencia para mejorar la observabilidad del sistema, especialmente en regiones donde el modelo linealizado no es observable. La idea es introducir una señal de excitación adicional que permita generar una respuesta del sistema que sea sensible a las variaciones de los estados internos, lo que facilita la estimación de variables como la velocidad mecánica.Esta técnica no reconoce especificamente la posición del ángulo eléctrico, si no más bien, identifica el error entre la posición estimada y la posición real, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. 
+
+Lo que se implementa, es simplementa un voltaje de alta frecuencia en el eje del flujo, lo que genera una corriente de alta frecuencia que puede ser analizada para extraer información sobre la posición del rotor y la velocidad. Si se supone un angulo diferente al real, esto se verá reflejado en la corriente del eje del torque, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. Esta técnica es especialmente útil en aplicaciones donde se requiere un control preciso a bajas velocidades, como en el caso de los clinostatos, donde las perturbaciones mecánicas variables pueden afectar significativamente el desempeño del sistema.
+
+\begin{equation}
+    \begin{bmatrix}
+        V_d \\
+        V_q
+    \end{bmatrix} = 
+    \begin{bmatrix}
+         V_{dHF} \\
+        0
+    \end{bmatrix}
+\end{equation}
+
+Ya que se implementa una señal de bajo voltaje y de alta frecuencia, la respuesta será netamente una corriente de alta frecuencia,ya que el sistema mecánico no tendrá el tiempo suficiente para responder a la entrada ,lo que no afecta el desempeño del sistema, pero en caso de que el angulo estimado sea diferente al real, se verá reflejado en la corriente del eje del torque, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. Pero esta tecnica solo es posible para motores con saliencia, es decir, motores que presentan una diferencia entre la inductancia en el eje del flujo y el eje del torque, lo que permite generar una respuesta de alta frecuencia que sea sensible a las variaciones de la posición del rotor. En el caso de los motores paso a paso, esta condición se cumple debido a su construcción interna, lo que hace que esta técnica sea especialmente adecuada para mejorar la observabilidad y el desempeño del sistema de control en aplicaciones como los clinostatos.
+
+\section{Saliencia}
+La saliencia es una propiedad de los motores eléctricos que se refiere a la diferencia entre la inductancia en el eje del flujo y el eje del torque. Esta diferencia permite generar una respuesta de alta frecuencia que sea sensible a las variaciones de la posición del rotor, lo que es fundamental para la implementación de técnicas como la inyección de señales de alta frecuencia para mejorar la observabilidad del sistema. Estos valores de inductancia van cambiando según la posición del rotor, debido a la geometría interna del motor, producto de la diferencia de resistencia que se genera entre el aire y el hierro, lo que hace que la inductancia varíe en función de la posición angular del rotor. 
+Los motores paso a paso presentan una saliencia significativamente mayor que los motores PMSM, debido a que presentan una construcción interna de más dientes ó número de polos. Un PMSM típico puede presentar entre 4 a 6 pares de polos, mientras que un motor paso a paso puede presentar entre 50 a 100 pares de polos, lo que genera una diferencia significativa en la inductancia entre el eje del flujo y el eje del torque, lo que hace que esta técnica sea especialmente adecuada para mejorar la observabilidad y el desempeño del sistema de control en aplicaciones como los clinostatos. 
+
+Todos los motores presentan saliencia, pero en algunos casos esta puede ser tan baja que no se puede aprovechar para mejorar la observabilidad del sistema, lo que limita la efectividad de técnicas como la inyección de señales de alta frecuencia. Por lo mismo, sus ecuaciones se simplifican para efectos prácticos. En nuestro caso, aun que podría simplificarse el modelo asumiendo que la inductancia es constante, se decidió mantener el modelo completo para poder aprovechar la saliencia del motor y mejorar la observabilidad del sistema, lo que es especialmente relevante en aplicaciones como los clinostatos, donde las perturbaciones mecánicas variables pueden afectar significativamente el desempeño del sistema de control.
+
+Una de las ventajas de la transformada de Park, es que como la saliencia varia en función del flujo, se puede interpretar como una inductancia constante en el plano de Park, lo que simplifica el análisis y el costo computacional.
+
+\begin{equation}
+\label{eq:dinamica_electrica}
+\begin{aligned}
+    \begin{bmatrix} 
+        \dot{I}_a \\ \dot{I}_b 
+    \end{bmatrix} &= \frac{1}{\Delta_L}
+    \begin{bmatrix} 
+        L_b & -L_{ab} \\ 
+        -L_{ab} & L_a 
+    \end{bmatrix}
+    \begin{bmatrix} 
+        V_{a} - R I_a - e_a - \left( I_a \dot{L}_a + I_b \dot{L}_{ab} \right) \\ 
+        V_{b} - R I_b - e_b - \left( I_b \dot{L}_b + I_a \dot{L}_{ab} \right)
+    \end{bmatrix} \\
+    \text{donde:} \\
+    e_a &= -K_e \omega_m \sin(\theta_e) \\
+    e_b &= K_e \omega_m \cos(\theta_e)
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\label{eq:mecanica_completa}
+\left\{
+\begin{aligned}
+    T_e &= K_e (I_b \cos\theta_e - I_a \sin\theta_e) + P L_2 \left[ 2 I_a I_b \cos(2\theta_e) - (I_a^2 - I_b^2) \sin(2\theta_e) \right] \\
+    \dot{\omega}_m &= \frac{1}{J} \left( T_e - T_l - B \omega_m - T_{dm} \sin(4\theta_e) \right) \\
+    \dot{\theta}_m &= \omega_m \\
+    \theta_e &= P \cdot \theta_m
+\end{aligned}
+\right.
+\end{equation}
+%%\footnotetext{Nota: Los parámetros del EKF fueron sintonizados mediante el método de prueba y error.}

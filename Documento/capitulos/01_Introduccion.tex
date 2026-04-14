@@ -1,0 +1,100 @@
+\chapter{Introduccion general}
+Dentro de la ingeniería, en especial en el área de investigación espacial o de agricultura, es común realizar investigaciones para simular condiciones comunes del espacio exterior, las cuales son, por regla general, muy distintas a las que se pueden encontrar en nuestro planeta. Una de las condiciones que gustaría generar o explorar es la de la gravedad, la cual claramente no es posible controlar hoy en día.
+ Como alternativa, han nacido ideas como Clinostatos y RPM (Random Position Machine), las cuales pueden generar artificialmente, mediante fuerzas centrífugas, 	modificar el promedio temporal del vector de gravedad.
+
+ \section{Estado del arte}
+ \subsection{Clinostatos}
+    Las máquinas de ingravidez (o Clinostatos) son dispositivos que hacen girar sus ejes para evitar que el vector de gravedad permanezca fijo en un sistema de referencia y con ello provocar un promedio temporal de sus efectos sobre una muestra.
+
+
+Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, dependiendo del nivel de complejidad y del grado de libertad y movimiento requerido. El más común es un clinostato de 2D, puesto que, con este, se cumple con elrequisito mínimo para cubrir la región de una esfera, lo cual es la mejor figura para simular un verdadero ambiente de ingravidez~\cite{ArturoRojas-Moreno2018}.
+
+
+ Pero para poder provocar un promedio temporal cercano a 0, es necesario mantener una velocidad constante. Esta velocidad no puede ser cualquiera, dependiendo del tipo de aplicación y de estudio, lo cual puede variar desde 1  hasta 120 [RPM]~\cite{Cacayurin2023}. Este valor depende del orden de magnitud máximo al que se quiera llegar, dependiendo también del radio del centro del eje dónde gire, puesto que contra más alejado esté menor velocidad se necesitará.
+
+ \subsection{Accionamiento y dinámicas de motores eléctricos}
+
+ Para generar el movimiento de los distintos ejes en un clinostato, es necesario disponer de sistemas de accionamiento basados en motores eléctricos. La selección del tipo de motor depende de diversos factores, tales como las cargas mecánicas involucradas, las velocidades de operación, la estrategia de control requerida, los costos de implementación y la disponibilidad comercial.
+
+ En la literatura y en aplicaciones prácticas de clinostatos, los motores más comúnmente utilizados corresponden a motores de corriente continua (DC) y motores paso a paso (steppers), debido principalmente a su facilidad de integración y control. Los motores DC se caracterizan por su comportamiento continuo y por requerir estrategias de control que permitan regular su velocidad frente a variaciones de carga, lo cual suele implicar el uso de realimentación. Por su parte, los motores stepper destacan por su capacidad de generar movimiento incremental mediante la conmutación controlada de sus fases, permitiendo un control preciso del desplazamiento angular y un alto torque a bajas velocidades.
+
+ A diferencia de los motores DC, los motores stepper no operan directamente con corriente continua, sino que requieren una secuencia de excitación adecuada para generar el movimiento rotacional. Esta característica les permite asegurar desplazamientos angulares definidos a partir de una cantidad determinada de pasos eléctricos, lo que ha motivado su uso frecuente en aplicaciones donde se privilegia la simplicidad mecánica y el control del posicionamiento. Cómo desventaja, estos motores pueden presentar un mayor rizado de vibraciones mecánicas y de corriente, lo cual puede generar efectos indeseados dependiendo del caso de estudio \cite{Cacayurin2023}.
+
+ En cuanto a la transmisión del movimiento, los clinostatos pueden presentar distintas configuraciones mecánicas. En algunos diseños, cada eje cuenta con un motor instalado sobre un marco móvil que acciona un eje adicional, configuraciones que pueden repetirse para obtener sistemas de dos o tres dimensiones. En estos casos, el suministro de energía y el sensado continuo suelen realizarse mediante slip-rings o sistemas de cableado rotativo, los cuales permiten la rotación sin enredos.
+
+ Si bien estas soluciones facilitan la medición en tiempo real de variables como aceleración o gravedad mediante sensores inerciales o encoders, presentan limitaciones asociadas a mayores costos de implementación, requerimientos de mantenimiento, restricciones de velocidad y un aumento en la complejidad del sistema de cableado.
+
+ Como alternativa, se emplean sistemas de transmisión mediante poleas, los cuales permiten transferir el movimiento desde un eje fijo hacia un marco móvil a través de elementos mecánicos como correas y rodamientos, evitando la necesidad de cableado rotativo. Esta configuración posibilita la generación de movimiento rotacional en cada eje con una menor complejidad mecánica y costos reducidos.
+
+ No obstante, al prescindir del uso de slip-rings, se dificulta la incorporación de sensores mecánicos para la medición continua de variables como velocidad o posición. En consecuencia, en sistemas sometidos a condiciones de alto torque, rozamiento o cargas variables, pueden presentarse diferencias significativas entre la velocidad real del eje y la velocidad deseada, afectando el desempeño dinámico del clinostato.
+
+  \subsection{Tipos de controles}
+
+  Los esquemas de control cerrado de un motor eléctrico se basan generalmente en control PID, los cuales permiten llegar a error estacionario 0. Sin embargo, el desempeño de estos controladores dependen de  la retroalimentación de la variable a controlar y del conocimiento de los parámetros internos del motor, así como perturbaciones externas. En muchas aplicaciones, estas variables y parámetros no son medibles directamente, además de que pueden ir variando con el tiempo, por lo que su desconocimiento puede generar errores en el control de velocidad del motor.
+
+  Frente a estas limitaciones, se ha demostrado la implementación de técnicas de estimación basadas en observadores de estado, que permiten reconstruir variables del sistema, cómo la velocidad mecánica, mediante la lectura de señales eléctricas\cite{Nicola2023},\cite{Nicola2024},\cite{Lascu2020}. Adicionalmente, los observadores de perturbaciones han sido propuestos como una herramienta complementaria para estimar efectos externos no modelados explícitamente, como lo podrían ser torque variable y roce\cite{Yu2025}.
+
+  Si bien la estimación de la velocidad y del torque es relevante para el desempeño dinámico del sistema, su estimación simultánea incrementa la complejidad del esquema de control y la sensibilidad a incertidumbres del modelo. En particular, formular un estimador capaz de reconstruir un torque de carga variable, considerar parámetros mecánicos parcialmente desconocidos (por ejemplo, rozamiento) y, al mismo tiempo, lograr un control con error estacionario cercano a cero constituye un desafío, especialmente en condiciones de operación variables.
+
+  Adicionalmente, el funcionamiento de un estimador de estados necesita de información de otros estados, los cuales pueden entregar muy poca información (tal cómo la fuerza electro-motriz, la cual es proporcional a la velocidad mecánica) tanto en estado estacionario cómo en baja velocidad, comprometiendo la observabilidad del sistema\cite{Shan-Mao2009}. Una forma de resolver esto es aprovechando la saliencia de los motores híbridos que se manifiesta como una anisotropía magnética donde la inductancia de cada fase varía de forma sinusoidal según la posición angular del rotor. Esta característica es explotada por técnicas como el HFI, que permiten estimar la posición y velocidad del rotor a bajas velocidades o incluso en estado estacionario, mediante la inyección de señales de alta frecuencia y el análisis de la respuesta del sistema ~\cite{Helsing2022} \cite{Wang2025}
+
+  Se puede observar que existen métodos que implementan una mezcla de técnicas de control clásico (PID), observadores de estado y técnicas de inyección de alta frecuenca[HFI]. Por separado, estos métodos son insuficientes para resolver el problema de control de un clinostato accionado por motores stepper sin sensores mecánicos a baja velocidad, debido a las limitaciones mencionadas anteriormente. Sin embargo, la combinación de estas técnicas podría permitir mejorar el desempeño dinámico del sistema, al aprovechar las fortalezas de cada método y mitigar sus debilidades.
+
+  
+  A partir de la revisión del estado del arte, se observa que los clinostatos reportados en la literatura utilizan predominantemente configuraciones mecánicas y estrategias de control que dependen del uso de sensores mecánicos o inerciales, así como de sistemas de cableado rotativo como slip-rings, para asegurar un control continuo del movimiento de sus ejes. Por otra parte, las técnicas de control avanzadas y sensorless han sido ampliamente estudiadas en otros contextos de accionamiento eléctrico, pero su aplicación a motores paso a paso en clinostatos con configuraciones mecánicas simplificadas y perturbaciones no medidas ha sido escasamente abordada. Esta brecha motiva la necesidad de estudiar e implementar estrategias de control que permitan mejorar el comportamiento dinámico de clinostatos accionados por motores stepper, sin recurrir al uso de sensores mecánicos adicionales.
+
+  \section{Problemática}
+
+  
+En el presente trabajo se aborda el estudio de un clinostato bidimensional accionado mediante motores paso a paso y un sistema de transmisión por poleas, cuya configuración permite mantener los motores fijos y prescindir del uso de sistemas de cableado rotativo como slip-rings. Si bien esta solución simplifica la implementación mecánica y reduce los costos y requerimientos de mantenimiento, introduce desafíos relevantes desde el punto de vista del control del movimiento.
+
+Debido a la geometría del sistema de poleas, el torque resistente aplicado sobre el eje del motor no es constante, sino que varía en función de la posición angular del sistema. En particular, determinadas posiciones implican mayores esfuerzos mecánicos, mientras que otras presentan menores exigencias de torque. Esta variación de carga constituye una perturbación mecánica no medible por un sensor por la naturaleza del sistea, que afecta directamente el comportamiento dinámico del motor.
+
+Cuando se utilizan motores paso a paso operando a lazo abierto, estas perturbaciones pueden generar desviaciones significativas entre la velocidad deseada y la velocidad real del eje, además de incrementar las vibraciones mecánicas y el rizado de corriente. Estas variaciones comprometen la estabilidad del movimiento y dificultan la obtención de un régimen de giro uniforme, condición fundamental para el correcto funcionamiento de un clinostato.
+
+Adicionalmente, la ausencia de sensores mecánicos o inerciales instalados de forma permanente en los ejes impide la medición continua de variables como la velocidad o el torque de carga. Esta limitación restringe la aplicación de esquemas de control convencionales basados en realimentación directa, y obliga a enfrentar el problema del control del movimiento bajo condiciones de información parcial del sistema.
+
+En este contexto, surge la necesidad de desarrollar e implementar estrategias de control que permitan mejorar el desempeño dinámico del clinostato frente a perturbaciones mecánicas variables, manteniendo un comportamiento de velocidad estable sin recurrir al uso de sensores mecánicos adicionales.
+
+\section{Propuesta de solución}
+Con el fin de abordar la problemática descrita, se propone implementar un esquema de control en lazo cerrado orientado a mantener un comportamiento de velocidad estable en un clinostato 2D accionado por motores paso a paso, considerando la presencia de perturbaciones mecánicas variables y la ausencia de sensado mecánico continuo.
+La estrategia propuesta se basa en la integración de un controlador de corriente y velocidad con técnicas de estimación, de manera que la retroalimentación necesaria para el control no dependa de sensores mecánicos adicionales. En particular, se plantea utilizar un control orientado a campo (FOC) para gobernar las variables eléctricas del motor en un sistema de referencia dq, permitiendo regular el torque a través de la componente de corriente asociada y mejorar el comportamiento dinámico frente a variaciones de carga.
+Dado que no se dispone de medición directa de velocidad, se incorpora un observador de estados para estimar la velocidad del sistema a partir de señales eléctricas disponibles (principalmente corrientes y voltajes) y de la respuesta a la inyección de señales de alta frecuencia, garantizando observabilidad a baja velocidad. Adicionalmente, se considera la inclusión de un esquema de estimación o compensación de perturbaciones, de modo de atenuar el efecto de un torque resistente variable asociado a la transmisión por poleas y a condiciones mecánicas no modeladas explícitamente, como el rozamiento.
+Para evaluar el desempeño de la solución propuesta, se plantea comparar el comportamiento del sistema operando a lazo abierto y a lazo cerrado con estimación, analizando la capacidad 	de seguimiento de una referencia de velocidad y la respuesta frente a perturbaciones. Complementariamente, se utilizarán variables eléctricas medibles (por ejemplo, rizado de corriente y esfuerzo de control) como indicadores indirectos del desempeño dinámico del motor, permitiendo cuantificar mejoras asociadas a la estrategia implementada.
+Finalmente, la propuesta considera validar la factibilidad de la estrategia mediante simulación y una implementación experimental acotada en el prototipo de clinostato, de modo de demostrar su aplicabilidad práctica bajo las restricciones de sensado del sistema.
+
+\section{Objetivos}
+
+
+\subsection{Objetivo general}
+Implementar 	un sistema de control sin sensores basada en EKF y observadores de estado para motores stepper híbridos, con el fin de garantizar la estabilidad de una baja velocidad en un clinostato 2D frente a perturbaciones de torque no sensadas.
+
+\subsection{Objetivos especificos}
+\begin{enumerate}
+    \item Modelar el sistema electro-mecánico del motor stepper, incorporando la  dinámica relevante(saliencia) y una representación del torque resistente variable asociado a la posición correspondiente a un clinostato.
+    \item Evaluar el desempeño del clinostato operando a lazo abierto frente a perturbaciones mecánicas, mediante indicadores dinámicos y eléctricos observables.
+    \item Diseñar un esquema de control en lazo cerrado para el control de velocidad basado en FOC.
+    \item Estimar la velocidad del sistema mediante un filtro de Kalman Extendido (EKF) a partir de señales eléctricas disponibles, analizando su robustez frente a incertidumbres paramétricas.
+    \item Mitigar el efecto de perturbaciones mecánicas variables mediante la estimación y compensación por feed-forward.
+    \item Integrar una técnica de inyección de señales de alta frecuencia (HFI) para garantizar la observabilidad de la posición del rotor en régimenes de baja y nula velocidad.
+    \item Comparar el desempeño del sistema en lazo abierto y lazo cerrado sensorless utilizando métricas cuantitativas de seguimiento de velocidad y variables eléctricas indirectas.
+\end{enumerate}
+
+\subsection{Alcances}
+
+\begin{enumerate}
+    \item 	Lazo de control: Se realizará un lazo de control FOC, para el desacoplamiento de las corrientes y voltajes en los ejes d y q.
+    \item 	Estimación Sensorless: Se utilizará un filtro de Kalman extendido (EKF) para filtrar las señales y compararlas con las mediciones esperadas. Este filtro permitirá también poder visualizar variables no medibles por la naturaleza del sistema, tales como velocidad mecánica y angulo eléctrico, además de una perturbación desconocida y difícil de medir.
+    \item 	Inyección de alta frecuencia: Debido a que el EKF pierde observabilidad al estar a baja velocidad, se utilizará un HFI para estimar el ángulo eléctrico a baja y nula velocidad.
+    \item Estimación de variables de interés inclusive a baja velocidad.
+    
+\end{enumerate}
+\subsection{Limitaciones}
+
+
+\begin{enumerate}
+    \item 	Limitaciones respecto al ruido: El EKF es sensible al ruido de las señales eléctricas, lo que puede afectar la precisión de la estimación de velocidad y perturbaciones, especialmente en condiciones de operación con bajo nivel de señal o alta interferencia.
+    \item Limitaciones respecto a la modelación: El desempeño del EKF depende de la precisión del modelo del sistema, incluyendo la representación de la dinámica del motor y las perturbaciones. Cualquier discrepancia entre el modelo y el comportamiento real puede generar errores en la estimación.
+    \item Limitaciones respecto a la implementación: La implementación de un esquema de control en lazo cerrado con estimación sensorless puede requerir recursos computacionales significativos, lo que podría limitar su aplicabilidad en sistemas con restricciones de procesamiento o memoria.
+    \item Limitaciones respecto a la validación experimental: La validación de la estrategia propuesta se realizará en un prototipo de clinostato y en un motor sin clinostato, lo que podría no reflejar completamente las condiciones de operación reales del sistema final, limitando la generalización de los resultados obtenidos.
+\end{enumerate}

@@ -1,0 +1,52 @@
+\documentclass[12pt,letterpaper]{report} % 'letterpaper' es el estándar en Chile
+
+% --- Paquetes de Idioma y Fuentes ---
+\usepackage[utf8]{inputenc}   
+\usepackage[T1]{fontenc}      
+\usepackage[spanish, es-tabla]{babel} % 'es-tabla' para que diga "Tabla" y no "Cuadro"
+
+% --- Formato de Página (Márgenes sugeridos para tesis) ---
+\usepackage[left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{amsmath}
+
+% --- Gráficos y Multimedia ---
+\usepackage{graphicx}
+\graphicspath{ {./imagenes/} }
+\usepackage{caption} % Para mejores leyendas en fotos y tablas
+
+% --- Enlaces y PDF ---
+\usepackage[colorlinks=true, allcolors=black]{hyperref} % Hipervínculos en el índice
+
+% --------------------------------------------------------------------------
+% INICIO DEL DOCUMENTO
+% --------------------------------------------------------------------------
+\begin{document}
+
+% 1. Portada (Se recomienda \input para evitar saltos de página extraños)
+\input{capitulos/00_Portada}
+
+% 2. Numeración romana para preliminares (índices, agradecimientos, resumen)
+\pagenumbering{roman}
+
+%%\tableofcontents 
+\newpage
+%%\listoffigures 
+%%\newpage
+%%\listoftables
+%%\newpage
+
+% 3. Numeración arábiga para el cuerpo de la tesis
+\pagenumbering{arabic}
+
+% Capítulos (usa \include para que cada capítulo empiece en página nueva)
+\include{capitulos/01_Introduccion}
+ \include{capitulos/02_Marco_teorico}
+ %%\include{capitulos/03_Metodologia}
+
+% 4. Bibliografía
+\newpage
+\addcontentsline{toc}{chapter}{Bibliografía} % Para que aparezca en el índice
+\bibliographystyle{ieeetr}
+\bibliography{referencias.bib}
+
+\end{document}
