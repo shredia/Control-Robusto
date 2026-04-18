@@ -13,12 +13,12 @@ P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1; %%Corriente nominal del torque 
 I_max = sqrt(2*I_nom);
-Tdm = 18/1000;%%18/1000;%%Torque para que no se mueva el rotor
+Tdm = 0;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  330/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
 Psi = Kt/P;
-Ke = Kt;
+Ke = 0;
 max_step_rate = 3000;
 R =  2.5; %% [Ohms]
 L = 6/1000; %% [L]
@@ -29,6 +29,10 @@ Lq = 3.18/1000;
 L0 = 5.945/1000;
 L2 = 2.765/1000;
 
+% Ld = L;
+% Lq = Ld;
+% L2 = 0;
+% L0 = L;
 %%Propiedades del motor (variables que creo conocer)
 B_internal = 5*Thold/100; %%roce
 J_internal = 4.7/1000000; %%inercia del motor 
@@ -54,11 +58,15 @@ InitialSpeed = 0; %%rad/s
 
 
 
-Vdc = 6;
+Vdc = 12;
 
-fbw = 500;          % Hz (BW corriente)
+fbw_d = 100;          % Hz (BW corriente)
+fbw_q = 100;          % Hz (BW corriente)
+
+wd_d = 2*pi*fbw_d;      % rad/s
+wd_q = 2*pi*fbw_q;      % rad/s 
+
 fbw_Wm = 25;         % Hz (Bw Wm)
-wd  = 2*pi*fbw;      % rad/s  
 frecuency_simulation = 100e3;
 f_carrier = 20e3;
 sample_time = 1/frecuency_simulation;
@@ -75,20 +83,23 @@ Ts_current = 1/f_current;
 Ts_Wm = Ts_current;
 f_wm = 1/Ts_Wm;
 Ts_DO = Ts_Wm;
-Kp_d = wd*L;
-Ki_d = wd*R;
+Kp_d = wd_d*L;
+Ki_d = wd_d*R;
 
-Kp_q = wd*L;
-Ki_q = wd*R;
+Kp_q = wd_q*L;
+Ki_q = wd_q*R;
 
-Kp_q_salient = wd*Lq;
-Ki_q_salient = wd*R;
+shi_d = 1.2;
+shi_q = 1.2;
 
-Kp_d_salient = wd*Ld;
-Ki_d_salient = wd*R;
+Kp_q_salient = 2*shi_q*wd_q*Lq-R
+Ki_q_salient = wd_q^2*Lq
+
+Kp_d_salient = 2*shi_d*wd_d*Ld -R
+Ki_d_salient = wd_d^2*Ld
 
 shi_w = 1.5;
-wn_w = 2*pi*fbw_Wm
+wn_w = 2*pi*fbw_Wm;
 
 Kp_w = (2*shi_w*wn_w*J_var)/Kt;
 Ki_w = (wn_w^2)*J_var/Kt;
@@ -106,6 +117,27 @@ params.Lq     = Lq;
 params.P      = P;
 params.Ke     = Ke;
 params.J_real = J_internal; % Usamos el valor real para la planta
-params.B_real = B_real; % Usamos el valor real para la planta
+params.B_real = B_internal; % Usamos el valor real para la planta
 params.Kt     = Kt;
 params.Tdm = Tdm;
+% Análisis de lazo cerrado de velocidad en Matlab
+% s = tf('s');
+% G_planta = Kt / (J_real * s + B_real);
+% C_pi = Kp_w + Ki_w/s;
+% L_a = C_pi * G_planta; % Lazo abierto
+% T = feedback(L_a, 1);  % Lazo cerrado
+% 
+% figure
+% margin(L_a)
+% grid on
+% title('Bode con márgenes')
+% 
+% figure
+% step(T)
+% grid on
+% title('Respuesta al escalón')
+% 
+% figure
+% pzmap(T)
+% grid on
+% title('Mapa polo-cero')

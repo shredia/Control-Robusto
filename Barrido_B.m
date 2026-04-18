@@ -9,18 +9,18 @@ InitFcn();   % Carga parámetros base del modelo
 %% =========================
 modelName = "Simulacion_stepper";
 
-B_factors = [0.5 1 2 5 10];   % multiplicadores respecto a B_internal
+B_factors = [B_var];   % multiplicadores respecto a B_internal
 N = numel(B_factors);
 
 Fmax      = 2000;
 Kmax      = 5;
-doPlotFFT = false;   % false durante barrido, para no abrir muchas figuras
+doPlotFFT = true;   % false durante barrido, para no abrir muchas figuras
 
 t_inicial = 0.2;
 t_final   = 0.4;
 Time_simulation = 0.5;
 
-motorNames = ["M0","M1","M2"];
+motorNames = ["M2"];
 
 %% =========================
 %% Carpeta de guardado
@@ -45,7 +45,7 @@ end
 %% Referencia de velocidad
 %% =========================
 t_ref = [0.0];
-w_ref = [45];
+w_ref = [1];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
@@ -122,17 +122,17 @@ for k = 1:N
     data(k).time      = out.tout;
 
     %% ---- Guardar señales de los 3 motores ----
-    data(k).M0.Ia = out.Ia_planta_M0;
-    data(k).M0.Ib = out.Ib_planta_M0;
-    data(k).M0.We = out.We_planta_M0;
-    data(k).M0.Wm = out.Wm_planta_M0;
-    data(k).M0.Te = out.Te_planta_M0;
-
-    data(k).M1.Ia = out.Ia_planta_M1;
-    data(k).M1.Ib = out.Ib_planta_M1;
-    data(k).M1.We = out.We_planta_M1;
-    data(k).M1.Wm = out.Wm_planta_M1;
-    data(k).M1.Te = out.Te_planta_M1;
+    % data(k).M0.Ia = out.Ia_planta_M0;
+    % data(k).M0.Ib = out.Ib_planta_M0;
+    % data(k).M0.We = out.We_planta_M0;
+    % data(k).M0.Wm = out.Wm_planta_M0;
+    % data(k).M0.Te = out.Te_planta_M0;
+    % 
+    % data(k).M1.Ia = out.Ia_planta_M1;
+    % data(k).M1.Ib = out.Ib_planta_M1;
+    % data(k).M1.We = out.We_planta_M1;
+    % data(k).M1.Wm = out.Wm_planta_M1;
+    % data(k).M1.Te = out.Te_planta_M1;
 
     data(k).M2.Ia = out.Ia_planta_M2;
     data(k).M2.Ib = out.Ib_planta_M2;
