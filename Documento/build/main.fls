@@ -123,6 +123,12 @@ INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\bu
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
 OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.aux
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
@@ -167,6 +173,30 @@ INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm248
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx2488.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx1440.tfm
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr8.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr6.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi12.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi8.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi6.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy8.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\eccc1200.tfm
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lot
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lot
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lot
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lot
 INPUT .\capitulos\01_Introduccion.tex
 INPUT .\capitulos\01_Introduccion.tex
 OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\01_Introduccion.aux
@@ -180,19 +210,27 @@ OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\b
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT capitulos\02_Marco_teorico.tex
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr8.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr6.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi12.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi8.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi6.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy8.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0800.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0600.tfm
+INPUT .\capitulos\03_Metodologia.tex
+INPUT .\capitulos\03_Metodologia.tex
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT .\capitulos\03_Metodologia.tex
+INPUT .\capitulos\03_Metodologia.tex
+INPUT capitulos\03_Metodologia.tex
+INPUT .\capitulos\Anexos.tex
+INPUT .\capitulos\Anexos.tex
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
+INPUT .\capitulos\Anexos.tex
+INPUT .\capitulos\Anexos.tex
+INPUT capitulos\Anexos.tex
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
+INPUT .\imagenes\anexos\datasheet_motor.png
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
@@ -204,12 +242,22 @@ INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\bu
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\03_Metodologia.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
+INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\Anexos.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.out
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.out
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx2488.pk
@@ -222,6 +270,8 @@ INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\c
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmex10.pfb
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi6.pfb
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi6.pfb
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi8.pfb
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi8.pfb
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr12.pfb

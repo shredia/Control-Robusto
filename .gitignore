@@ -31,3 +31,6 @@ codegen/
 
 # Cloud based storage dotfile
 .MATLABDriveTag
+slprj/sim/varcache/Simulacion_stepper/varInfo.mat
+slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat
+slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat

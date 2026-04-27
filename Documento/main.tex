@@ -28,12 +28,12 @@
 % 2. Numeración romana para preliminares (índices, agradecimientos, resumen)
 \pagenumbering{roman}
 
-%%\tableofcontents 
+\tableofcontents 
 \newpage
-%%\listoffigures 
-%%\newpage
-%%\listoftables
-%%\newpage
+\listoffigures 
+\newpage
+\listoftables
+\newpage
 
 % 3. Numeración arábiga para el cuerpo de la tesis
 \pagenumbering{arabic}
@@ -41,8 +41,12 @@
 % Capítulos (usa \include para que cada capítulo empiece en página nueva)
 \include{capitulos/01_Introduccion}
  \include{capitulos/02_Marco_teorico}
- %%\include{capitulos/03_Metodologia}
+ \include{capitulos/03_Metodologia}
 
+
+ %Anexis
+ \appendix
+\include{capitulos/Anexos}
 % 4. Bibliografía
 \newpage
 \addcontentsline{toc}{chapter}{Bibliografía} % Para que aparezca en el índice

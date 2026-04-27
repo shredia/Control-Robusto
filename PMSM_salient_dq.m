@@ -106,7 +106,7 @@ function Derivatives(block)
     % Si no tienes Nr o phi_tdm, usa phi=0 y define Nr en params.
     
 
-    Tdet = p.Tdm * sin(p.P*Th_m);
+    Tdet = p.Tdm * sin(p.N_steps*Th_m + p.Phi);
 
     % =========================
     % Mecánica

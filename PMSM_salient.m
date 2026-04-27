@@ -92,7 +92,7 @@ function Derivatives(block)
     
     % --- Dinámica Mecánica ---
     % Te_total incluye reluctancia y síncrono. Sumamos Detent Torque (Tdm)
-    T_detent = p.Tdm * sin(p.P * Th_m); % Usualmente 4*P o P según el motor
+    T_detent = p.Tdm * sin(p.N_steps* Th_m + p.Phi); % Usualmente 4*P o P según el motor
     dWm = (Te - Tl - p.B_real * Wm - T_detent) / p.J_real;
     dTh = Wm;
 

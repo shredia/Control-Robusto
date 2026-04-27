@@ -1,0 +1,58 @@
+\chapter{Metodología}
+
+\section{Caracterización del motor}
+
+Para controlar un motor paso a paso, es fundamental conocer sus características eléctricas y mecánicas. En este caso, se utilizó un motor stepper bifásico modelo 17HS3401S. La información detallada del motor se encuentra en la Figura
+(\ref{fig:datasheet_motor})
+
+ A continuación, se listan los parámetros obtenidos:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Características nominales del motor paso a paso. Fuente: Datasheet del fabricante.\ref{tab:especificaciones_motor}}
+    \label{tab:especificaciones_motor}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} & \textbf{Unidad} \\ \hline
+        Voltaje nominal & $V_{nom}$ & 7.3 V & V \\ \hline
+        Corriente por fase & $I_{nom}$ & 1  & A \\ \hline
+        Resistencia de fase & $R$ & 3.4 (1 $\pm$ 15 $\%$)  & $\Omega$ \\ \hline
+        Inductancia de fase & $L$ & 6 (1 $\pm$ 20 $\%$)  & mH \\ \hline
+        Torque de mantenimiento & $\tau_{hold}$ & 330  & mN$\cdot$m \\ \hline
+        Torque de detención & $\tau_{dtm}$ & 18  & mN$\cdot$m \\ \hline
+        Inercia del rotor & $J$ & 68  & g$\cdot$cm$^2$ \\ \hline
+        Ángulo de paso & $\theta_{step}$ & 1.8  & grados \\ \hline
+        fases & $N_{phases}$ & 2 & - \\ \hline
+    \end{tabular}
+\end{table}
+
+Estas propiedades corresponden a las dadas por el fabricante, pero existen ciertas propiedades implicitas que se pueden calcular a partir de estas, como la inductancia mutua, la constante de torque, el número de pasos por revolución, entre otras. 
+
+\begin{equation}
+\label{eq:propiedades_implicitas}
+\left\{
+\begin{aligned}
+        L_0 &= \frac{L_a + L_b}{2} \\
+        L_2 &= \frac{L_a - L_b}{2} \\
+        K_e &= \frac{T_{hold}}{\sqrt{2} \cdot I_{nom}} \\
+        N_{steps} &= \frac{360}{\theta_{step}} \\
+        P &= 2 \cdot N_{phases} \\
+\end{aligned}
+\right.
+\end{equation}
+
+
+A partir de las ecuaciones descritas en (\ref{eq:propiedades_implicitas}), se obtuvieron los parámetros necesarios para la configuración del observador, los cuales se resumen en la Tabla \ref{tab:parametros_calculados}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Parámetros derivados para el modelo dinámico.}
+    \label{tab:parametros_calculados}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} & \textbf{Unidad} \\ \hline
+        Pasos por revolución & $N_{steps}$ & 200 & steps/rev \\ \hline
+        Constante de torque/fuerza & $K_e$ & 0.233 & N$\cdot$m/A \\ \hline
+        Inductancia promedio & $L_0$ & 6.0 & mH \\ \hline
+    \end{tabular}
+\end{table}

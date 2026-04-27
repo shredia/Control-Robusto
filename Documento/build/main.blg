@@ -5,6 +5,10 @@ Reallocating 'name_of_file' (item size: 1) to 30 items.
 A level-1 auxiliary file: capitulos/01_Introduccion.aux
 Reallocating 'name_of_file' (item size: 1) to 31 items.
 A level-1 auxiliary file: capitulos/02_Marco_teorico.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: capitulos/03_Metodologia.aux
+Reallocating 'name_of_file' (item size: 1) to 21 items.
+A level-1 auxiliary file: capitulos/Anexos.aux
 Reallocating 'name_of_file' (item size: 1) to 7 items.
 The style file: ieeetr.bst
 Reallocating 'name_of_file' (item size: 1) to 16 items.
@@ -13,7 +17,7 @@ Warning--empty institution in Helsing2022
 Warning--empty booktitle in Wang2025
 You've used 9 entries,
             1876 wiz_defined-function locations,
-            540 strings with 5855 characters,
+            542 strings with 5903 characters,
 and the built_in function-call counts, 2594 in all, are:
 = -- 235
 > -- 110

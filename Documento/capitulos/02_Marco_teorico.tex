@@ -27,7 +27,7 @@ Una aproximación común para el modelado de motores paso a paso es utilizar un 
 \end{equation}
 
 \section{Transformada de Park y Clarke}
-La transformada de Clarke es una transformada que permite, mediante una multiplicación de matrices, transformar toda la información que hay en un sistema trifásico en un sistema bifásico. Esta transformada es bastante útil, puesto que reduce la cantidad de información redundante, y adicionalmente, la salida de esta transformada es una salida ortogonal(es decir, son dos señales separadas en 90 grados). Debido a que nuestro motor stepper es bifásico, ya desfasado 90 grados, esta transformada se descarta como una opción para el control, pero es importante conocerla, puesto que es la base de la transformada de Park, que sí se utiliza en el control de motores paso a paso.
+La transformada de Clarke es una transformada que permite, mediante una multiplicación de matrices, transformar toda la información que hay en un sistema trifásico en un sistema bifásico. Esta transformada es bastante útil, puesto que reduce la cantidad de información redundante, y adicionalmente, la salida de esta transformada es una salida ortogonal ( es decir, son dos señales separadas en 90 grados). Debido a que nuestro motor stepper es bifásico, ya desfasado 90 grados, esta transformada se descarta como una opción para el control, pero es importante conocerla, puesto que es la base de la transformada de Park, que sí se utiliza en el control de motores paso a paso.
 
 La transformada de park tiene como objetivo transformar un sistema de referencia estacionario, a un sistema de referencia rotatorio.Esto es útil, puesto que en un sistema electrico alterno, existe información redundante en una gráfica sinoidal, dónde los valores más importantes serían la frecuencia y la amplitud, pero no el valor instantáneo. Al transformar a un sistema de referencia rotatorio, se obtiene una recta si la amplitud se mantiene constante, lo que facilita el análisis y el control del sistema. Además, esta transformada permite separar la información de torque y flujo en dos componentes ortogonales, lo que es fundamental para el diseño de controladores basados en la regulación de corrientes.
 
@@ -56,8 +56,8 @@ Al aplicar la transformada de Park a las ecuaciones (\ref{eq:modelo_motor}), se 
 
 \begin{equation}
     \begin{bmatrix}
-        \dot{i_d} \\
-        \dot{i_q} \\
+        \dot{I}_d \\
+        \dot{I}_q \\
         \dot{\omega_{m}} \\
         \dot{\theta_{m}}
     \end{bmatrix} = 
@@ -121,7 +121,10 @@ Una de las ventajas de la transformada de Park, es que como la saliencia varia e
     \end{bmatrix} \\
     \text{donde:} \\
     e_a &= -K_e \omega_m \sin(\theta_e) \\
-    e_b &= K_e \omega_m \cos(\theta_e)
+    e_b &= K_e \omega_m \cos(\theta_e) \\
+    L_a &= L_0 + L_2 \cos(2\theta_e) \\
+    L_b &= L_0 - L_2 \cos(2\theta_e) \\
+    L_{ab} &= L_2 \sin(2\theta_e) \\
 \end{aligned}
 \end{equation}
 
@@ -135,5 +138,21 @@ Una de las ventajas de la transformada de Park, es que como la saliencia varia e
     \theta_e &= P \cdot \theta_m
 \end{aligned}
 \right.
+\end{equation}
+
+Al aplicar la transformada de Park a las ecuaciones (\ref{eq:dinamica_electrica}) y (\ref{eq:mecanica_completa}), se obtiene un modelo mucho más simple, dónde las inductancias que varían en función del ángulo eléctrico, se interpretan como inductancias constantes en el plano de Park, lo que simplifica el análisis y el costo computacional.
+
+\begin{equation}
+    \label{eq: dq}
+    \begin{aligned}
+            \begin{bmatrix} 
+            \dot{I}_a \\ \dot{I}_b \\ \dot{\omega}_m \\ \dot{\theta}_m 
+    \end{bmatrix} 
+    \end{aligned}   = \begin{bmatrix} 
+        (V_{d} - R I_{d})\frac{1}{L_d} + \omega_{m} L_q I_{q} \\
+        (V_{q} - R I_{q} + K_{e}\omega_{m} )\frac{1}{L_q} - \omega_{m} L_d I_{d} \\
+        (K_{e} I_{q}- P(L_{d} - L_{q})I_{d}I_{q} - T_l - B\omega_{m} - T_{dm} \sin(4\theta_e) )\frac{1}{J} \\
+        \omega_{m}
+    \end{bmatrix}
 \end{equation}
 %%\footnotetext{Nota: Los parámetros del EKF fueron sintonizados mediante el método de prueba y error.}

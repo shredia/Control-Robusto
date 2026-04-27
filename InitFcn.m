@@ -1,4 +1,4 @@
-Time_simulation = 0.5;
+Time_simulation = 1;
 t_ref = [0.0];
 w_ref = [1];
 
@@ -13,16 +13,17 @@ P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1; %%Corriente nominal del torque 
 I_max = sqrt(2*I_nom);
-Tdm = 0;%%18/1000;%%Torque para que no se mueva el rotor
+Tdm = 18/1000;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  330/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
 Psi = Kt/P;
-Ke = 0;
+Ke = Kt;
 max_step_rate = 3000;
 R =  2.5; %% [Ohms]
 L = 6/1000; %% [L]
-
+Phi = pi/2;
+    
 %%Saliencia
 Ld = 8.71/1000;
 Lq = 3.18/1000;
@@ -34,7 +35,7 @@ L2 = 2.765/1000;
 % L2 = 0;
 % L0 = L;
 %%Propiedades del motor (variables que creo conocer)
-B_internal = 5*Thold/100; %%roce
+B_internal = 1e-4; %%roce
 J_internal = 4.7/1000000; %%inercia del motor 
 %%Propiedades de carga del motor (variables que desconozco)
 J_external = J_internal*1;
@@ -66,8 +67,8 @@ fbw_q = 100;          % Hz (BW corriente)
 wd_d = 2*pi*fbw_d;      % rad/s
 wd_q = 2*pi*fbw_q;      % rad/s 
 
-fbw_Wm = 25;         % Hz (Bw Wm)
-frecuency_simulation = 100e3;
+fbw_Wm = 5;         % Hz (Bw Wm)
+frecuency_simulation = 10e3;
 f_carrier = 20e3;
 sample_time = 1/frecuency_simulation;
 
@@ -98,7 +99,7 @@ Ki_q_salient = wd_q^2*Lq
 Kp_d_salient = 2*shi_d*wd_d*Ld -R
 Ki_d_salient = wd_d^2*Ld
 
-shi_w = 1.5;
+shi_w = 1.2;
 wn_w = 2*pi*fbw_Wm;
 
 Kp_w = (2*shi_w*wn_w*J_var)/Kt;
@@ -116,10 +117,12 @@ params.Ld     = Ld;
 params.Lq     = Lq;
 params.P      = P;
 params.Ke     = Ke;
-params.J_real = J_internal; % Usamos el valor real para la planta
-params.B_real = B_internal; % Usamos el valor real para la planta
+params.J_real = J_real; % Usamos el valor real para la planta
+params.B_real = B_real; % Usamos el valor real para la planta
 params.Kt     = Kt;
 params.Tdm = Tdm;
+params.N_steps = N_steps;
+params.Phi = Phi;
 % Análisis de lazo cerrado de velocidad en Matlab
 % s = tf('s');
 % G_planta = Kt / (J_real * s + B_real);
