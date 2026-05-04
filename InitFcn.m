@@ -1,4 +1,4 @@
-Time_simulation = 1;
+Time_simulation = 5;
 t_ref = [0.0];
 w_ref = [1];
 
@@ -61,13 +61,13 @@ InitialSpeed = 0; %%rad/s
 
 Vdc = 12;
 
-fbw_d = 100;          % Hz (BW corriente)
-fbw_q = 100;          % Hz (BW corriente)
+fbw_d = 250;          % Hz (BW corriente)
+fbw_q = 250;          % Hz (BW corriente)
 
 wd_d = 2*pi*fbw_d;      % rad/s
 wd_q = 2*pi*fbw_q;      % rad/s 
 
-fbw_Wm = 5;         % Hz (Bw Wm)
+fbw_Wm = 25;         % Hz (Bw Wm)
 frecuency_simulation = 10e3;
 f_carrier = 20e3;
 sample_time = 1/frecuency_simulation;
@@ -90,8 +90,8 @@ Ki_d = wd_d*R;
 Kp_q = wd_q*L;
 Ki_q = wd_q*R;
 
-shi_d = 1.2;
-shi_q = 1.2;
+shi_d = 0.707;
+shi_q = 0.707;
 
 Kp_q_salient = 2*shi_q*wd_q*Lq-R
 Ki_q_salient = wd_q^2*Lq
@@ -99,7 +99,7 @@ Ki_q_salient = wd_q^2*Lq
 Kp_d_salient = 2*shi_d*wd_d*Ld -R
 Ki_d_salient = wd_d^2*Ld
 
-shi_w = 1.2;
+shi_w = 0.707;
 wn_w = 2*pi*fbw_Wm;
 
 Kp_w = (2*shi_w*wn_w*J_var)/Kt;

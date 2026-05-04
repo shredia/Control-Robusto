@@ -32,8 +32,8 @@ Estas propiedades corresponden a las dadas por el fabricante, pero existen ciert
 \label{eq:propiedades_implicitas}
 \left\{
 \begin{aligned}
-        L_0 &= \frac{L_a + L_b}{2} \\
-        L_2 &= \frac{L_a - L_b}{2} \\
+        L_0 &= \frac{L_q + L_d}{2} \\
+        L_2 &= \frac{L_q - L_d}{2} \\
         K_e &= \frac{T_{hold}}{\sqrt{2} \cdot I_{nom}} \\
         N_{steps} &= \frac{360}{\theta_{step}} \\
         P &= 2 \cdot N_{phases} \\
@@ -56,3 +56,40 @@ A partir de las ecuaciones descritas en (\ref{eq:propiedades_implicitas}), se ob
         Inductancia promedio & $L_0$ & 6.0 & mH \\ \hline
     \end{tabular}
 \end{table}
+
+Adicionalmente, aun que en el datasheet se describe la inductancia promedio, se sabe que esta no es constante y varía con la posición del rotor. Por lo tanto, se realizó una medición experimental de la inductancia en función de la posición del rotor utilizando un tester LCR. Las pruebas se muestran en la Figura (\ref{fig:medicion_inductancia}). En la siguiente tabla se resumen los valores obtenidos para la inductancia en diferentes posiciones del rotor.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Tabla de medición de inductancia}
+    \label{tab:medicion_inductancia}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Paso} & \textbf{La} & \textbf{Lb}  \\ \hline
+        0 & 3.205 mH & 5.15 mH \\ \hline
+        1 & 3.24 mH & 4.8 mH \\ \hline
+        2 & 5.87 mH & 3.19 mH \\ \hline
+        3 & 3.195 mH & 5.56 mH \\ \hline
+        4 & 6.4 mH & 3.19 mH \\ \hline
+        5 & 8.7 mH & 3.18 mH \\ \hline
+        6 & 3.18 mH & 7.58 mH \\ \hline
+        7 & 8.71 mH & 3.18 mH \\ \hline
+        8 & 3.27 mH & 7.5 mH \\ \hline
+    \end{tabular}
+\end{table}
+
+Dónde La son las mediciones de inductancia de la fase A y Lb son las mediciones de inductancia de la fase B. Se puede observar que la inductancia varía significativamente con la posición del rotor. Usando las ecuaciones de (\ref{eq:propiedades_implicitas}), se pueden calcular los valores de $L_0$ y $L_2$ para cada posición del rotor, lo que permitirá una modelación más precisa del motor paso a paso.
+
+\begin{equation}
+\label{eq:calculo_inductancia}
+\left\{
+\begin{aligned}
+L_q &= \max(L_a,L_b) &= 8.71 [mH] \\ 
+L_d &= \min(L_a,L_b) &= 3.18 [mH] \\ 
+L_0 &= \frac{L_q + L_d}{2} &= 5.945 [mH] \\ 
+L_2 &= \frac{L_q - L_d}{2} &= 2.765 [mH] \\
+\end{aligned}
+\right.
+\end{equation}
+
+Se puede comprobar, que el valor de $L_0$ calculado a partir de las mediciones experimentales es consistente con el valor dado en el datasheet, lo que valida la precisión de las mediciones realizadas. Además, la variación de $L_2$ con la posición del rotor proporciona información valiosa para la modelación dinámica del motor paso a paso, lo que permitirá un control más preciso y eficiente del mismo.

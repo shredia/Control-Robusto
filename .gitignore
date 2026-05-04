@@ -34,3 +34,6 @@ codegen/
 slprj/sim/varcache/Simulacion_stepper/varInfo.mat
 slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat
 slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat
+barrido_J_resultados.mat
+barrido_J
+barrido_B
