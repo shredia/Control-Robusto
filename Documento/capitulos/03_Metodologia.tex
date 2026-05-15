@@ -9,7 +9,7 @@ Para controlar un motor paso a paso, es fundamental conocer sus características
 
 \begin{table}[htbp]
     \centering
-    \caption{Características nominales del motor paso a paso. Fuente: Datasheet del fabricante.\ref{tab:especificaciones_motor}}
+    \caption{Características nominales del motor paso a paso. Fuente: Datasheet del fabricante\ref{tab:especificaciones_motor}}
     \label{tab:especificaciones_motor}
     \begin{tabular}{|l|c|c|c|}
         \hline
@@ -92,4 +92,283 @@ L_2 &= \frac{L_q - L_d}{2} &= 2.765 [mH] \\
 \right.
 \end{equation}
 
-Se puede comprobar, que el valor de $L_0$ calculado a partir de las mediciones experimentales es consistente con el valor dado en el datasheet, lo que valida la precisión de las mediciones realizadas. Además, la variación de $L_2$ con la posición del rotor proporciona información valiosa para la modelación dinámica del motor paso a paso, lo que permitirá un control más preciso y eficiente del mismo.
+Se puede comprobar, que el valor de $L_0$ calculado a partir de las mediciones experimentales es consistente con el valor dado en el datasheet, lo que valida la precisión de las mediciones realizadas. Además, la variación de $L_2$ con la posición del rotor proporciona información valiosa para la modelación dinámica del motor paso a paso, lo que permitirá un control más preciso y eficiente del mismo. Para la implementación del control, como se utiliará en el plano DQ, se utilizarán los valores de Lq y Ld, puestos que estos representan la inductancia en los ejes q y d respectivamente, lo que permitirá una mejor modelación del comportamiento del motor en el plano DQ.
+
+\section{Control PI}
+
+Para realizar el control del motor PMSM, se implementó un controlador proporcional-integral (PI) para regular la corriente en los ejes d y q, además de la velocidad.Como la planta es altamente no-lineal, se utilizó un desacople en cada eje, lo cual permitire tratar cada eje como un sistema SISO, lo que simplifica el diseño del controlador. Para esto, se utilizan las ecuaciones (\ref{eq: dq}) y se obtienen las siguientes ecuaciones de desacople:
+
+
+\begin{equation}
+\label{eq: desacoples}
+\left\{
+\begin{aligned}
+V_{d} &= V_{d,PI} - \omega_{e} L_{q} I_{q} \\ 
+V_{q} &= V_{q,PI} + \omega_{e} L_{d} I_{d} + K_e \omega_{m} \\ 
+I_{q} &= I_{q,PI} + P(L_{d} - L_{q})I_{d}I_{q} + T_{L} + T_{dm}sin(4\theta_{e}) \\ 
+\end{aligned}
+\right.
+\end{equation}
+
+Una vez aplicado esto, se obtiene el siguiente sistema desacoplado, al cual se le aplicará una transformada de laplace para obtener la función de transferencia de cada eje, lo que permitirá el diseño del controlador PI para cada uno de ellos.
+
+\begin{equation}
+\label{eq: sistema_desacoplado}
+\begin{aligned}
+    \frac{I_{d}(s)}{V_{d,PI}(s)} &= \frac{1}{L_d s + R} \\
+    \frac{I_{q}(s)}{V_{q,PI}(s)} &= \frac{1}{L_q s + R} \\
+    \frac{\omega_{m}(s)}{I_{q,PI}(s)} &= \frac{K_e}{J s + B} \\
+\end{aligned}
+\end{equation}
+
+
+
+Estas funciones de transferencia permiten el diseño del controlador PI para cada eje del sistema desacoplado.
+
+%%Lazo de velocidad
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    block/.style={
+        draw,
+        rectangle,
+        minimum width=2.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    sum/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt
+    }
+]
+
+% Nodos
+\node[coordinate] (wref) at (0,0) {};
+\node[sum] (sumw) at (1.4,0) {};
+\node[block] (PIw) at (3.8,0) {$PI_{\omega}$};
+\node[coordinate] (iqref) at (6.4,0) {};
+\node[sum] (sumiq) at (6.4,0) {};
+\node[coordinate] (iqref) at (8.2,0) {};
+\node[coordinate] (comp1) at (6.4,-1.6) {};
+\node[coordinate] (comp2) at (6.4,1.6) {};
+
+% Entrada de medición
+\node[coordinate] (wm) at (1.4,-1.6) {};
+
+% Signos
+\node at ($(sumw)+(-0.2,0)$) {$+$};
+\node at ($(sumw)+(0,-0.2)$) {$-$};
+
+\node at ($(sumiq)+(0,0.2)$) {$+$};
+\node at ($(sumiq)+(-0.2,0)$) {$+$};
+\node at ($(sumiq)+(0,-0.2)$) {$+$};
+
+% Camino principal
+\draw[-{Latex}] (wref) -- node[above] {$\omega_m^\ast$} (sumw);
+\draw[-{Latex}] (sumw) -- node[above] {$e_\omega$} (PIw);
+\draw[-{Latex}] (PIw) -- node[above] {$I_{q,PI}$} (sumiq);
+\draw[-{Latex}] (sumiq) -- node[above] {$I_q^\ast$} (iqref);
+\draw[-{Latex}] (comp2) -- node[right] {$T_{x} + B W_{m}$} (sumiq.north);
+\draw[-{Latex}] (comp1) -- node[right] {$T_{tdm}$} (sumiq.south);
+% Medición
+\draw[-{Latex}] (wm) -- node[right] {$\omega_m$} (sumw.south);
+
+\end{tikzpicture}
+\caption{Control PI de velocidad con desacople                                              }
+\label{fig:pi_velocidad}
+\end{figure}
+
+%%Lazo de Iq
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    block/.style={
+        draw,
+        rectangle,
+        minimum width=2.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    sum/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt
+    }
+]
+
+% Nodos principales
+\node[coordinate] (iqref) at (0,0) {};
+\node[sum] (sumq) at (1.4,0) {};
+\node[block] (PIq) at (3.8,0) {$PI_q$};
+\node[sum] (sumvq) at (6.4,0) {};
+\node[coordinate] (vq) at (8.4,0) {};
+
+% Entradas externas
+\node[coordinate] (iq) at (1.4,-1.6) {};
+\node[coordinate] (dec1) at (6.4,1.6) {};
+\node[coordinate] (dec2) at (6.4,-1.6) {};
+
+% Signos comparador q
+\node at ($(sumq)+(-0.2,0)$) {$+$};
+\node at ($(sumq)+(0,-0.2)$) {$-$};
+
+% Signos sumador desacople q
+\node at ($(sumvq)+(0,0.2)$) {$+$};
+\node at ($(sumvq)+(-0.2,0)$) {$+$};
+\node at ($(sumvq)+(0,-0.2)$) {$+$};
+
+% Camino principal
+\draw[-{Latex}] (iqref) -- node[above] {$i_q^\ast$} (sumq);
+\draw[-{Latex}] (sumq) -- node[above] {$e_q$} (PIq);
+\draw[-{Latex}] (PIq) -- node[above] {$V_{q,PI}$} (sumvq);
+\draw[-{Latex}] (sumvq) -- node[above] {$V_q$} (vq);
+
+% Medición iq
+\draw[-{Latex}] (iq) -- node[right] {$i_q$} (sumq.south);
+
+% Desacoples
+\draw[-{Latex}] (dec1) -- node[right] {$+K_e\omega_e$} (sumvq.north);
+\draw[-{Latex}] (dec2) -- node[right] {$+\omega_e L_d i_d$} (sumvq.south);
+
+\end{tikzpicture}
+\caption{Control PI de corriente en el eje $q$ con desacople.}
+\label{fig:pi_corriente_q}
+\end{figure}
+
+%%Lazo de Id
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    block/.style={
+        draw,
+        rectangle,
+        minimum width=2.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    sum/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt
+    }
+]
+
+% Nodos principales
+\node[coordinate] (idref) at (0,0) {};
+\node[sum] (sumd) at (1.4,0) {};
+\node[block] (PId) at (3.8,0) {$PI_d$};
+\node[sum] (sumvd) at (6.4,0) {};
+\node[coordinate] (vd) at (8.4,0) {};
+
+% Entradas externas
+\node[coordinate] (id) at (1.4,-1.6) {};
+\node[coordinate] (decq) at (6.4,1.6) {};
+
+% Signos comparador d
+\node at ($(sumd)+(-0.2,0)$) {$+$};
+\node at ($(sumd)+(0,-0.2)$) {$-$};
+
+% Signos sumador desacople d
+\node at ($(sumvd)+(0,0.2)$) {$+$};
+\node at ($(sumvd)+(-0.2,0)$) {$+$};
+
+% Camino principal
+\draw[-{Latex}] (idref) -- node[above] {$i_d^\ast=0$} (sumd);
+\draw[-{Latex}] (sumd) -- node[above] {$e_d$} (PId);
+\draw[-{Latex}] (PId) -- node[above] {$V_{d,PI}$} (sumvd);
+\draw[-{Latex}] (sumvd) -- node[above] {$V_d$} (vd);
+
+% Medición id
+\draw[-{Latex}] (id) -- node[right] {$i_d$} (sumd.south);
+
+% Desacople
+\draw[-{Latex}] (decq) -- node[right] {$-\omega_e L_q i_q$} (sumvd.north);
+
+\end{tikzpicture}
+\caption{Control PI de corriente en el eje $d$ con desacople.}
+\label{fig:pi_corriente_d}
+\end{figure}
+
+\section{Filtro de Kalman Extendido}
+Para estimar los estados del sistema, se implementó un filtro de Kalman extendido (EKF) debido a la naturaleza no lineal del modelo del motor paso a paso. El EKF permite estimar el estado del sistema a partir de las mediciones disponibles, incluso en presencia de ruido y perturbaciones, pero no todos los estados son completamente observables ó completamente controlables, puesto que esto depende de la naturaleza del sistema y de las variables que se estén midiendo y controlando. 
+
+Para esto, se realizó un análisis de observabilidad y controlabilidad del sistema utilizando las matrices de estado linealizadas alrededor de un punto de operación. Se determinó que el sistema es parcialmente observable y parcialmente controlable, lo que implica que no todos los estados pueden ser estimados o controlados directamente. Sin embargo, el EKF se diseñó para aprovechar la información disponible y proporcionar estimaciones precisas de los estados relevantes para el control del motor paso a paso.
+\subsection{Observabilidad y controlabilidad}
+
+La obserbabilidad y controlabilidad de un sistema se puede calcular mediante las derivadas de Lie, pero, para efectos prácticos, se puede linealizar el sistema alrededor de un punto de operación y calcular las matrices de observabilidad y controlabilidad a partir de la matriz de estado linealizada. Para esto, se utilizó la ecuación (\ref{eq: dq}) y se linealizó alrededor de un punto de operación específico, lo que permitió obtener las matrices A y B necesarias para el análisis de observabilidad y controlabilidad. Las matrices A y B se calcularon utilizando las siguientes ecuaciones:
+
+\begin{equation}
+\label{eq: Matriz A y B}
+\left\{
+\begin{aligned}
+ A &= \left. \frac{\partial f}{\partial x} \right|_{x=x_0,u=u_0} \\
+ B &= \left. \frac{\partial f}{\partial u} \right|_{x=x_0,u=u_0} \\
+\end{aligned}
+\right.
+\end{equation}
+
+Dónde $f$ representa las ecuaciones del sistema no lineal, $x$ es el vector de estados, $u$ es el vector de entradas, y $x_0$ y $u_0$ son el punto de operación alrededor del cual se realiza la linealización.
+
+La matriz de observabilidad se calcula utilizando la matriz A y la matriz de salida C, mientras que la matriz de controlabilidad se calcula utilizando la matriz A y la matriz B. Para este sistema, se asumió que las salidas disponibles para la medición son la corriente en los ejes d y q, lo que implica que la matriz de salida C es la siguiente:
+
+
+
+
+\begin{equation}
+    C = 
+    \begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+    \end{bmatrix}
+\end{equation}
+
+ La observabilidad y controlabilidad del sistema se determina evaluando el rango de estas matrices. Si el rango de la matriz de observabilidad es igual al número de estados, entonces el sistema es completamente observable. Si el rango de la matriz de controlabilidad es igual al número de estados, entonces el sistema es completamente controlable.
+
+ Para este caso, la matriz de observabilidad se calcula utilizando la matriz A y la matriz C, y se obtiene la siguiente matriz de observabilidad:
+
+\begin{equation}
+    O = 
+    \begin{bmatrix}
+        C \\
+        CA \\
+        CA^2 \\
+        CA^3 \\
+    \end{bmatrix}
+\end{equation}
+
+y la de controlabilidad se calcula utilizando la matriz A y la matriz B, y se obtiene la siguiente matriz de controlabilidad:
+
+\begin{equation}
+    Q = 
+    \begin{bmatrix}
+        B & AB & A^2B & A^3B \\
+    \end{bmatrix}   
+\end{equation}
+
+
+
+Utilizando la ecuación \ref{eq: dq}, se utilizaron los siguientes parámetros para linealizar y calcular las matrices de observabilidad y controlabilidad:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Tabla de parámetros punto de operación}
+    \label{tab:punto de operacion}
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Parámetro} &  $R $ & Ld  & Lq  & Ke & Kt & J & B & P & $W_{m}$ & $I_{d}$ & $I_{q}$ & $T_{x}$ & $V_{d}$ & $V_{q}$ \\
+        \hline
+        % Valores de punto de operación (rellenar según corresponda)
+        \textbf{Valor} &2.5 & 3.2& 8.1 & 0.045 & 0.045 & 0.01 & 0.11 & 50 & 0.1 & 0 & 1 & 0.2& 0 &10 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Después de calcular las matrices de observabilidad y controlabilidad, se evaluó su rango para determinar la observabilidad y controlabilidad del sistema.Se utilizó el programa de Matlab como apoyo a esto.  Se encontró que el sistema es parcialmente observable y parcialmente controlable, lo que implica que no todos los estados pueden ser estimados o controlados directamente. Sin embargo, el EKF se diseñó para aprovechar la información disponible y proporcionar estimaciones precisas de los estados relevantes para el control del motor paso a paso.
+
+El rango de la matriz de observabilidad se encontró que es igual a 3, lo que indica que el sistema es parcialmente observable, ya que el número de estados es 4. El rango de la matriz de controlabilidad se encontró que es igual a 4, lo que indica que el sistema es totalmente controlable, ya que el número de estados es 4. Esto significa que hay un estado que no puede ser estimado pero si controlado, lo que es consistente con la naturaleza del sistema, puesto que en un motor paso a paso, la posición del rotor no es directamente medible, pero puede ser controlada a través de las corrientes en los ejes d y q. Cabe destacar, que esto es solo para un sistema linealizado alrededor de un punto de operación específico, y la observabilidad y controlabilidad pueden variar dependiendo del punto de operación y de las variables que se estén midiendo y controlando.Por ejemplo, en el punto de operación dado, las derivadas se asumen 0,por lo que no existe información de la posición del rotor, lo que hace que esta no sea observable, pero si se agregaran derivadas no nulas, se podría obtener información de la posición del rotor, lo que haría que esta fuera observable.Adicionalmente, a altas velocidades, la fuerza electro-motriz es más significativa, lo que podría proporcionar información adicional para la estimación de la posición del rotor, lo que también podría mejorar la observabilidad del sistema. Por lo tanto, es importante considerar estos factores al diseñar el EKF y al evaluar la observabilidad y controlabilidad del sistema en diferentes condiciones de operación.
+
+Cómo el objetivo es controlar la velocidad para que sea constante, provocando que las derivadas sean 0 en un punto de operación de baja velocidad,por lo que tampoco existe información del rotor que pueda ser entrega por la fuerza electro-motriz, es necesario aplicar alguna estrategia para mejorar la observabilidad del sistema, como por ejemplo, aplicar una señal de excitación adicional para obtener información de la posición del rotor, lo que permitiría una mejor estimación de los estados y un control más preciso del motor paso a paso.

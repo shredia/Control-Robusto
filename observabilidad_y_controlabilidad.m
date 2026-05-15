@@ -15,13 +15,12 @@ f5_1 = 0;
  
 % % --- Jacobianos ---
  A_1 = jacobian(f_1,x_1);  % Matriz A = ∂f/∂x
- B_1 = jacobian(f_1,u_1);  % Matriz B = ∂f/∂u
+ B_1 = jacobian(f_1,u_1);  % Matriz B = ∂f/∂u   
 
 % % --- Matriz de observación (por ejemplo, medición de Id e Iq) ---
 C_1 = [1 0 0 0  ;
-       0 1 0 0 ;
-       0 0 0 1 ];
-
+       0 1 0 0 ]
+    
 
 D_1 = zeros(2,2);
 
@@ -30,13 +29,13 @@ disp('Matriz A_1 = ');
 pretty(A_1)
 disp('Matriz B_1 = ');
 pretty(B_1)
-
+    
 % 
 % --- Ver observabilidad y controlabilidad ---
 % --- Construcción de la Matriz de Observabilidad ---
 O = [C_1; 
      C_1*A_1; 
-     C_1*A_1^2];
+     C_1*A_1^2]
 
 % --- SUSTITUCIÓN NUMÉRICA (Crítico para que rank y cond funcionen) ---
 % Definimos un struct con tus valores medidos
@@ -48,7 +47,7 @@ params.Kt = 0.045;
 params.J  = 0.01; 
 params.B  = 0.11; 
 params.Nr = 50; 
-params.Wm = 10; % Tu velocidad de interés (0.1 rad/s o RPM)
+params.Wm =0.1; % Tu velocidad de interés (0.1 rad/s o RPM)
 params.Id = 0; 
 params.Iq = 1; 
 params.Tx = 0.2;
@@ -78,6 +77,12 @@ end
 s = svd(O_num);
 disp('Valores singulares de la matriz de observabilidad:');
 disp(s);
+
+matriz_controlabilidad_1 = [B_1 A_1*B_1 A_1^2*B_1 A_1^3*B_1 A_1^4*B_1];
+pretty(matriz_controlabilidad_1);
+ctrl_rank_1 = rank(matriz_controlabilidad_1);
+disp(['Rango controlabilidad: ', num2str(ctrl_rank_1)]);
+
 
 
 

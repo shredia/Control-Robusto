@@ -2,7 +2,10 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Control PI de velocidad con desacople }}{16}{figure.caption.7}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Control PI de corriente en el eje $q$ con desacople.}}{16}{figure.caption.8}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Control PI de corriente en el eje $d$ con desacople.}}{16}{figure.caption.9}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Datasheet de un motor stepper bifásico 17HS3401S.}}{17}{figure.caption.7}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Datasheet de un motor stepper bifásico 17HS3401S.}}{20}{figure.caption.11}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {B.1}{\ignorespaces Mediciones de inductancia del motor stepper bifásico 17HS3401S.}}{19}{figure.caption.8}%
+\contentsline {figure}{\numberline {B.1}{\ignorespaces Mediciones de inductancia del motor stepper bifásico 17HS3401S.}}{22}{figure.caption.12}%

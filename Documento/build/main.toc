@@ -21,6 +21,9 @@
 \contentsline {section}{\numberline {2.7}Saliencia}{11}{section.2.7}%
 \contentsline {chapter}{\numberline {3}Metodología}{13}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Caracterización del motor}{13}{section.3.1}%
-\contentsline {chapter}{\numberline {A}Datasheet Motor}{16}{appendix.Alph1}%
-\contentsline {chapter}{\numberline {B}Mediciones de inductancia}{18}{appendix.Alph2}%
-\contentsline {chapter}{Bibliografía}{20}{figure.caption.8}%
+\contentsline {section}{\numberline {3.2}Control PI}{15}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Filtro de Kalman Extendido}{16}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Observabilidad y controlabilidad}{17}{subsection.3.3.1}%
+\contentsline {chapter}{\numberline {A}Datasheet Motor}{19}{appendix.Alph1}%
+\contentsline {chapter}{\numberline {B}Mediciones de inductancia}{21}{appendix.Alph2}%
+\contentsline {chapter}{Bibliografía}{23}{figure.caption.12}%

@@ -146,11 +146,11 @@ Al aplicar la transformada de Park a las ecuaciones (\ref{eq:dinamica_electrica}
     \label{eq: dq}
     \begin{aligned}
             \begin{bmatrix} 
-            \dot{I}_a \\ \dot{I}_b \\ \dot{\omega}_m \\ \dot{\theta}_m 
+            \dot{I}_d \\ \dot{I}_q \\ \dot{\omega}_m \\ \dot{\theta}_m 
     \end{bmatrix} 
     \end{aligned}   = \begin{bmatrix} 
-        (V_{d} - R I_{d})\frac{1}{L_d} + \omega_{m} L_q I_{q} \\
-        (V_{q} - R I_{q} + K_{e}\omega_{m} )\frac{1}{L_q} - \omega_{m} L_d I_{d} \\
+        (V_{d} - R I_{d}+ P\omega_{m} L_q I_{q} )\frac{1}{L_d} \\
+        (V_{q} - R I_{q}  - P\omega_{m} L_d I_{d} - K_{e}\omega_{m} )\frac{1}{L_q}  \\
         (K_{e} I_{q}- P(L_{d} - L_{q})I_{d}I_{q} - T_l - B\omega_{m} - T_{dm} \sin(4\theta_e) )\frac{1}{J} \\
         \omega_{m}
     \end{bmatrix}
