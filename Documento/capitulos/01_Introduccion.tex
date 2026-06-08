@@ -1,73 +1,131 @@
 \chapter{Introduccion general}
-Dentro de la ingeniería, en especial en el área de investigación espacial o de agricultura, es común realizar investigaciones para simular condiciones comunes del espacio exterior, las cuales son, por regla general, muy distintas a las que se pueden encontrar en nuestro planeta. Una de las condiciones que gustaría generar o explorar es la de la gravedad, la cual claramente no es posible controlar hoy en día.
- Como alternativa, han nacido ideas como Clinostatos y RPM (Random Position Machine), las cuales pueden generar artificialmente, mediante fuerzas centrífugas, 	modificar el promedio temporal del vector de gravedad.
+La investigación en ambientes de microgravedad ha ido adquiriendo mayor relevenacia em áreas como la biología, medicina, ciencia de materiales y  física, debido a que numerosos fenómenos físicos y biológicos se comportan de manera diferente en ausencia de gravedad. Sin embargo, el acceso a entornos de microgravedad sigue siendo limitado y costoso. 
+
+Por lo tanto, se han creado alternativas tecnologícas capaces de simular microgravedad mediante la modificación continua de la orientación del vector gravitacional respecto de una muestra.Dentro de estas tecnologías, los clinostatos se destacan por su relativa simplicidad, bajo costo y capacidad de operación continua. 
+
+El funcionamiento de un clinostato se basa en la rotación de una muestra alrededor de uno o más ejes, tomando relevencia la velocidad de rotación y el radio de giro, con el fin de promediar temporalmente los efectos de la gravedad sobre la muestra.La estabilidad de la velocidad angular y la suavidad de estar rotación son condiciones fundamentales para garantizar la efectividad de la simulación de microgravedad, lo que se traduce en desafíos tanto para el control del movimiento como para la mitigación de perturbaciones mecánicas.
+
+Los clinostatos pueden usar tanto motores de corriente continua como motores paso a paso, dependiendo de la aplicación y los requerimientos de control. Estos últimos presentan una ventaja en términos de simplicidad de control a lazo abierto, pero pueden ser susceptibles a perturbaciones mecánicas cómo presentar errores de posicionamiento, velocidad y vibraciones al operar a baja velocidades, afectando la continuidad del movimiento.
+
+Por otra parte, la incorporación de sensores mecánicos de posición incremente la complejidad estructural del sistema,especialmente en plataformas de rotación continua, debido a la necesidad de sistemas de cableado rotativo como slip-rings para la transmisión de señales. Esto limita la capacidad de implementar esquemas de control en lazo cerrado basados en mediciones directas de variables como velocidad o posición, lo que plantea el desafío de desarrollar estrategias de control sin sensores (sensorless) que permitan mantener un comportamiento de velocidad estable frente a perturbaciones mecánicas variables. Para este tipo de problemáticas, se han utilizado estrategias de control sensorless,las cuales permiten estimar posición y velociad utilizando únicamente variables eléctricas del motor.
+
+No obstante, el control sensorless presenta dificultades importantes en bajas velocidades, debido a la pérdida de observabilidad de variables como el ángulo eléctrico. Cómo consecuencia,diversos trábajos han propuesto observadores y técnicas híbridas capaces de recuperar esta información a baja velocidad, mediante el uso de modelos dinpamicas, propiedades mecánicas del motor e inyecciones de señales alta frecuencia.
+
+En este contexto, esta tesis aborda la problemática de control de movimiento de un motor PMSM para un clinostato, considerando condiciones como baja velocidad, aceleraciones nulas y estimación sensorless, buscando mejorar la estabilidad del movimiento frente a perturbaciones mecánicas variables.
 
  \section{Estado del arte}
+
+  
+
  \subsection{Clinostatos}
-    Las máquinas de ingravidez (o Clinostatos) son dispositivos que hacen girar sus ejes para evitar que el vector de gravedad permanezca fijo en un sistema de referencia y con ello provocar un promedio temporal de sus efectos sobre una muestra.
+    Las máquinas de microgravedad (o Clinostatos) son dispositivos que hacen girar sus ejes para evitar que el vector de gravedad permanezca fijo en un sistema de referencia y con ello provocar un promedio temporal de sus efectos sobre una muestra.
 
 
-Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, dependiendo del nivel de complejidad y del grado de libertad y movimiento requerido. El más común es un clinostato de 2D, puesto que, con este, se cumple con elrequisito mínimo para cubrir la región de una esfera, lo cual es la mejor figura para simular un verdadero ambiente de ingravidez~\cite{ArturoRojas-Moreno2018}.
+Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, dependiendo del nivel de complejidad y del grado de libertad y movimiento requerido. El más común es un clinostato de 2D, puesto que, con este, se cumple con el requisito mínimo para cubrir la región de una esfera, lo cual es la mejor figura para simular un ambiente de microgravedad~\cite{rojas-morenoDesignNovel3DOF2018}.
+
+ Pero para poder provocar un promedio temporal cercano a 0, es necesario mantener una velocidad constante. Esta velocidad no puede ser cualquiera, dependiendo del tipo de aplicación y de estudio, lo cual puede variar desde 1  hasta 120 [RPM]~\cite{cacayurinEngineeredDesign3axis2023}. Este valor depende del orden de magnitud máximo al que se quiera llegar, dependiendo también del radio del centro del eje dónde gire, puesto que contra más alejado esté,menor velocidad se necesitará.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.8]{imagenes/relacion_velocidad_radio.png}
+    \caption{Relación entre velocidad de giro y radio para alcanzar microgravedad. Fuente: ~\cite{rodriguezDISENOMAQUINAMICROGRAVEDAD}}
+    \label{ref:relacion_velocidad_radio}
+\end{figure}
+
+La figura (\ref{ref:relacion_velocidad_radio}) muestra una gráfica que representa la relación entre la velocidad de giro, el radio y los valores de micro-gravedad alcanzados. Se puede observar que la tendencia de los valores de microgravedad tiende a disminuir a medida que decrece la velocidad de giro y aumenta el valor del radio.
+Esto se debe a que la aceleración centrípeta, que es la responsable de generar una fuerza aparente que contrarresta la gravedad, depende directamente de la velocidad angular y del radio de giro. Por lo tanto, para alcanzar niveles más cercanos a microgravedad, es necesario mantener una velocidad de giro constante y adecuada en función del radio de giro utilizado. Por ende, las aceleraciones centrípetas generadas por el movimiento disminuyen y se acercan a la condición de microgravedad, lo que permite simular un ambiente de gravedad reducida para la muestra en estudio. Esta relación es fundamental, puesto que, como se tiene un espacio limitado de área de trabajo, es necesario ajustar la velocidad de giro para alcanzar el nivel de microgravedad deseado. 
+
+Este giro, provoca un movimiento que en cada instante de tiempo, aun que el vector de gravedad sea el mismo, la dirección o aplicación sobre la muestra es diferente, lo que provoca que el efecto de la gravedad se promedie tendiendo a 0~\cite{kimCustomizedSmallsizedClinostat2023}. En los estudios enfocados en plantas, es necesario mantener un control de la velocidad para ambos motores, con distintos radios, para poder generar un movimiento más aleatorio y así evitar que el vector de gravedad se mantenga fijo en una dirección por mucho tiempo, lo que se conoce como convergencia a microgravedad~\cite{rodriguezDISENOMAQUINAMICROGRAVEDAD}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.8]{imagenes/Tabla_convergencia.png}
+    \caption{Tabla de tiempo de convergencia a microgravedad dependiendo del radio y la velocidad de giro. Fuente: ~\cite{rodriguezDISENOMAQUINAMICROGRAVEDAD}}
+    \label{fig:tabla_convergencia}
+\end{figure}
+
+La tabla (\ref{fig:tabla_convergencia}) muestra el tiempo de convergencia a microgravedad para distintas configuraciones de velocidad y radio. Se puede observar que, en general, a medida que se incrementa la velocidad de giro y se aumenta la razón entre los motores, el tiempo de convergencia tiende a disminuir, además de los valores de microgravedad alcanzados. La mejor tasa de relación es la de 4:0.2, puesto que alcanza el menor valor de micro-gravedad y menor tiempo de convergencia. Sin embargo,esta configuración no es la más utilizada, si no la de 4:1.8, debido a las limitaciones que se puedan presentan en el control. En particular, Rodríguez señala que para velocidades máximas de 10 [RPM], el eje más lento debería operar entre 0.5 y 0.025 [RPM], condición para la cual "es necesario tener un control muy preciso para velocidades muy bajas de rotación" \cite{rodriguezDISENOMAQUINAMICROGRAVEDAD}. Por lo tanto, una de las limitaciones es la implementación de un sistema de control preciso y robusto en régimenes de baja velocidad.
 
 
- Pero para poder provocar un promedio temporal cercano a 0, es necesario mantener una velocidad constante. Esta velocidad no puede ser cualquiera, dependiendo del tipo de aplicación y de estudio, lo cual puede variar desde 1  hasta 120 [RPM]~\cite{Cacayurin2023}. Este valor depende del orden de magnitud máximo al que se quiera llegar, dependiendo también del radio del centro del eje dónde gire, puesto que contra más alejado esté menor velocidad se necesitará.
+ \subsection{Transmisión de movimiento}
 
- \subsection{Accionamiento y dinámicas de motores eléctricos}
-
- Para generar el movimiento de los distintos ejes en un clinostato, es necesario disponer de sistemas de accionamiento basados en motores eléctricos. La selección del tipo de motor depende de diversos factores, tales como las cargas mecánicas involucradas, las velocidades de operación, la estrategia de control requerida, los costos de implementación y la disponibilidad comercial.
-
- En la literatura y en aplicaciones prácticas de clinostatos, los motores más comúnmente utilizados corresponden a motores de corriente continua (DC) y motores paso a paso (steppers), debido principalmente a su facilidad de integración y control. Los motores DC se caracterizan por su comportamiento continuo y por requerir estrategias de control que permitan regular su velocidad frente a variaciones de carga, lo cual suele implicar el uso de realimentación. Por su parte, los motores stepper destacan por su capacidad de generar movimiento incremental mediante la conmutación controlada de sus fases, permitiendo un control preciso del desplazamiento angular y un alto torque a bajas velocidades.
-
- A diferencia de los motores DC, los motores stepper no operan directamente con corriente continua, sino que requieren una secuencia de excitación adecuada para generar el movimiento rotacional. Esta característica les permite asegurar desplazamientos angulares definidos a partir de una cantidad determinada de pasos eléctricos, lo que ha motivado su uso frecuente en aplicaciones donde se privilegia la simplicidad mecánica y el control del posicionamiento. Cómo desventaja, estos motores pueden presentar un mayor rizado de vibraciones mecánicas y de corriente, lo cual puede generar efectos indeseados dependiendo del caso de estudio \cite{Cacayurin2023}.
-
- En cuanto a la transmisión del movimiento, los clinostatos pueden presentar distintas configuraciones mecánicas. En algunos diseños, cada eje cuenta con un motor instalado sobre un marco móvil que acciona un eje adicional, configuraciones que pueden repetirse para obtener sistemas de dos o tres dimensiones. En estos casos, el suministro de energía y el sensado continuo suelen realizarse mediante slip-rings o sistemas de cableado rotativo, los cuales permiten la rotación sin enredos.
-
- Si bien estas soluciones facilitan la medición en tiempo real de variables como aceleración o gravedad mediante sensores inerciales o encoders, presentan limitaciones asociadas a mayores costos de implementación, requerimientos de mantenimiento, restricciones de velocidad y un aumento en la complejidad del sistema de cableado.
+ Los clinostatos pueden presentar distintas configuraciones mecánicas. En algunos diseños, cada eje cuenta con un motor instalado sobre un marco móvil que acciona un eje adicional, configuraciones que pueden repetirse para obtener sistemas de dos o tres dimensiones. En estos casos, el suministro de energía y el sensado continuo suelen realizarse mediante slip-rings o sistemas de cableado rotativo, los cuales permiten la rotación sin enredos.
+ 
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.8]{imagenes/Clinostato_3ejes.png}
+    \caption{Clinostato de tres ejes. Fuente: ~\cite{cacayurinEngineeredDesign3axis2023}}
+    \label{fig:clinostato_3ejes}
+    \end{figure}
+ Si bien estas soluciones facilitan la medición en tiempo real de variables como aceleración o gravedad mediante sensores inerciales o encoders, pueden presentar limitaciones asociadas a mayores costos de implementación, requerimientos de mantenimiento, restricciones de velocidad y un aumento en la complejidad del sistema de cableado.
 
  Como alternativa, se emplean sistemas de transmisión mediante poleas, los cuales permiten transferir el movimiento desde un eje fijo hacia un marco móvil a través de elementos mecánicos como correas y rodamientos, evitando la necesidad de cableado rotativo. Esta configuración posibilita la generación de movimiento rotacional en cada eje con una menor complejidad mecánica y costos reducidos.
 
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.6]{imagenes/Clinostato_2ejes.png}
+    \caption{Clinostato de 2 ejes. Fuente: ~\cite{wahabkawafiWahabkClinostatV0522026}}
+    \label{fig:clinostato_2ejes}
+    \end{figure}
+
+
  No obstante, al prescindir del uso de slip-rings, se dificulta la incorporación de sensores mecánicos para la medición continua de variables como velocidad o posición. En consecuencia, en sistemas sometidos a condiciones de alto torque, rozamiento o cargas variables, pueden presentarse diferencias significativas entre la velocidad real del eje y la velocidad deseada, afectando el desempeño dinámico del clinostato.
 
-  \subsection{Tipos de controles}
+  \subsection{Control sensorless}
 
-  Los esquemas de control cerrado de un motor eléctrico se basan generalmente en control PID, los cuales permiten llegar a error estacionario 0. Sin embargo, el desempeño de estos controladores dependen de  la retroalimentación de la variable a controlar y del conocimiento de los parámetros internos del motor, así como perturbaciones externas. En muchas aplicaciones, estas variables y parámetros no son medibles directamente, además de que pueden ir variando con el tiempo, por lo que su desconocimiento puede generar errores en el control de velocidad del motor.
+  Al no contar con sensores de posición ó velocidad, se hace evidente una problemática de control, puesto que existen alternativas, cómo el uso de motores paso a paso que permiten operar a lazo abierto, es decir, sin necesidad de medición de alguna variable que permita medir de forma directa ó indirecta la posición o velocidad del motor. Sin embargo, esta solución puede presentar limitaciones en términos de estabilidad de la velocidad y precisión de posicionamiento, especialmente en condiciones de carga variable o perturbaciones mecánicas.
 
-  Frente a estas limitaciones, se ha demostrado la implementación de técnicas de estimación basadas en observadores de estado, que permiten reconstruir variables del sistema, cómo la velocidad mecánica, mediante la lectura de señales eléctricas\cite{Nicola2023},\cite{Nicola2024},\cite{Lascu2020}. Adicionalmente, los observadores de perturbaciones han sido propuestos como una herramienta complementaria para estimar efectos externos no modelados explícitamente, como lo podrían ser torque variable y roce\cite{Yu2025}.
+  Frente a estas limitaciones, se ha demostrado la implementación de técnicas de estimación basadas en observadores de estado, que permiten reconstruir variables del sistema, cómo la velocidad mecánica, mediante la lectura de señales eléctricas ~\cite{nicolaImprovementPerformancesSensorless2023},~\cite{nicolaPMSMSensorlessControl2024},~\cite{lascuPLLPositionSpeed2020}. Adicionalmente, los observadores de perturbaciones han sido propuestos como una herramienta complementaria para estimar efectos externos no modelados explícitamente, como lo podrían ser torque variable y roce\cite{yuSimultaneousStateDisturbances2025}\cite{horvathLoadTorquePermanent2023}.
 
-  Si bien la estimación de la velocidad y del torque es relevante para el desempeño dinámico del sistema, su estimación simultánea incrementa la complejidad del esquema de control y la sensibilidad a incertidumbres del modelo. En particular, formular un estimador capaz de reconstruir un torque de carga variable, considerar parámetros mecánicos parcialmente desconocidos (por ejemplo, rozamiento) y, al mismo tiempo, lograr un control con error estacionario cercano a cero constituye un desafío, especialmente en condiciones de operación variables.
+  Si bien la estimación de velocidad y torque es relevante para el desempeño dinámico del sistema, su estimación simultánea incrementa la complejidad del esquema de control y la sensibilidad a incertidumbres del modelo. En particular, formular un estimador capaz de reconstruir un torque de carga variable, considerar parámetros mecánicos parcialmente desconocidos (como el rozamiento, el flujo magnético y algunos parámetros físicos del motor susceptibles a variaciones de temperatura) y, simultaneamente,mantener un desempeño dinámico adecuado con errores de seguimiento reducidos,constituye un desafío significativo, especialmente bajo condiciones de operaciones variables.
 
-  Adicionalmente, el funcionamiento de un estimador de estados necesita de información de otros estados, los cuales pueden entregar muy poca información (tal cómo la fuerza electro-motriz, la cual es proporcional a la velocidad mecánica) tanto en estado estacionario cómo en baja velocidad, comprometiendo la observabilidad del sistema\cite{Shan-Mao2009}. Una forma de resolver esto es aprovechando la saliencia de los motores híbridos que se manifiesta como una anisotropía magnética donde la inductancia de cada fase varía de forma sinusoidal según la posición angular del rotor. Esta característica es explotada por técnicas como el HFI, que permiten estimar la posición y velocidad del rotor a bajas velocidades o incluso en estado estacionario, mediante la inyección de señales de alta frecuencia y el análisis de la respuesta del sistema ~\cite{Helsing2022} \cite{Wang2025}
+  \subsection{Observabilidad }
+    La observabilidad de un sistema es una propiedad que permite determinar si es posible reconstruir el estado interno del mismo a partir de una cantidad determinada de sus salidas y entradas. En el contexto de sistemas de control de motores, la observabilidad es vital para garantizar que las variables de interés, como la velocidad mecánica y el ángulo electrico, puedan ser estimadas de manera precisa a partir de las señales eléctricas disponibles. Sin embargo, la observabilidad puede garantizarse solo bajo ciertas condiciones, como por ejemplo, si la velocidad angular es diferente a 0 ó existiesen aceleraciones~\cite{horvathLoadTorquePermanent2023}~\cite{zaltniObservabilityAnalysisPMSM2009}. En particular, en régimenes de baja o nula velocidad, y considerando que se busca una aceleración nula, el sistema pierde observabilidad, por lo tanto no es posible estimar la velocidad mecánica ó el angulo eléctrico, lo que limita la capacidad de implementar un control tanto al lazo de velocidad cómo al lazo de corriente. No obstante, estas limitaciones se aplican netamente a motores SPMSM, los cuales se caracterizan por presentar una inductancia constante. En cambio, los motores paso a paso bifásicos (que se comportan como IPMSM), poseen una alta saliencia, lo que implica que su inductancia varía en función de la posición del rotor. Por lo tanto, esta propiedad permite garantizar la observabilidad de la posición del rotor incluso en régimenes de muy baja velocidad. ~\cite{koteichPermanentMagnetSynchronous2015}.
 
-  Se puede observar que existen métodos que implementan una mezcla de técnicas de control clásico (PID), observadores de estado y técnicas de inyección de alta frecuenca[HFI]. Por separado, estos métodos son insuficientes para resolver el problema de control de un clinostato accionado por motores stepper sin sensores mecánicos a baja velocidad, debido a las limitaciones mencionadas anteriormente. Sin embargo, la combinación de estas técnicas podría permitir mejorar el desempeño dinámico del sistema, al aprovechar las fortalezas de cada método y mitigar sus debilidades.
+    \subsection{Motores,Saliencia y perturbaciones mecánicas}
 
-  
-  A partir de la revisión del estado del arte, se observa que los clinostatos reportados en la literatura utilizan predominantemente configuraciones mecánicas y estrategias de control que dependen del uso de sensores mecánicos o inerciales, así como de sistemas de cableado rotativo como slip-rings, para asegurar un control continuo del movimiento de sus ejes. Por otra parte, las técnicas de control avanzadas y sensorless han sido ampliamente estudiadas en otros contextos de accionamiento eléctrico, pero su aplicación a motores paso a paso en clinostatos con configuraciones mecánicas simplificadas y perturbaciones no medidas ha sido escasamente abordada. Esta brecha motiva la necesidad de estudiar e implementar estrategias de control que permitan mejorar el comportamiento dinámico de clinostatos accionados por motores stepper, sin recurrir al uso de sensores mecánicos adicionales.
+    En la práctica, existen diferentes tipos de motores, los cuales pueden variar por su tipo de alimentación, construcción y características propias. En particular, los motores paso a paso se caracterizan por su capacidad de dividir una rotación completa en un número específico de pasos, lo que permite una alta precisión en el control de posición y velocidad, razón por lo que se usa bastante en impresoras 3D, CNC, etc.
+
+     \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.3]{imagenes/Clasificacion_motores.png}
+    \caption{Clasificación de los motores. Fuente: ~\cite{oswosVisionGeneralMotors2026}}
+    \label{fig:Clasificacion_motores}
+    \end{figure}
+
+    Los motores PMSM (Permanent Magnet Synchronous Motor) se caracterizan por tener imanes permanentes en el rotor, lo que les confiere una alta eficiencia y un buen rendimiento en aplicaciones de control de velocidad.Estos imanes pueden estar fuera o dentro del rotor, lo que da lugar a diferentes configuraciones de motores PMSM, como los motores de imanes externos (SPMSM) y los motores de imanes internos (IPMSM). Los IPMSM se caracterizanpor tener imanes internos que no llegan a cubrir toda la circunferencia del rotor, lo que genera una variación en la inductancia en función de la posición del rotor, conocida como saliencia. Esta propiedad de saliencia permite que los motores IPMSM mantengan la observabilidad de la posición del rotor incluso a bajas velocidades, lo que los hace adecuados para aplicaciones de control sensorless en régimenes de baja velocidad.
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.4]{imagenes/IPMSM.png}
+    \caption{imagen conceptual de un motor IPMSM. Fuente: ~\cite{AN2590SensorlessFOCforPMSMUsingReducedOrderLuenbergerObserverDS00002590}}
+    \label{fig:IPMSM}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.4]{imagenes/SPMSM.png}
+    \caption{imagen conceptual de un motor SPMSM. Fuente: ~\cite{AN2590SensorlessFOCforPMSMUsingReducedOrderLuenbergerObserverDS00002590}}
+    \label{fig:SPMSM}
+    \end{figure}
+
+    Esta diferencia entre motores genera una diferencia magnética que varía en función de la posición del rotor. Un motor paso a paso, es un motor IPMSM con muchos pares de imanes, lo cual es una gran ventaja para el control sensorless, puesto que, gracias a esta alta candidad de pales de polos de imanes que presentan una alta saliencia, permiten garantizar la observabilidad de la posición del rotor incluso a bajas velocidades, lo que los hace adecuados para aplicaciones de control sensorless en régimenes de baja velocidad. Sin embargo, una alta saliencia también presenta una perturbación adicional, la cual puede ir a favor ó en contra del movimiento del motor dependiendo de la posición. Esto a altas velocidades no es un gran problema, puesto que el efecto de esta perturbación es cancelada por la inercia del sistema,no obstante, en regímenes de muy baja velocidad, dichas perturbaciones pueden amplificarse y dominar la dinámica del motor, afectando negativamente la suavidad del movimiento, la estabilidad del control y la precisión de estimación de velocidad y posición.
+
+    A esta perturbación se le conoce como torque cogging, y al estar fuertemente relacionado con la estructura del motor este existirá siempre, sin importar si el motor estuviese con corriente eléctrica ó no. ~\cite{buSpeedRippleReduction2021}. La frecuencia de esta perturbación depende de la cantidad de numeros de polos del rotor y número de espacios del estator, por lo que, en motores paso a paso con una alta cantidad de polos, esta perturbación puede presentar una frecuencia relativamente alta, lo que puede generar un rizado de corriente significativo y afectar la estabilidad del movimiento a bajas velocidades. ~\cite{guzinskiSensorlessLowSpeed2019}.
 
   \section{Problemática}
 
-  
-En el presente trabajo se aborda el estudio de un clinostato bidimensional accionado mediante motores paso a paso y un sistema de transmisión por poleas, cuya configuración permite mantener los motores fijos y prescindir del uso de sistemas de cableado rotativo como slip-rings. Si bien esta solución simplifica la implementación mecánica y reduce los costos y requerimientos de mantenimiento, introduce desafíos relevantes desde el punto de vista del control del movimiento.
+  Si bien existen técnicas de control sensorless para motores, considerando perturbaciones externas,cogging ó condiciones a baja velocidad, la literatura disponible respecto a la integración en conjunto de estas técnicas aún es limitada. La aplicación para un clinostato se presenta como un caso de estudio relevante, debido a las condiciones particulares de operación, como la necesidad de mantener una velocidad constante a bajas velocidades, la presencia de perturbaciones mecánicas variables y la imposibilidad de incorporar sensores mecánicos para la medición continua de variables como velocidad o posición. Por lo tanto, se hace evidente la necesidad de desarrollar una estrategia de control que integre técnicas de estimación sensorless, considerando tanto la dinámica del motor como las perturbaciones mecánicas variables, con el fin de garantizar un desempeño dinámico adecuado y una simulación efectiva de microgravedad en el clinostato.
 
-Debido a la geometría del sistema de poleas, el torque resistente aplicado sobre el eje del motor no es constante, sino que varía en función de la posición angular del sistema. En particular, determinadas posiciones implican mayores esfuerzos mecánicos, mientras que otras presentan menores exigencias de torque. Esta variación de carga constituye una perturbación mecánica no medible por un sensor por la naturaleza del sistea, que afecta directamente el comportamiento dinámico del motor.
 
-Cuando se utilizan motores paso a paso operando a lazo abierto, estas perturbaciones pueden generar desviaciones significativas entre la velocidad deseada y la velocidad real del eje, además de incrementar las vibraciones mecánicas y el rizado de corriente. Estas variaciones comprometen la estabilidad del movimiento y dificultan la obtención de un régimen de giro uniforme, condición fundamental para el correcto funcionamiento de un clinostato.
 
-Adicionalmente, la ausencia de sensores mecánicos o inerciales instalados de forma permanente en los ejes impide la medición continua de variables como la velocidad o el torque de carga. Esta limitación restringe la aplicación de esquemas de control convencionales basados en realimentación directa, y obliga a enfrentar el problema del control del movimiento bajo condiciones de información parcial del sistema.
-
-En este contexto, surge la necesidad de desarrollar e implementar estrategias de control que permitan mejorar el desempeño dinámico del clinostato frente a perturbaciones mecánicas variables, manteniendo un comportamiento de velocidad estable sin recurrir al uso de sensores mecánicos adicionales.
-
-\section{Propuesta de solución}
-Con el fin de abordar la problemática descrita, se propone implementar un esquema de control en lazo cerrado orientado a mantener un comportamiento de velocidad estable en un clinostato 2D accionado por motores paso a paso, considerando la presencia de perturbaciones mecánicas variables y la ausencia de sensado mecánico continuo.
-La estrategia propuesta se basa en la integración de un controlador de corriente y velocidad con técnicas de estimación, de manera que la retroalimentación necesaria para el control no dependa de sensores mecánicos adicionales. En particular, se plantea utilizar un control orientado a campo (FOC) para gobernar las variables eléctricas del motor en un sistema de referencia dq, permitiendo regular el torque a través de la componente de corriente asociada y mejorar el comportamiento dinámico frente a variaciones de carga.
-Dado que no se dispone de medición directa de velocidad, se incorpora un observador de estados para estimar la velocidad del sistema a partir de señales eléctricas disponibles (principalmente corrientes y voltajes) y de la respuesta a la inyección de señales de alta frecuencia, garantizando observabilidad a baja velocidad. Adicionalmente, se considera la inclusión de un esquema de estimación o compensación de perturbaciones, de modo de atenuar el efecto de un torque resistente variable asociado a la transmisión por poleas y a condiciones mecánicas no modeladas explícitamente, como el rozamiento.
-Para evaluar el desempeño de la solución propuesta, se plantea comparar el comportamiento del sistema operando a lazo abierto y a lazo cerrado con estimación, analizando la capacidad 	de seguimiento de una referencia de velocidad y la respuesta frente a perturbaciones. Complementariamente, se utilizarán variables eléctricas medibles (por ejemplo, rizado de corriente y esfuerzo de control) como indicadores indirectos del desempeño dinámico del motor, permitiendo cuantificar mejoras asociadas a la estrategia implementada.
-Finalmente, la propuesta considera validar la factibilidad de la estrategia mediante simulación y una implementación experimental acotada en el prototipo de clinostato, de modo de demostrar su aplicabilidad práctica bajo las restricciones de sensado del sistema.
 
 \section{Objetivos}
 
 
 \subsection{Objetivo general}
-Implementar 	un sistema de control sin sensores basada en EKF y observadores de estado para motores stepper híbridos, con el fin de garantizar la estabilidad de una baja velocidad en un clinostato 2D frente a perturbaciones de torque no sensadas.
+Implementar un sistema de control sin sensores basada en EKF y observadores de estado para motores stepper híbridos, con el fin de garantizar la estabilidad de una baja velocidad en un clinostato 2D frente a perturbaciones de torque no sensadas.
 
 \subsection{Objetivos especificos}
 \begin{enumerate}

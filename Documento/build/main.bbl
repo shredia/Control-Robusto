@@ -1,58 +1,86 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{ArturoRojas-Moreno2018}
-F.~S.-R.~A. Rojas-Moreno, {\em Design of a novel 3DOF clinostat to produce
-  microgravity for bioengineering applications}.
-\newblock IEEE, 2018.
+\bibitem{rodriguezDISENOMAQUINAMICROGRAVEDAD}
+F.~S. Rodríguez, ``DiseÑo de una mÁquina de microgravedad de tres grados de
+  libertad,''
 
-\bibitem{Cacayurin2023}
-C.~R.~C. Cacayurin, J.~C. L.~D. Chavez, M.~C.~G. Lansangan, C.~B. Lucas,
-  J.~J.~D. Villanueva, R.~Concepcion, R.~J. Relano, and A.~Bandala, ``An
-  engineered design of 3-axis clinostat for simulated gravity experiments in
-  astrobotany,'' in {\em 2023 IEEE 15th International Conference on Humanoid,
-  Nanotechnology, Information Technology, Communication and Control,
-  Environment, and Management, HNICEM 2023}, Institute of Electrical and
-  Electronics Engineers Inc., 2023.
+\bibitem{cacayurinEngineeredDesign3axis2023}
+C.~R.~C. Cacayurin, J.~C.~L. De~Chavez, M.~C.~G. Lansangan, C.~B. Lucas,
+  J.~J.~D. Villanueva, R.~Concepcion, R.-J. Relano, and A.~Bandala, ``An
+  {{Engineered Design}} of 3-axis {{Clinostat}} for {{Simulated Gravity
+  Experiments}} in {{Astrobotany}},'' in {\em 2023 {{IEEE}} 15th
+  {{International Conference}} on {{Humanoid}}, {{Nanotechnology}},
+  {{Information Technology}}, {{Communication}} and {{Control}},
+  {{Environment}}, and {{Management}} ({{HNICEM}})}, pp.~1--6, IEEE.
 
-\bibitem{Nicola2023}
-M.~Nicola and C.~I. Nicola, ``Improvement performances of sensorless control
-  for pmsm based on foc strategy using luenberger observer, sine cosine
-  algorithm, and rl-td3 agent,'' in {\em 2023 International Conference on
-  Electromechanical and Energy Systems, SIELMEN 2023 - Proceedings}, Institute
-  of Electrical and Electronics Engineers Inc., 2023.
+\bibitem{wahabkawafiWahabkClinostatV0522026}
+W.~Kawafi and D.~Dragomirescu, ``Wahabk/{{Clinostat}}: {{V0}}.5.2.''
 
-\bibitem{Nicola2024}
-C.~I. Nicola, M.~Nicola, A.~Iacob, and C.~Pîrvu, ``Pmsm sensorless control
-  system based on dtc using flc and luenberger-pll observer,'' in {\em
-  Proceedings - 2024 IEEE 6th Global Power, Energy and Communication
-  Conference, GPECOM 2024}, pp.~138--143, Institute of Electrical and
-  Electronics Engineers Inc., 2024.
+\bibitem{AN2590SensorlessFOCforPMSMUsingReducedOrderLuenbergerObserverDS00002590}
+STMicroelectronics, ``Sensorless {{FOC}} for {{PMSM}} using {{Reduced Order
+  Luenberger Observer}}.''
 
-\bibitem{Lascu2020}
-C.~Lascu and G.~D. Andreescu, ``Pll position and speed observer with integrated
-  current observer for sensorless pmsm drives,'' {\em IEEE Transactions on
-  Industrial Electronics}, vol.~67, pp.~5990--5999, 7 2020.
+\bibitem{rojas-morenoDesignNovel3DOF2018}
+A.~Rojas-Moreno and F.~Santos-Rodriguez, ``Design of a novel {{3DOF}} clinostat
+  to produce microgravity for bioengineering applications,'' in {\em 2018
+  {{IEEE XXV International Conference}} on {{Electronics}}, {{Electrical
+  Engineering}} and {{Computing}} ({{INTERCON}})}, pp.~1--4, IEEE.
 
-\bibitem{Yu2025}
-K.~Yu, F.~Xiang, J.~Su, W.~Zhu, and S.~Li, ``Simultaneous state and
-  disturbances estimation for sensorless pmsm control: Design and
-  experiments,'' {\em IEEE Transactions on Power Electronics}, vol.~40,
-  pp.~17750--17760, 2025.
+\bibitem{kimCustomizedSmallsizedClinostat2023}
+D.~Kim, Q.~T.~T. Nguyen, S.~Lee, K.-M. Choi, E.-J. Lee, and J.~Y. Park,
+  ``Customized small-sized clinostat using {{3D}} printing and gas-permeable
+  polydimethylsiloxane culture dish,'' vol.~9, no.~1, p.~63.
 
-\bibitem{Shan-Mao2009}
-G.~Shan-Mao, H.~Feng-You, and Z.~Hui, ``Study on extend kalman filter at low
-  speed in sensorless pmsm drives,'' in {\em Proceedings - 2009 International
-  Conference on Electronic Computer Technology, ICECT 2009}, pp.~311--316,
-  2009.
+\bibitem{nicolaImprovementPerformancesSensorless2023}
+M.~Nicola and C.-I. Nicola, ``Improvement {{Performances}} of {{Sensorless
+  Control}} for {{PMSM Based}} on {{FOC Strategy Using Luenberger Observer}},
+  {{Sine Cosine Algorithm}}, and {{RL-TD3 Agent}},'' in {\em 2023
+  {{International Conference}} on {{Electromechanical}} and {{Energy Systems}}
+  ({{SIELMEN}})}, pp.~1--7, IEEE.
 
-\bibitem{Helsing2022}
-R.~Helsing and T.~Sanchez, ``Modeling and control of a pmsm operating in low
-  speeds,'' tech. rep., 2022.
+\bibitem{nicolaPMSMSensorlessControl2024}
+C.-I. Nicola, M.~Nicola, A.~Iacob, and C.~Pîrvu, ``{{PMSM Sensorless Control
+  System Based}} on {{DTC Using FLC}} and {{Luenberger-PLL Observer}},'' in
+  {\em 2024 6th {{Global Power}}, {{Energy}} and {{Communication Conference}}
+  ({{GPECOM}})}, pp.~138--143, IEEE.
 
-\bibitem{Wang2025}
-D.~Wang, Z.~Wang, P.~Zhang, and L.~Niu, ``Optimized nonlinear high-frequency
-  injection for sensorless pmsm in low-speed industrial servo systems,''
-  pp.~982--986, Institute of Electrical and Electronics Engineers (IEEE), 11
-  2025.
+\bibitem{lascuPLLPositionSpeed2020}
+C.~Lascu and G.-D. Andreescu, ``{{PLL Position}} and {{Speed Observer With
+  Integrated Current Observer}} for {{Sensorless PMSM Drives}},'' vol.~67,
+  no.~7, pp.~5990--5999.
+
+\bibitem{yuSimultaneousStateDisturbances2025}
+K.~Yu, F.~Xiang, J.~Su, W.~Zhu, and S.~Li, ``Simultaneous {{State}} and
+  {{Disturbances Estimation}} for {{Sensorless PMSM Control}}: {{Design}} and
+  {{Experiments}},'' vol.~40, no.~12, pp.~17750--17760.
+
+\bibitem{horvathLoadTorquePermanent2023}
+K.~Horváth, ``Load {{Torque}} and {{Permanent Magnet Flux Linkage Estimation}}
+  of {{Surface-Mounted PMSM}} by {{Using Unscented Kalman Filter}},'' in {\em
+  2023 {{International Conference}} on {{Electrical Drives}} and {{Power
+  Electronics}} ({{EDPE}})}, pp.~1--8, IEEE.
+
+\bibitem{zaltniObservabilityAnalysisPMSM2009}
+D.~Zaltni, M.~N. Abdelkrim, M.~Ghanes, and J.~P. Barbot, ``Observability
+  analysis of {{PMSM}},'' in {\em 2009 3rd {{International Conference}} on
+  {{Signals}}, {{Circuits}} and {{Systems}} ({{SCS}})}, pp.~1--6, IEEE.
+
+\bibitem{koteichPermanentMagnetSynchronous2015}
+M.~Koteich, A.~Maloum, G.~Duc, and G.~Sandou, ``Permanent magnet synchronous
+  drives observability analysis for motion-sensorless control,'' in {\em 2015
+  {{IEEE Symposium}} on {{Sensorless Control}} for {{Electrical Drives}}
+  ({{SLED}})}, pp.~1--8, IEEE.
+
+\bibitem{buSpeedRippleReduction2021}
+F.~Bu, Z.~Yang, Y.~Gao, Z.~Pan, T.~Pu, M.~Degano, and C.~Gerada, ``Speed
+  {{Ripple Reduction}} of {{Direct-Drive PMSM Servo System}} at {{Low-Speed
+  Operation Using Virtual Cogging Torque Control Method}},'' vol.~68, no.~1,
+  pp.~160--174.
+
+\bibitem{guzinskiSensorlessLowSpeed2019}
+J.~Guzinski, M.~Morawiec, Z.~Krzeminski, K.~Luksza, P.~Strankowski, and
+  A.~Kouzou, ``Sensorless {{Low Speed PMSM Motor Control}} with {{Cogging
+  Torque Compensation}},'' in {\em 2019 2nd {{International Conference}} on
+  {{Smart Grid}} and {{Renewable Energy}} ({{SGRE}})}, pp.~1--6, IEEE.
 
 \end{thebibliography}

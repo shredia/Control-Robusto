@@ -1,4 +1,4 @@
-Time_simulation = 0.5;
+Time_simulation = 5;
 t_ref = [0.0];
 w_ref = [0.2];
 
@@ -13,7 +13,7 @@ P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1; %%Corriente nominal del torque 
 I_max = sqrt(2*I_nom);
-Tdm = 0/1000;%%18/1000;%%Torque para que no se mueva el rotor
+Tdm = 18/1000;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  330/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
@@ -132,7 +132,7 @@ wh = 2 * pi * f_h;     % Frecuencia en rad/s (para la demodulación)
 
 % Parámetros del Filtro BPF
 Fs_control = f_ekf;    % Asumiendo frecuencia de muestreo de 10kHz (ajustar si es otra)
-BW_hfi = 100;          % Ancho de banda del filtro en Hz (típicamente 100-200Hz)
+BW_hfi = 200;          % Ancho de banda del filtro en Hz (típicamente 100-200Hz)
 
 % Diseño del filtro de 1er orden de butterworth (produce un BPF de 2do orden)
 % Normalización de frecuencias [f_inferior, f_superior] respecto a Fs/2

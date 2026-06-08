@@ -1,11 +1,19 @@
 \babel@toc {spanish}{}\relax 
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Relación entre velocidad de giro y radio para alcanzar microgravedad. Fuente: ~\cite {rodriguezDISENOMAQUINAMICROGRAVEDAD}}}{3}{figure.caption.4}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Tabla de tiempo de convergencia a microgravedad dependiendo del radio y la velocidad de giro. Fuente: ~\cite {rodriguezDISENOMAQUINAMICROGRAVEDAD}}}{4}{figure.caption.5}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Clinostato de tres ejes. Fuente: ~\cite {cacayurinEngineeredDesign3axis2023}}}{5}{figure.caption.6}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces Clinostato de 2 ejes. Fuente: ~\cite {wahabkawafiWahabkClinostatV0522026}}}{6}{figure.caption.7}%
+\contentsline {figure}{\numberline {1.5}{\ignorespaces Clasificación de los motores. Fuente: ~\cite {oswosVisionGeneralMotors2026}}}{8}{figure.caption.8}%
+\contentsline {figure}{\numberline {1.6}{\ignorespaces imagen conceptual de un motor IPMSM. Fuente: ~\cite {AN2590SensorlessFOCforPMSMUsingReducedOrderLuenbergerObserverDS00002590}}}{8}{figure.caption.9}%
+\contentsline {figure}{\numberline {1.7}{\ignorespaces imagen conceptual de un motor SPMSM. Fuente: ~\cite {AN2590SensorlessFOCforPMSMUsingReducedOrderLuenbergerObserverDS00002590}}}{9}{figure.caption.10}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Control PI de velocidad con desacople }}{16}{figure.caption.7}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Control PI de corriente en el eje $q$ con desacople.}}{16}{figure.caption.8}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Control PI de corriente en el eje $d$ con desacople.}}{16}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Control PI de velocidad con desacople }}{23}{figure.caption.15}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Control PI de corriente en el eje $q$ con desacople.}}{23}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Control PI de corriente en el eje $d$ con desacople.}}{23}{figure.caption.17}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Datasheet de un motor stepper bifásico 17HS3401S.}}{20}{figure.caption.11}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Datasheet de un motor stepper bifásico 17HS3401S.}}{25}{figure.caption.18}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {B.1}{\ignorespaces Mediciones de inductancia del motor stepper bifásico 17HS3401S.}}{22}{figure.caption.12}%
+\contentsline {figure}{\numberline {B.1}{\ignorespaces Mediciones de inductancia del motor stepper bifásico 17HS3401S.}}{27}{figure.caption.19}%
+\addvspace {10\p@ }

@@ -15,3 +15,56 @@
     \caption{Mediciones de inductancia del motor stepper bifásico 17HS3401S.} 
     \label{fig:medicion_inductancia} % Esta es la "llave" para referenciarlo
 \end{figure}
+
+\chapter{Análisis observabilidad y controlabilidad}
+\begin{lstlisting}[style=MatlabStyle, caption={Sistema no lineal y cálculo de Jacobianos}, label={lst:jacobianos}]
+%% === Sistema no lineal y calculo de Jacobianos ===
+clear; clc;
+
+syms Rs R Ld Lq Kt Vd Vq Id Iq We Wm Tl J Th_m Nr B a b Wa Wb Ke Tx Te L0 L2 La Lb % Variables simbolicas
+
+f1_1 = (Vd - Rs*Id + Nr*Wm*Lq*Iq)/Ld;         % d(Id)/dt
+f2_1 = (Vq - Rs*Iq - Nr*Wm*Ld*Id-Ke*Wm)/Lq;  % d(Iq)/dt
+f3_1 = (Kt*(Iq) + (Ld-Lq)*Id*Iq -B*Wm)/J;    % d(Wm)/dt
+f4_1 = Wm;
+
+f_1 = [f1_1; f2_1; f3_1; f4_1];
+x_1 = [Id; Iq; Wm; Th_m];
+u_1 = [Vd; Vq];
+
+A_1 = jacobian(f_1,x_1);
+B_1 = jacobian(f_1,u_1);
+
+C_1 = [1 0 0 0;
+       0 1 0 0];
+
+D_1 = zeros(2,2);
+
+disp('Matriz A_1 = ');
+pretty(A_1)
+
+disp('Matriz B_1 = ');
+pretty(B_1)
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Resultados del analisis de observabilidad y controlabilidad}, label={lst:resultados}]
+--- RESULTADOS DEL ANALISIS ---
+Rango de Observabilidad: 3
+Numero de Condicion: Inf
+El sistema NO es completamente observable.
+Base del subespacio no observable:
+     0
+     0
+     0
+     1
+
+Valores singulares de la matriz de observabilidad:
+   1.0e+05 *
+
+    6.1860
+    0.9525
+    0.0000
+         0
+
+Rango controlabilidad: 4
+\end{lstlisting}

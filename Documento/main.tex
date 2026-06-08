@@ -22,7 +22,23 @@
 \usepackage{schemabloc}
 \usetikzlibrary{arrows.meta, positioning, calc,babel}
 
-% --------------------------------------------------------------------------
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinestyle{MatlabStyle}{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    commentstyle=\color{green!40!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+%-------------------------------------------------------------------
 % INICIO DEL DOCUMENTO
 % --------------------------------------------------------------------------
 \begin{document}
@@ -56,6 +72,6 @@
 \newpage
 \addcontentsline{toc}{chapter}{Bibliografía} % Para que aparezca en el índice
 \bibliographystyle{ieeetr}
-\bibliography{referencias.bib}
+\bibliography{biblioteca.bib}
 
 \end{document}

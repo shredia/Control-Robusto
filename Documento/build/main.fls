@@ -263,6 +263,17 @@ INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarycalc.code.tex
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarybabel.code.tex
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarybabel.code.tex
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstpatch.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstpatch.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstpatch.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstmisc.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstmisc.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstmisc.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.aux
@@ -331,8 +342,8 @@ INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
-OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\eccc1200.tfm
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
@@ -348,13 +359,62 @@ INPUT .\capitulos\01_Introduccion.tex
 INPUT .\capitulos\01_Introduccion.tex
 INPUT capitulos\01_Introduccion.tex
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1728.tfm
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\relacion_velocidad_radio.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT .\imagenes\Tabla_convergencia.png
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0800.tfm
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_3ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clinostato_2ejes.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\Clasificacion_motores.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\IPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
+INPUT .\imagenes\SPMSM.png
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT .\capitulos\02_Marco_teorico.tex
 OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT capitulos\02_Marco_teorico.tex
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0800.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm0600.tfm
 INPUT .\capitulos\03_Metodologia.tex
 INPUT .\capitulos\03_Metodologia.tex
@@ -382,6 +442,17 @@ INPUT .\imagenes\anexos\medicion_inductancia.png
 INPUT .\imagenes\anexos\medicion_inductancia.png
 INPUT .\imagenes\anexos\medicion_inductancia.png
 INPUT .\imagenes\anexos\medicion_inductancia.png
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstlang1.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstlang1.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstlang1.sty
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ectt1200.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ectt1095.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1095.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\tcrm1200.tfm
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
@@ -403,6 +474,14 @@ INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\bu
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.out
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecti1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ectt1095.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ectt1095.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0600.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0600.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0800.pk
+INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm0800.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\eccc1200.pk
 INPUT C:\Users\damia\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
