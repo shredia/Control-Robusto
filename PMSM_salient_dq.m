@@ -106,7 +106,7 @@ function Derivatives(block)
     % Si no tienes Nr o phi_tdm, usa phi=0 y define Nr en params.
     
 
-    Tdet = p.Tdm * sin(p.N_steps*Th_m + p.Phi);
+    Tdet = p.Tdm * sin(p.Nr*Th_m + p.Phi); %%Revisar si es N_steps Ó Nr (200 valles energeóticos o por pares de polos)
 
     % =========================
     % Mecánica

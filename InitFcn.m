@@ -1,6 +1,6 @@
-Time_simulation = 0.5;
+Time_simulation = 2;
 t_ref = [0.0];
-w_ref = [0.2];
+w_ref = [1];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
@@ -25,8 +25,8 @@ L = 6/1000; %% [L]
 Phi = pi/2;
     
 %%Saliencia
-Ld = 8.71/1000;
-Lq = 3.18/1000;
+Lq = 8.71/1000;
+Ld = 3.18/1000;
 L0 = 5.945/1000;
 L2 = 2.765/1000;
 
@@ -36,7 +36,7 @@ L2 = 2.765/1000;
 % L0 = L;
 %%Propiedades del motor (variables que creo conocer)
 B_internal = 1e-4; %%roce
-J_internal = 4.7/1000000; %%inercia del motor 
+J_internal = 47e-7; %%inercia del motor 
 %%Propiedades de carga del motor (variables que desconozco)
 J_external = J_internal*1;
 B_external = B_internal*1;
@@ -51,15 +51,18 @@ J_rate = J_var/J_real;
 B_rate = B_var/B_real;
 %%Variables de roce que desconozco
 Tc = 0.002; %%Coulomb friction
-Tba = 2.5*Tc; %%Breakwat friction
-Wba = 2;%%breakway frictions (rad/s)
+Tba = 0;2.5*Tc; %%Breakwat friction
+Wba = 0;2;%%breakway frictions (rad/s)
+
 
 InitialSpeed = 0; %%rad/s
+RI_flag = 0;
+HFI_flag = 1;
 
 
 
 
-Vdc = 12;
+Vdc = 24;
 
 fbw_d = 500;          % Hz (BW corriente)
 fbw_q = 500;          % Hz (BW corriente)
@@ -99,17 +102,74 @@ Ki_q_salient = wd_q^2*Lq
 Kp_d_salient = 2*shi_d*wd_d*Ld -R
 Ki_d_salient = wd_d^2*Ld
 
-shi_w = 0.707;
+shi_w = 2.5;
 wn_w = 2*pi*fbw_Wm;
 
 Kp_w = (2*shi_w*wn_w*J_var - B_var)/Kt;
 Ki_w = (wn_w^2)*J_var/Kt;
 
-% Si B desconocido, no uses B0,B1 con (B/J) real
-BJ_hat = B_var/J_var;     % o una estimación
-B0 = 3*wn_w - BJ_hat;
-B1 = 3*wn_w^2 - B0*BJ_hat;
-B2 = -(J_var/P)*(wn_w^3);
+
+
+%% ==========================
+% Resonant Controller
+%% ==========================
+
+
+zeta_p = 0.01;
+zeta_z = 0.9;
+
+z0 = 0.98;
+z6 = 0.7;
+
+Kri = 0.001;
+
+
+
+wr = P*w_ref;
+
+wp = wr/sqrt(1-2*zeta_p^2);
+wz = wp;
+
+a_ri = 2*exp(-Ts_Wm*zeta_z*wz)* ...
+       cos(Ts_Wm*wz*sqrt(1-zeta_z^2));
+
+b_ri = exp(-2*Ts_Wm*zeta_z*wz);
+
+c_ri = 2*exp(-Ts_Wm*zeta_p*wp)* ...
+       cos(Ts_Wm*wp*sqrt(1-zeta_p^2));
+
+d_ri = exp(-2*Ts_Wm*zeta_p*wp);
+
+Kr_norm = Kri*(1-c_ri+d_ri)/(1-a_ri+b_ri);
+
+
+fprintf('wr      = %.6f\n',wr);
+fprintf('a_ri    = %.6f\n',a_ri);
+fprintf('b_ri    = %.6f\n',b_ri);
+fprintf('c_ri    = %.6f\n',c_ri);
+fprintf('d_ri    = %.6f\n',d_ri);
+
+Kr_norm = Kri*(1-c_ri+d_ri)/(1-a_ri+b_ri);
+
+fprintf('Kr_norm = %.6f\n',Kr_norm);
+
+%% =========================================================================
+% SINTONIZACIÓN INDEPENDIENTE DEL OBSERVADOR DE PERTURBACIONES (DOB)
+%% =========================================================================
+fbw_DO = 30;                  % Hz (Ancho de banda del DOB, subido de ~10Hz a 120Hz)
+wn_do = 2*pi*fbw_DO;           % rad/s
+
+% Usamos una sintonización de polos repetidos en -wn_do (Polinomio de Hurwitz)
+% para garantizar estabilidad estricta y convergencia rápida.
+BJ_hat = B_var / J_var;
+
+B0 = 3*wn_do - BJ_hat;
+B1 = 3*wn_do^2 - B0*BJ_hat;
+B2 = (wn_do^3)*(J_var/P);        % Ajuste de ganancia pura de perturbación
+
+% Si usas la estructura exacta del paper (unidades eléctricas):
+% Asegúrate de pasar estos valores calculados (beta0_calc, beta1_calc, beta2_calc)
+% directo a los puertos de entrada de tu S-Function.
 
 % --- Empaquetado para S-Function Level-2 ---
 params.R      = R;
@@ -123,7 +183,7 @@ params.Kt     = Kt;
 params.Tdm = Tdm;
 params.N_steps = N_steps;
 params.Phi = Phi;
-
+params.Nr = N_steps;
 
 %% Cálculo de parámetros del HFI
 Amplitud_HFI = 0.5;      % Voltios
@@ -150,90 +210,79 @@ a2_hfi = a_hfi(3);
 fprintf('Coeficientes calculados para f_h = %d Hz:\n', f_h);
 fprintf('b0 = %.6f, b1 = %.6f, b2 = %.6f\n', b0_hfi, b1_hfi, b2_hfi);
 fprintf('a1 = %.6f, a2 = %.6f\n', a1_hfi, a2_hfi);
-
-% Análisis de lazo cerrado de velocidad en Matlab
-% s = tf('s');
-% G_planta = Kt / (J_real * s + B_real);
-% C_pi = Kp_w + Ki_w/s;
-% L_a = C_pi * G_planta; % Lazo abierto
-% T = feedback(L_a, 1);  % Lazo cerrado
 % 
-% figure
-% margin(L_a)
-% grid on
-% title('Bode con márgenes')
 % 
-% figure
-% step(T)
-% grid on
-% title('Respuesta al escalón')
-% 
-% figure
-% pzmap(T)
-% grid on
-% title('Mapa polo-cero')
-
-
-% %% 1. Variable de Laplace
+% %% ====================================================
+% % PI convencional
+% %% ====================================================
 % 
 % s = tf('s');
 % 
-% %% 2. Frecuencia de la perturbación
+% % Planta mecánica
+% Gp = 1/(J_var*s + B_var);
 % 
-% wd = 4*P*w_ref;      % rad/s
-% fd = wd/(2*pi);      % Hz
+% % PI velocidad
+% C_PI = Kp_w + Ki_w/s;
 % 
-% fprintf('Frecuencia perturbación: %.4f rad/s = %.4f Hz\n', wd, fd);
+% % Lazo abierto
+% L_PI = Kt*C_PI*Gp;
 % 
-% %% 3. Controlador PI de velocidad
+% % Perturbación torque -> velocidad
+% Gd_PI = -Gp/(1 + L_PI);
 % 
-% Cw = Kp_w + Ki_w/s;
+% figure
+% bode(Gd_PI)
+% grid on
+% title('Perturbación Torque -> Velocidad (PI)')
 % 
-% %% 4. Transferencia perturbación -> velocidad sin PI
+% %% ====================================================
+% % Resonador
+% %% ====================================================
 % 
-% Gd_w_open = -1/(J_var*s + B_var);
+% wr = P*w_ref;
 % 
-% %% 5. Transferencia perturbación -> velocidad con PI
+% zeta_p = 0.01;
+% zeta_z = 0.9;
 % 
-% Gd_w_closed = -1/(J_var*s + B_var + Kt*Cw);
+% Kri = 0.03;
 % 
-% %% 6. Bode comparativo
+% R1 = Kri * ...
+%     (s^2 + 2*zeta_z*wr*s + wr^2) / ...
+%     (s^2 + 2*zeta_p*wr*s + wr^2);
 % 
-% figure;
-% bode(Gd_w_open, Gd_w_closed);
-% grid on;
-% legend('Sin PI', 'Con PI');
-% title('Bode: perturbación de torque T_d \rightarrow velocidad \omega_m');
+% %% ====================================================
+% % Controlador total
+% %% ====================================================
 % 
-% %% 7. Marcar frecuencia de perturbación en el Bode
+% C_RI = C_PI + R1;
 % 
-% figure;
-% bode(Gd_w_closed);
-% grid on;
-% title('Bode: T_d \rightarrow \omega_m con PI de velocidad');
+% L_RI = Kt*C_RI*Gp;
 % 
-% hold on;
+% Gd_RI = -Gp/(1 + L_RI);
 % 
-% % Obtener magnitud y fase exactamente en wd
-% [mag, phase] = bode(Gd_w_closed, wd);
+% figure
 % 
-% mag = squeeze(mag);
-% phase = squeeze(phase);
+% bode(Gd_PI,'r',Gd_RI,'b')
 % 
-% mag_db = 20*log10(mag);
+% grid on
 % 
-% fprintf('\n===== Evaluación en frecuencia de perturbación =====\n');
-% fprintf('|Gd_w(jwd)| = %.6e rad/s por N*m\n', mag);
-% fprintf('|Gd_w(jwd)| = %.2f dB\n', mag_db);
-% fprintf('Fase = %.2f grados\n', phase);
+% legend('PI','PI + RI')
 % 
-% %% 8. Estimar rizado desde el Bode
+% title('Rechazo perturbación torque')
 % 
-% A_w = mag*Tdm;             % amplitud del rizado [rad/s]
-% ripple_pp = 2*A_w;         % peak-to-peak [rad/s]
-% ripple_percent = ripple_pp/w_ref*100;
+% wd = P*w_ref;
 % 
-% fprintf('\n===== Rizado estimado =====\n');
-% fprintf('A_w = %.6f rad/s\n', A_w);
-% fprintf('Ripple pp = %.6f rad/s\n', ripple_pp);
-% fprintf('Ripple percent = %.2f %%\n', ripple_percent);
+% [mag_PI,~] = bode(Gd_PI,wd);
+% [mag_RI,~] = bode(Gd_RI,wd);
+% 
+% mag_PI = squeeze(mag_PI);
+% mag_RI = squeeze(mag_RI);
+% 
+% fprintf('\n');
+% fprintf('===== COMPARACION =====\n');
+% 
+% fprintf('PI     : %.2f dB\n',20*log10(mag_PI));
+% fprintf('PI+RI  : %.2f dB\n',20*log10(mag_RI));
+% 
+% fprintf('Mejora : %.2f dB\n', ...
+%     20*log10(mag_RI/mag_PI));
