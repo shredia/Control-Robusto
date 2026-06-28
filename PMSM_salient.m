@@ -4,7 +4,7 @@
     
     function setup(block)
         block.NumInputPorts  = 3; % Va, Vb, Tl
-        block.NumOutputPorts = 7; % Ia, Ib, Wm, We, Th_m, Th_e, Te 
+        block.NumOutputPorts = 8; % Ia, Ib, Wm, We, Th_m, Th_e, Te,Tdtm 
         
         block.SetPreCompInpPortInfoToDynamic;
         block.SetPreCompOutPortInfoToDynamic;
@@ -22,7 +22,7 @@
         block.ContStates.Data = [0; 0; 0; 0]; 
     end
     
-    function [Te, L_mat, dL_dTh] = calculate_physics(p, Ia, Ib, Wm, Th_m)
+    function [Te, L_mat, dL_dTh,Tdtm] = calculate_physics(p, Ia, Ib, Wm, Th_m)
         % Función auxiliar interna para consistencia total entre Outputs y Derivatives
         Th_e = p.P * Th_m;
         Th_e_2 = 2 * Th_e;
@@ -46,6 +46,7 @@
         Te_sync  = p.Ke * (Ib*cos(Th_e) - Ia*sin(Th_e));
         
         Te = Te_sync + Te_reluc;
+        Tdtm = p.Tdm * sin(p.Nr*Th_m + p.Phi);
     end
     
     function Outputs(block)
@@ -53,7 +54,7 @@
         x = block.ContStates.Data;
         Ia = x(1); Ib = x(2); Wm = x(3); Th_m = x(4);
         
-        [Te, ~, ~] = calculate_physics(p, Ia, Ib, Wm, Th_m);
+        [Te, ~, ~,Tdtm] = calculate_physics(p, Ia, Ib, Wm, Th_m);
         
         block.OutputPort(1).Data = Ia;
         block.OutputPort(2).Data = Ib;
@@ -62,6 +63,7 @@
         block.OutputPort(5).Data = Th_m;
         block.OutputPort(6).Data = p.P * Th_m;
         block.OutputPort(7).Data = Te; 
+        block.OutputPort(8).Data = Tdtm; 
     end
     
     function Derivatives(block)

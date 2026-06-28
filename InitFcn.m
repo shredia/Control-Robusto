@@ -1,4 +1,4 @@
-Time_simulation = 2;
+Time_simulation = 0.5;
 t_ref = [0.0];
 w_ref = [1];
 
@@ -11,10 +11,10 @@ N_steps = 360/Step_angle; %%numero de pasos del motor
 N_teeths = N_steps/N_phases; %%Cantidad de dientes del rotor
 P = N_teeths/2;%%Número de pares de polos
 
-I_nom = 1; %%Corriente nominal del torque 
+I_nom = 1.7; %%Corriente nominal del torque 
 I_max = sqrt(2*I_nom);
-Tdm = 0/1000;%%18/1000;%%Torque para que no se mueva el rotor
-Thold =  330/1000; %%Torque máximo para mantener la posición
+Tdm = 22/1000;%%18/1000;%%Torque para que no se mueva el rotor
+Thold =  392/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
 Psi = Kt/P;
@@ -25,10 +25,10 @@ L = 6/1000; %% [L]
 Phi = pi/2;
     
 %%Saliencia
-Lq = 8.71/1000;
-Ld = 3.18/1000;
-L0 = 5.945/1000;
-L2 = 2.765/1000;
+Lq = 9.61/1000;
+Ld = 3.66/1000;
+L0 = 6.635/1000;
+L2 = 2.975/1000;
 
 % Ld = L;
 % Lq = Ld;
@@ -36,7 +36,7 @@ L2 = 2.765/1000;
 % L0 = L;
 %%Propiedades del motor (variables que creo conocer)
 B_internal = 1e-4; %%roce
-J_internal = 47e-7; %%inercia del motor 
+J_internal = 54e-7; %%inercia del motor 
 %%Propiedades de carga del motor (variables que desconozco)
 J_external = J_internal*1;
 B_external = B_internal*1;
@@ -57,7 +57,7 @@ Wba = 0;2;%%breakway frictions (rad/s)
 
 InitialSpeed = 0; %%rad/s
 RI_flag = 0;
-HFI_flag = 1;
+HFI_flag = 0;
 
 
 
@@ -84,7 +84,8 @@ Ts_ekf = 1/f_ekf;
 
 
 Ts_current = 1/f_current;
-Ts_Wm = Ts_current;
+Ts_Wm = Ts_current*10;
+Ts_pos = Ts_Wm*10;
 f_wm = 1/Ts_Wm;
 Ts_DO = Ts_Wm;
 Kp_d = wd_d*L;
@@ -102,12 +103,18 @@ Ki_q_salient = wd_q^2*Lq
 Kp_d_salient = 2*shi_d*wd_d*Ld -R
 Ki_d_salient = wd_d^2*Ld
 
-shi_w = 2.5;
+shi_w = 1;
 wn_w = 2*pi*fbw_Wm;
 
-Kp_w = (2*shi_w*wn_w*J_var - B_var)/Kt;
+Kp_w = (2*shi_w*wn_w*J_var )/Kt;
 Ki_w = (wn_w^2)*J_var/Kt;
+Kd_w = Kp_w/1000;
+Tf_w = 10/1000;
 
+
+Kp_pos = 1.0;    % Ganancia Proporcional (rigidez)
+Ki_pos = 0;     % Ganancia Integral (elimina error en estado estable)
+Kd_pos = 0.05;    % Ganancia Derivativa (amortiguamiento ante cogging)
 
 
 %% ==========================

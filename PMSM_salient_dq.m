@@ -4,7 +4,7 @@ end
 
 function setup(block)
     block.NumInputPorts  = 3; % Vd, Vq, Tl
-    block.NumOutputPorts = 7; % Id, Iq, Wm, We, Th_m, Th_e, Te
+    block.NumOutputPorts = 8; % Id, Iq, Wm, We, Th_m, Th_e, Te,Tdtm
 
     block.SetPreCompInpPortInfoToDynamic;
     block.SetPreCompOutPortInfoToDynamic;
@@ -49,6 +49,7 @@ function Outputs(block)
     % Te_PM  = Ke * Iq
     % Te_rel = P*(Ld-Lq)*Id*Iq
     Te = p.Ke*Iq - p.P*(p.Ld - p.Lq)*Id*Iq;
+    Tdtm = p.Tdm * sin(p.Nr*Th_m + p.Phi); %%Revisar si es N_steps Ó Nr (200 valles energeóticos o por pares de polos)
 
 
     block.OutputPort(1).Data = Id;
@@ -58,6 +59,7 @@ function Outputs(block)
     block.OutputPort(5).Data = Th_m;
     block.OutputPort(6).Data = Th_e;
     block.OutputPort(7).Data = Te;
+    block.OutputPort(8).Data = Tdtm;
 end
 
 function Derivatives(block)
