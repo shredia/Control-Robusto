@@ -1,0 +1,255 @@
+function [Iq_ref, Id_ref, Iq_cogging, Iq_PI, error_Wm] = PI_speed_RI_MTPA( ...
+        Wm_ref, Wm, Ts, ...
+        Kp_w, Ki_w, Kd_w, Tf_w, ...
+        Tl_tdm, B, ...
+        Imax, ...
+        RI_enable, a_ri, b_ri, c_ri, d_ri, Kr_norm, ...
+        Ld, Lq, Ke, P)
+
+% =========================================================================
+% CONTROL DE VELOCIDAD MECÁNICA + MTPA
+%
+% Ke debe corresponder a Kt_pm [N*m/A]:
+%       Te = Ke*Iq + Krel*Id*Iq
+%
+% Se asume:
+%       Te = 1.5*P*(Psi*Iq + (Ld-Lq)*Id*Iq)
+%
+% Por tanto:
+%       Ke   = 1.5*P*Psi
+%       Krel = 1.5*P*(Ld-Lq)
+%
+% Salidas:
+%   Iq_ref      : referencia q luego de MTPA y límite vectorial
+%   Id_ref      : referencia d MTPA
+%   Iq_cogging  : salida del resonador RI
+%   Iq_PI       : salida PI/PID de velocidad, sin feedforward
+% =========================================================================
+
+persistent int_w
+persistent Wm_prev
+persistent dWm_filt_prev
+persistent y1_ri y2_ri
+persistent e1_ri e2_ri
+
+if isempty(int_w)
+
+    int_w = 0;
+
+    Wm_prev       = Wm;
+    dWm_filt_prev = 0;
+
+    y1_ri = 0;
+    y2_ri = 0;
+
+    e1_ri = 0;
+    e2_ri = 0;
+
+end
+
+% =========================================================================
+% Protecciones numéricas
+% =========================================================================
+Ts_eff   = max(Ts, 1e-9);
+Imax_eff = max(abs(Imax), 1e-6);
+
+Kt_pm = Ke;
+
+% Modelo PMSM estándar
+Krel =  P * (Ld - Lq);
+
+% =========================================================================
+% 1. Error de velocidad
+% =========================================================================
+error_Wm = Wm_ref - Wm;
+
+% =========================================================================
+% 2. Derivada filtrada sobre velocidad medida
+% =========================================================================
+dWm_raw = (Wm - Wm_prev) / Ts_eff;
+
+if Tf_w > 0
+
+    alpha_d = Ts_eff / (Tf_w + Ts_eff);
+
+    dWm_filt = dWm_filt_prev + ...
+        alpha_d * (dWm_raw - dWm_filt_prev);
+
+else
+
+    dWm_filt = dWm_raw;
+
+end
+
+D_w = -Kd_w * dWm_filt;
+
+% =========================================================================
+% 3. Feedforward de carga y roce viscoso
+% =========================================================================
+T_ff = Tl_tdm + B * Wm_ref;
+
+if abs(Kt_pm) > 1e-9
+    Iq_ff = T_ff / Kt_pm;
+else
+    Iq_ff = 0;
+end
+
+% =========================================================================
+% 4. Resonador para ripple / cogging
+% =========================================================================
+if RI_enable ~= 0
+
+    Iq_RI_new = ...
+          c_ri * y1_ri ...
+        - d_ri * y2_ri ...
+        + Kr_norm * (error_Wm ...
+        - a_ri * e1_ri ...
+        + b_ri * e2_ri);
+
+else
+
+    Iq_RI_new = 0;
+
+end
+
+% =========================================================================
+% 5. Integrador candidato
+% =========================================================================
+int_w_candidate = int_w + Ki_w * Ts_eff * error_Wm;
+
+% =========================================================================
+% 6. Control de velocidad + MTPA + límite vectorial
+% =========================================================================
+for pass = 1:2
+
+    % PI/PID de velocidad expresado en corriente q equivalente
+    Iq_PI = Kp_w * error_Wm + int_w_candidate + D_w;
+
+    % Referencia total antes de MTPA
+    Iq_ref_raw = Iq_ff + Iq_PI + Iq_RI_new;
+
+    % ---------------------------------------------------------------------
+    % MTPA
+    % ---------------------------------------------------------------------
+    if abs(Krel) > 1e-9 && abs(Kt_pm) > 1e-9
+
+        % Punto MTPA que toca el círculo de corriente máxima
+        disc_mtpa = Kt_pm^2 + ...
+            8 * Krel^2 * Imax_eff^2;
+
+        Id_mtpa_max = (-Kt_pm + sqrt(max(0, disc_mtpa))) ...
+            / (4 * Krel);
+
+        % Protección adicional
+        Id_mtpa_max = max(-Imax_eff, min(Imax_eff, Id_mtpa_max));
+
+        Iq_mtpa_max = sqrt(max(0, ...
+            Imax_eff^2 - Id_mtpa_max^2));
+
+        % Limita Iq a lo permitido por la trayectoria MTPA
+        Iq_ref = max(-Iq_mtpa_max, ...
+                 min(Iq_mtpa_max, Iq_ref_raw));
+
+        % Trayectoria MTPA estable numéricamente.
+        %
+        % Para Lq > Ld:
+        %   Krel < 0
+        %   A_mtpa < 0
+        %   Id_ref < 0
+        A_mtpa = Kt_pm / (2 * Krel);
+
+        denom_mtpa = abs(A_mtpa) + ...
+            sqrt(A_mtpa^2 + Iq_ref^2);
+
+        Id_ref = sign(A_mtpa) * Iq_ref^2 / denom_mtpa;
+
+        sat = abs(Iq_ref_raw) > Iq_mtpa_max;
+
+    else
+
+        % Motor sin saliencia relevante: Id = 0
+        Id_ref = 0;
+
+        Iq_ref = max(-Imax_eff, ...
+                 min(Imax_eff, Iq_ref_raw));
+
+        sat = abs(Iq_ref_raw) > Imax_eff;
+
+    end
+
+
+      % Motor sin saliencia relevante: Id = 0
+        % Id_ref = 0;
+        % 
+        % Iq_ref = max(-Imax_eff, ...
+        %          min(Imax_eff, Iq_ref_raw));
+        % 
+        % sat = abs(Iq_ref_raw) > Imax_eff;
+    % Protección final de magnitud vectorial
+    Iref_mag = sqrt(Id_ref^2 + Iq_ref^2);
+
+    if Iref_mag > Imax_eff
+
+        scale = Imax_eff / Iref_mag;
+
+        Id_ref = Id_ref * scale;
+        Iq_ref = Iq_ref * scale;
+
+        sat = true;
+
+    end
+
+    % ---------------------------------------------------------------------
+    % Anti-windup condicional del PI de velocidad
+    % ---------------------------------------------------------------------
+    int_increment = int_w_candidate - int_w;
+
+    integrator_worsens_sat = ...
+        (Iq_ref_raw * int_increment) > 0;
+
+    if pass == 1 && sat && integrator_worsens_sat
+
+        % Se rechaza integración que empuja más hacia saturación
+        int_w_candidate = int_w;
+
+    else
+
+        break;
+
+    end
+
+end
+
+% Guarda integrador final
+int_w = int_w_candidate;
+
+% =========================================================================
+% 7. Actualización de memorias
+% =========================================================================
+Wm_prev       = Wm;
+dWm_filt_prev = dWm_filt;
+
+if RI_enable ~= 0
+
+    y2_ri = y1_ri;
+    y1_ri = Iq_RI_new;
+
+    e2_ri = e1_ri;
+    e1_ri = error_Wm;
+
+else
+
+    y1_ri = 0;
+    y2_ri = 0;
+
+    e1_ri = 0;
+    e2_ri = 0;
+
+end
+
+% =========================================================================
+% 8. Salida de monitoreo del resonador
+% =========================================================================
+Iq_cogging = Iq_RI_new;
+
+end

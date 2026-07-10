@@ -1,6 +1,6 @@
-Time_simulation = 0.5;
+Time_simulation = 1;
 t_ref = [0.0];
-w_ref = [1];
+w_ref = [10];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
@@ -12,8 +12,8 @@ N_teeths = N_steps/N_phases; %%Cantidad de dientes del rotor
 P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1.7; %%Corriente nominal del torque 
-I_max = sqrt(2*I_nom);
-Tdm = 22/1000;%%18/1000;%%Torque para que no se mueva el rotor
+I_max = sqrt(2)*I_nom;
+Tdm = 18/1000;%%18/1000;%%Torque para que no se mueva el rotor
 Thold =  392/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
@@ -23,7 +23,7 @@ max_step_rate = 3000;
 R =  2.5; %% [Ohms]
 L = 6/1000; %% [L]
 Phi = pi/2;
-    
+Tl = 0.15;
 %%Saliencia
 Lq = 9.61/1000;
 Ld = 3.66/1000;
@@ -70,7 +70,7 @@ fbw_q = 500;          % Hz (BW corriente)
 wd_d = 2*pi*fbw_d;      % rad/s
 wd_q = 2*pi*fbw_q;      % rad/s 
 
-fbw_Wm = 20;         % Hz (Bw Wm)
+fbw_Wm = 50;         % Hz (Bw Wm)
 frecuency_simulation = 10e3;
 f_carrier = 20e3;
 sample_time = 1/frecuency_simulation;
@@ -106,9 +106,9 @@ Ki_d_salient = wd_d^2*Ld
 shi_w = 1;
 wn_w = 2*pi*fbw_Wm;
 
-Kp_w = (2*shi_w*wn_w*J_var )/Kt;
-Ki_w = (wn_w^2)*J_var/Kt;
-Kd_w = Kp_w/1000;
+Kp_w = (2*shi_w*wn_w*J_var -B_var)/Ke;
+Ki_w = (wn_w^2)*J_var/Ke;
+Kd_w = 0;%%Kp_w/1000;
 Tf_w = 10/1000;
 
 
@@ -163,7 +163,7 @@ fprintf('Kr_norm = %.6f\n',Kr_norm);
 %% =========================================================================
 % SINTONIZACIÓN INDEPENDIENTE DEL OBSERVADOR DE PERTURBACIONES (DOB)
 %% =========================================================================
-fbw_DO = 30;                  % Hz (Ancho de banda del DOB, subido de ~10Hz a 120Hz)
+fbw_DO = 25;                  % Hz (Ancho de banda del DOB, subido de ~10Hz a 120Hz)
 wn_do = 2*pi*fbw_DO;           % rad/s
 
 % Usamos una sintonización de polos repetidos en -wn_do (Polinomio de Hurwitz)
@@ -191,6 +191,9 @@ params.Tdm = Tdm;
 params.N_steps = N_steps;
 params.Phi = Phi;
 params.Nr = N_steps;
+params.Tload_amp = 0;  % [N·m] amplitud de carga por posición
+params.Nload     = 1;     % ciclos por vuelta mecánica
+params.Phi_load  = 0;     % [rad] fase de la carga
 
 %% Cálculo de parámetros del HFI
 Amplitud_HFI = 0.5;      % Voltios

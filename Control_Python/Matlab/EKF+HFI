@@ -1,0 +1,151 @@
+function [x_out, d_hat] = ekf_dq_4states_final(U, X, Ts, Ke, Kt, R, J, Ld, Lq, Nr, N_steps, B, Tdtm, beta0, beta1, beta2, wh, b0, b1, b2, a1, a2)
+% =========================================================================
+% EKF + HFI EXTERNO TIPO PLL (CORREGIDO)
+% =========================================================================
+persistent x_hat P
+persistent d_do theta_do omega_do
+persistent xa1 xa2 ya1 ya2
+persistent xb1 xb2 yb1 yb2
+persistent t_h eps_f
+persistent theta_hfi_e
+
+if isempty(x_hat)
+    x_hat = zeros(4,1);
+    P = diag([1e-4, 1e-4, 1e-2, 1e-6]);
+    d_do = 0;
+    theta_do = 0;
+    omega_do = 0;
+    xa1 = 0; xa2 = 0; ya1 = 0; ya2 = 0;
+    xb1 = 0; xb2 = 0; yb1 = 0; yb2 = 0;
+    t_h = 0; eps_f = 0; theta_hfi_e = 0;
+end
+
+% 1. Corrientes medidas
+Ia_raw = X(1); Ib_raw = X(2);
+
+% 2. Ángulo eléctrico interno EKF
+theta_e_ekf = wrap_pi(x_hat(4)*Nr);
+c = cos(theta_e_ekf); s = sin(theta_e_ekf);
+
+% 3. Transformación de Park
+Id_m =  Ia_raw*c + Ib_raw*s;
+Iq_m = -Ia_raw*s + Ib_raw*c;
+Vd_m =  U(1)*c + U(2)*s;
+Vq_m = -U(1)*s + U(2)*c;
+
+% 4. EKF - Predicción (Modelo fundamental)
+Id = x_hat(1); Iq = x_hat(2); Wm = x_hat(3);
+dId = (Vd_m - R*Id + Nr*Wm*Lq*Iq)/Ld;
+dIq = (Vq_m - R*Iq - Nr*Wm*Ld*Id - Ke*Wm)/Lq;
+
+% Torque considerando saliencia real (Lq > Ld)
+Te = Kt*Iq + Nr*(Ld - Lq)*Id*Iq;
+dWm = (Te - B*Wm)/J; 
+dTh = Wm;
+
+x_pred = x_hat + Ts*[dId; dIq; dWm; dTh];
+x_pred(4) = wrap_pi(x_pred(4));
+
+% 5. Jacobiano continuo -> discreto
+A = [ -R/Ld,                  Nr*Wm*Lq/Ld,             Nr*Lq*Iq/Ld,              0;
+      -Nr*Wm*Ld/Lq,           -R/Lq,                  -(Nr*Ld*Id + Ke)/Lq,       0;
+      Nr*(Ld-Lq)*Iq/J,        (Kt + Nr*(Ld-Lq)*Id)/J,  -B/J,                     0;
+      0,                      0,                       1,                        0];
+Phi = eye(4) + A*Ts;
+Qk = diag([1e-6, 1e-6, 1e-4, 1e-9]);
+P_pred = Phi*P*Phi' + Qk;
+
+% 6. EKF - Corrección
+Ck = [1 0 0 0; 0 1 0 0];
+Rk = diag([1e-2, 1e-2]);
+innov = [Id_m; Iq_m] - [x_pred(1); x_pred(2)];
+Sk = Ck*P_pred*Ck' + Rk;
+Lk = (P_pred*Ck')/Sk;
+
+x_corr_ekf = x_pred + Lk*innov;
+x_corr_ekf(4) = wrap_pi(x_corr_ekf(4));
+P = (eye(4) - Lk*Ck)*P_pred;
+P = 0.5*(P + P');
+
+% 7. BPF para señales HFI
+Iah = b0*Ia_raw + b1*xa1 + b2*xa2 - a1*ya1 - a2*ya2;
+xa2 = xa1; xa1 = Ia_raw; ya2 = ya1; ya1 = Iah;
+
+Ibh = b0*Ib_raw + b1*xb1 + b2*xb2 - a1*yb1 - a2*yb2;
+xb2 = xb1; xb1 = Ib_raw; yb2 = yb1; yb1 = Ibh;
+
+% 8. Park HFI con ángulo corregido
+theta_e_ekf_corr = wrap_pi(x_corr_ekf(4)*Nr);
+ch = cos(theta_e_ekf_corr); sh = sin(theta_e_ekf_corr);
+Iqh = -Iah*sh + Ibh*ch;
+
+% 9. Demodulación síncrona
+t_h = t_h + Ts;
+eps_raw = Iqh*sin(wh*t_h);
+
+% 10. LPF HFI
+f_lpf_hfi = 50; 
+alpha_lpf = Ts/(Ts + 1/(2*pi*f_lpf_hfi));
+eps_f = eps_f + alpha_lpf*(eps_raw - eps_f);
+
+% 11. PLL HFI - Ajuste de signo por Saliencia Inversa
+DeltaL = Lq - Ld; 
+Lavg = 0.5*(Ld + Lq);
+if abs(DeltaL) < 1e-12
+    eps_norm = 0;
+else
+    saliency = DeltaL/Lavg;
+    eps_norm = eps_f / abs(saliency);
+end
+
+K_hfi_pll = 1e-4; 
+% NOTA: Signo MENOS para que el lazo busque estabilidad en el eje d (inductancia mínima)
+theta_hfi_e = wrap_pi(theta_e_ekf_corr - K_hfi_pll*eps_norm); 
+
+% 12. Compensación de Retraso de Fase (Delay Filtros)
+theta_delay = 0.0; 
+theta_hfi_e = wrap_pi(theta_hfi_e + theta_delay);
+
+% 13. Transición Híbrida Inteligente EKF -> HFI
+W_hfi_on  = 20; 
+W_hfi_off = 30; 
+if abs(x_corr_ekf(3)) <= W_hfi_on
+    use_hfi = true;
+elseif abs(x_corr_ekf(3)) >= W_hfi_off
+    use_hfi = false;
+else
+    use_hfi = true;
+end
+
+theta_e_used = theta_e_ekf_corr;
+if use_hfi
+    theta_e_used = theta_hfi_e;
+end
+theta_m_used = wrap_pi(theta_e_used/Nr);
+
+% =========================================================================
+% 14. DISTURBANCE OBSERVER (Unificado en unidades mecánicas)
+% =========================================================================
+Id_c = x_corr_ekf(1); Iq_c = x_corr_ekf(2); theta_m_c = x_corr_ekf(4);
+
+% El error se calcula en posición mecánica para mantener consistencia con J
+e0_m = wrap_pi(theta_m_c - theta_do); 
+Te_obs = Kt*Iq_c + Nr*(Ld - Lq)*Id_c*Iq_c;
+
+% Integración del observador mecánico puramente lineal
+theta_do = wrap_pi(theta_do + Ts*(omega_do + beta0*e0_m));
+omega_do = omega_do + Ts*((Te_obs - d_do - B*omega_do)/J + beta1*e0_m);
+d_do = d_do - Ts*beta2*e0_m;
+
+% La salida d_hat estima la fricción y TODO el cogging de golpe
+d_hat = d_do; 
+
+% 15. Asignación de Estados Finales
+x_out = x_corr_ekf;
+x_out(4) = theta_m_used; % Inyección del ángulo híbrido para el control exterior
+x_hat = x_corr_ekf;      % Mantener el core del EKF guiado por el modelo fundamental
+end
+
+function out = wrap_pi(in)
+    out = atan2(sin(in), cos(in));
+end

@@ -1,0 +1,197 @@
+function [Vd, Vq, Id_out, Iq_out, Valpha, Vbetha, ...
+          Vd_hfi, Vq_hfi, error_d, error_q] = ...
+    PI_dq_vectorial_fixed( ...
+        Wm, X, Theta_e, Ts, Vdc, ...
+        Kp_d, Ki_d, Kp_q, Ki_q, ...
+        Psi, Ld, Lq, P, ...
+        Iq_ref_req, Amplitud_HFI, wh, HFI_enable, ...
+        Id_ref, Iq_comp, Kt, I_max)
+
+% =========================================================================
+% PI dq VECTORIAL CON DESACOPLE Y HFI
+%
+% Supuestos:
+%   - X = [Ialpha; Ibeta]
+%   - Wm es velocidad mecánica [rad/s]
+%   - Theta_e es ángulo eléctrico [rad]
+%   - P es número de pares de polos
+%   - Vdc es bus DC del inversor
+%
+% El límite vectorial utilizado es:
+%       Vmax = Vdc / sqrt(3)
+%
+% Iq_comp y Kt se mantienen en la firma para compatibilidad con tu modelo.
+% Iq_comp NO se suma ni resta aquí, porque ya debe estar incluido antes
+% del bloque MTPA en el controlador de velocidad.
+% =========================================================================
+
+persistent v_int_d
+persistent v_int_q
+persistent t_hfi
+
+if isempty(v_int_d)
+
+    v_int_d = 0;
+    v_int_q = 0;
+    t_hfi   = 0;
+
+end
+
+% =========================================================================
+% 1. Protecciones numéricas
+% =========================================================================
+Ts_eff   = max(Ts, 1e-9);
+Vdc_eff  = max(abs(Vdc), 1e-6);
+Imax_eff = max(abs(I_max), 1e-6);
+
+% =========================================================================
+% 2. Corrientes alpha-beta a dq
+% =========================================================================
+Ialpha = X(1);
+Ibeta  = X(2);
+
+cos_th = cos(Theta_e);
+sin_th = sin(Theta_e);
+
+Id =  Ialpha * cos_th + Ibeta * sin_th;
+Iq = -Ialpha * sin_th + Ibeta * cos_th;
+
+% =========================================================================
+% 3. Referencias de corriente
+%
+% Id_ref e Iq_ref_req deben provenir del bloque MTPA.
+% =========================================================================
+
+% Protección sobre Id solicitado
+Id_ref_limited = max(-Imax_eff, min(Imax_eff, Id_ref));
+
+% Límite disponible para Iq respetando el círculo de corriente
+Iq_limit = sqrt(max(0, Imax_eff^2 - Id_ref_limited^2));
+
+% Iq_comp se ignora intencionalmente para no duplicar compensaciones.
+Iq_ref = max(-Iq_limit, min(Iq_limit, Iq_ref_req));
+
+% =========================================================================
+% 4. Errores de corriente
+% =========================================================================
+err_d = Id_ref_limited - Id;
+err_q = Iq_ref - Iq;
+
+error_d = err_d;
+error_q = err_q;
+
+% Velocidad eléctrica
+We = P * Wm;
+
+% =========================================================================
+% 5. Desacople usando corrientes reales
+% =========================================================================
+V_cross_d = -We * Lq * Iq;
+V_cross_q =  We * (Ld * Id + Psi);
+
+% =========================================================================
+% 6. PI fundamental dq
+% =========================================================================
+Vd_pre = Kp_d * err_d + v_int_d + V_cross_d;
+Vq_pre = Kp_q * err_q + v_int_q + V_cross_q;
+
+% =========================================================================
+% 7. HFI y margen de tensión disponible
+% =========================================================================
+t_hfi = t_hfi + Ts_eff;
+
+if HFI_enable ~= 0
+
+    v_hfi = Amplitud_HFI * sin(wh * t_hfi);
+
+else
+
+    v_hfi = 0;
+
+end
+
+% Límite vectorial de tensión con SVPWM
+Vmax = Vdc_eff / sqrt(3);
+
+% Reserva de tensión para no saturar cuando se agregue HFI
+if HFI_enable ~= 0
+
+    Vfund_max = max(0, Vmax - abs(Amplitud_HFI));
+
+else
+
+    Vfund_max = Vmax;
+
+end
+
+% =========================================================================
+% 8. Saturación vectorial de tensión fundamental
+% =========================================================================
+Vmag_pre = sqrt(Vd_pre^2 + Vq_pre^2);
+
+if Vmag_pre > Vfund_max && Vmag_pre > 1e-12
+
+    scale_v = Vfund_max / Vmag_pre;
+
+    Vd = Vd_pre * scale_v;
+    Vq = Vq_pre * scale_v;
+
+else
+
+    Vd = Vd_pre;
+    Vq = Vq_pre;
+
+end
+
+% =========================================================================
+% 9. Anti-windup por back-calculation
+% =========================================================================
+if abs(Kp_d) > 1e-9
+    Kaw_d = Ki_d / abs(Kp_d);
+else
+    Kaw_d = 0;
+end
+
+if abs(Kp_q) > 1e-9
+    Kaw_q = Ki_q / abs(Kp_q);
+else
+    Kaw_q = 0;
+end
+
+v_int_d = v_int_d + Ts_eff * ...
+    (Ki_d * err_d + Kaw_d * (Vd - Vd_pre));
+
+v_int_q = v_int_q + Ts_eff * ...
+    (Ki_q * err_q + Kaw_q * (Vq - Vq_pre));
+
+% =========================================================================
+% 10. Inyección HFI en eje d
+% =========================================================================
+Vd_hfi = Vd + v_hfi;
+Vq_hfi = Vq;
+
+% Saturación final de seguridad
+Vmag_hfi = sqrt(Vd_hfi^2 + Vq_hfi^2);
+
+if Vmag_hfi > Vmax && Vmag_hfi > 1e-12
+
+    scale_hfi = Vmax / Vmag_hfi;
+
+    Vd_hfi = Vd_hfi * scale_hfi;
+    Vq_hfi = Vq_hfi * scale_hfi;
+
+end
+
+% =========================================================================
+% 11. Transformada inversa de Park
+% =========================================================================
+Valpha = Vd_hfi * cos_th - Vq_hfi * sin_th;
+Vbetha = Vd_hfi * sin_th + Vq_hfi * cos_th;
+
+% =========================================================================
+% 12. Salidas de monitoreo
+% =========================================================================
+Id_out = Id;
+Iq_out = Iq;
+
+end

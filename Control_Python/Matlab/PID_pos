@@ -1,0 +1,67 @@
+function [Wm_ref_pos, theta_m_ref, e_theta] = PID_position_hold( ...
+    theta_target, theta_m, Wm, Ts, ...
+    Kp_pos, Ki_pos, Kd_pos)
+
+    persistent theta_ref_int integral_pos
+
+    if isempty(theta_ref_int)
+        theta_ref_int = theta_m;  % parte desde la posición actual
+        integral_pos  = 0;
+    end
+
+    % ============================================================
+    % PARÁMETROS
+    % ============================================================
+    Wmax_pos  = 15.0;   % límite de salida del lazo de posición [rad/s]
+    Wtraj_max = 3.0;    % velocidad máxima de la trayectoria [rad/s]
+    Kaw       = 20.0;   % ganancia anti-windup [1/s]
+
+    % Función segura para ángulos periódicos entre -pi y pi
+    wrapPi = @(x) atan2(sin(x), cos(x));
+
+    % ============================================================
+    % 1. GENERADOR DE TRAYECTORIA
+    % Mueve la referencia suavemente hacia theta_target
+    % ============================================================
+    e_traj = wrapPi(theta_target - theta_ref_int);
+
+    dtheta_max = Wtraj_max * Ts;
+
+    dtheta = min(max(e_traj, -dtheta_max), dtheta_max);
+
+    theta_ref_int = wrapPi(theta_ref_int + dtheta);
+
+    % Velocidad de la trayectoria generada
+    Wm_traj_ref = dtheta / Ts;
+
+    theta_m_ref = theta_ref_int;
+
+    % ============================================================
+    % 2. ERROR DE POSICIÓN
+    % ============================================================
+    e_theta = wrapPi(theta_m_ref - theta_m);
+
+    % ============================================================
+    % 3. CONTROL PID DE POSICIÓN
+    %
+    % La derivada se calcula usando la velocidad real, no derivando
+    % numéricamente e_theta. Esto suele ser más estable.
+    % ============================================================
+    Wm_unsat = Wm_traj_ref ...
+             + Kp_pos * e_theta ...
+             + integral_pos ...
+             + Kd_pos * (Wm_traj_ref - Wm);
+
+    % ============================================================
+    % 4. SATURACIÓN
+    % ============================================================
+    Wm_ref_pos = min(max(Wm_unsat, -Wmax_pos), Wmax_pos);
+
+    % ============================================================
+    % 5. ANTI-WINDUP
+    % ============================================================
+    integral_pos = integral_pos + Ts * ( ...
+        Ki_pos * e_theta ...
+        + Kaw * (Wm_ref_pos - Wm_unsat) );
+
+end
