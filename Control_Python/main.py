@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import parameters as par
 import os
 from simulation import PMSMSimulation
+from project_config import ProjectConfig
 
 # Crear carpeta de salidas si no existe
 OUTPUT_DIR = "outputs"
@@ -359,8 +360,14 @@ if __name__ == "__main__":
         
     print(f"\nEjecutando Simulación: Lazo Cerrado en modo {title_prefix}...")
     sim = PMSMSimulation(
-        inverter_mode='average',
-        signals_routing=signals
+        signals_routing=signals,
+        config=ProjectConfig(
+            observer="ekf_hfi",
+            enable_dob=True,
+            enable_lms=True,
+            sensorless_control=False,
+            output_name="legacy_main",
+        ),
     )
     
     history = sim.run(

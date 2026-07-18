@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import parameters as par
 from simulation import PMSMSimulation
+from project_config import ProjectConfig
 
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -38,21 +39,19 @@ def run_case(case_name, use_bpf, use_hfi, qk_tx, title):
         'curr_Theta_e': 'theta_e_real'
     }
     
-    sim = PMSMSimulation(
-        inverter_mode='average',
-        signals_routing=signals
+    enable_dob = qk_tx > 1e-10
+    config = ProjectConfig(
+        observer="ekf_hfi" if use_hfi else "ekf",
+        enable_dob=enable_dob,
+        enable_lms=False,
+        enable_bpf=use_bpf,
+        sensorless_control=False,
+        output_name=case_name.lower().replace(" ", "_"),
     )
+    sim = PMSMSimulation(signals_routing=signals, config=config)
     
     # Configurar observador
-    sim.ekf_hfi.use_bpf = use_bpf
     sim.ekf_hfi.Qk_override = np.diag([1e-4, 1e-4, 1e-7, 1e-10, qk_tx])
-    
-    if not use_hfi:
-        sim.ekf_hfi.force_hfi_off = True
-        sim.current_controller.HFI_enable = 0
-    else:
-        sim.ekf_hfi.force_hfi_off = False
-        sim.current_controller.HFI_enable = 1
         
     history = sim.run(
         get_theta_ref=get_position_reference,

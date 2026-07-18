@@ -161,6 +161,10 @@ wh = 2.0 * np.pi * f_h        # Frecuencia en rad/s
 Amplitud_HFI = 2.0            # Voltios de inyección (aumentado para mayor SNR)
 HFI_enable = 1                # 1: Habilitado, 0: Deshabilitado
 
+# Kalman cinemático independiente: HFI(theta_e) -> [theta_e, omega_e, alpha_e]
+hfi_kf_q_jerk = 1.0e5         # Seguimiento de cambios de aceleración (rad_e^2/s^5)
+hfi_kf_sigma_theta = 0.15     # Ruido estándar del ángulo HFI (rad_e)
+
 # Coeficientes del filtro BPF HFI (Butterworth @ Fs=10kHz)
 b0_hfi = 0.030469
 b1_hfi = 0.0

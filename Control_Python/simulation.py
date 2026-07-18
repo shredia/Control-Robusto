@@ -1,5 +1,6 @@
 import numpy as np
 import parameters as par
+from project_config import ProjectConfig
 from pmsm_model import StepperMotor2Phase
 from inverter import TwoPhaseInverter
 def wrapPi(x):
@@ -20,7 +21,7 @@ def park(i_alpha, i_beta, theta_e):
 from control_blocks.PID_posicion import PIDPositionHold as PID_position_hold
 from control_blocks.PID_velocidad import PISpeedRIMTPA as PI_speed_RI_MTPA
 from control_blocks.PID_corrientes import PIDCorrientes as PI_dq_vectorial_fixed
-from observers import EKF_HFI_Observer, LoadTorqueObserver
+from observers import EKF_HFI_Observer, HfiKinematicKalman, LoadTorqueObserver
 from feedforward.lms_cogging import RealTimeLMSCogging
 
 class PMSMSimulation:
@@ -31,10 +32,11 @@ class PMSMSimulation:
     """
     def __init__(self, t_end=None, dt_sim=None, dt_pos=None, dt_speed=None, dt_current=None,
                  dt_observer=None, inverter_mode='average',
-                 signals_routing=None):
+                 signals_routing=None, config=None):
         
         # Configuración de enrutamiento de señales
-        self.signals_routing = signals_routing or {}
+        self.config = (config or ProjectConfig(inverter_mode=inverter_mode)).validate()
+        self.signals_routing = signals_routing or self._default_signal_routing()
         
         # Cargar valores por defecto desde parameters.py
         self.t_end = t_end if t_end is not None else par.t_end
@@ -43,7 +45,7 @@ class PMSMSimulation:
         self.dt_speed = dt_speed if dt_speed is not None else par.dt_speed
         self.dt_current = dt_current if dt_current is not None else par.dt_current
         self.dt_observer = dt_observer if dt_observer is not None else par.dt_observer
-        self.inverter_mode = inverter_mode
+        self.inverter_mode = self.config.inverter_mode
         
         # Inicializar el motor paso a paso con las condiciones físicas REALES (plant)
         self.motor = StepperMotor2Phase(
@@ -78,10 +80,40 @@ class PMSMSimulation:
             a1=par.a1_hfi, a2=par.a2_hfi, Ts=self.dt_observer
         )
 
+        self.hfi_speed_kf = HfiKinematicKalman(
+            pole_pairs=par.P,
+            dt=self.dt_observer,
+            q_jerk=par.hfi_kf_q_jerk,
+            sigma_theta=par.hfi_kf_sigma_theta,
+        )
+
+        # Las opciones se fijan aquí; los scripts no deben mutar internamente los bloques.
+        self.ekf_hfi.use_bpf = self.config.enable_bpf
+        self.ekf_hfi.force_hfi_off = not self.config.enable_hfi
+        q_tx = 1e-8 if self.config.enable_dob else 1e-12
+        self.ekf_hfi.Qk_override = np.diag([1e-4, 1e-4, 1e-7, 1e-10, q_tx])
+
         # Referencias intermedias retenidas para ZOH
         self.omega_ref_held = 0.0
         self.i_q_ref_held = 0.0
         self.i_d_ref_held = 0.0
+
+    def _default_signal_routing(self):
+        source = self.config.feedback_source
+        if source == "papers":
+            theta_m, omega_m, theta_e = "theta_m_hfi_kf", "Wm_hfi_kf", "theta_e_hfi_kf"
+        elif source == "ekf":
+            theta_m, omega_m, theta_e = "theta_m_ekf", "Wm_ekf", "theta_e_ekf"
+        else:
+            theta_m, omega_m, theta_e = "theta_m_real", "Wm_real", "theta_e_real"
+        return {
+            "pos_theta_m": theta_m,
+            "pos_Wm": omega_m,
+            "speed_Wm_ref": "omega_ref_ext",
+            "speed_Wm": omega_m,
+            "curr_Wm": omega_m,
+            "curr_Theta_e": theta_e,
+        }
 
     def run(self, get_theta_ref, get_load_torque, get_omega_ref=None):
         """
@@ -95,8 +127,13 @@ class PMSMSimulation:
             't': t_arr,
             'theta_ref': np.zeros(N), 'theta_m': np.zeros(N), 'theta_m_est': np.zeros(N),
             'omega_ref': np.zeros(N), 'omega_m': np.zeros(N), 'omega_m_est': np.zeros(N),
+            'theta_m_observer': np.zeros(N), 'omega_m_observer': np.zeros(N),
+            'theta_e_observer': np.zeros(N),
             'theta_e': np.zeros(N), 'theta_e_est': np.zeros(N),
             'theta_hfi_e': np.zeros(N), 'amp_hfi': np.zeros(N), 'threshold_hfi': np.zeros(N), 'hfi_valid': np.zeros(N),
+            'theta_e_hfi_kf': np.zeros(N), 'omega_e_hfi_kf': np.zeros(N),
+            'alpha_e_hfi_kf': np.zeros(N), 'omega_m_hfi_kf': np.zeros(N),
+            'innovation_hfi_kf': np.zeros(N),
             'e_w': np.zeros(N), 'e_theta_hfi': np.zeros(N), 'e_theta_ekf': np.zeros(N),
             'K_w': np.zeros(N), 'K_tx': np.zeros(N),
             'i_a': np.zeros(N), 'i_b': np.zeros(N),
@@ -120,6 +157,10 @@ class PMSMSimulation:
         x_est = np.zeros(5)
         amp_hfi_val = 0.0
         theta_hfi_e_val = 0.0
+        theta_e_hfi_kf = 0.0
+        omega_e_hfi_kf = 0.0
+        alpha_e_hfi_kf = 0.0
+        omega_m_hfi_kf = 0.0
         
         # Calcular los pasos enteros equivalentes
         steps_pos = int(round(self.dt_pos / self.dt_sim))
@@ -153,8 +194,13 @@ class PMSMSimulation:
             
             # 3. Lazo Discreto del Observador (LOB y EKF+HFI+DOB síncronos)
             if k % steps_observer == 0:
-                T_L_est = self.lob.step(self.motor.torque_e, self.motor.omega_m)
+                if self.config.enable_lob:
+                    T_L_est = self.lob.step(self.motor.torque_e, self.motor.omega_m)
                 x_est, d_hat_dob, amp_hfi_val, theta_hfi_e_val, threshold_hfi_val, K_w_val, K_tx_val = self.ekf_hfi.step(U=[v_d_cmd, v_q_cmd], X=[i_a, i_b])
+                hfi_measurement_valid = amp_hfi_val >= threshold_hfi_val
+                theta_e_hfi_kf, omega_e_hfi_kf, alpha_e_hfi_kf, omega_m_hfi_kf = self.hfi_speed_kf.step(
+                    theta_hfi_e_val, measurement_valid=hfi_measurement_valid
+                )
                 
             # =========================================================================
             # PANEL DE CONEXIONES Y PARÁMETROS (ESTILO SIMULINK)
@@ -169,7 +215,10 @@ class PMSMSimulation:
                 'theta_m_ekf': x_est[3],
                 'Wm_ekf': x_est[2],
                 'theta_e_ekf': wrapPi(x_est[3] * par.P),
-                'omega_ref_ext': get_omega_ref(t) if get_omega_ref else 0.0
+                'omega_ref_ext': get_omega_ref(t) if get_omega_ref else 0.0,
+                'Wm_hfi_kf': omega_m_hfi_kf,
+                'theta_e_hfi_kf': theta_e_hfi_kf,
+                'theta_m_hfi_kf': theta_e_hfi_kf / par.P,
             }
             
             # B. EJECUCIÓN SECUENCIAL DE LOS BLOQUES DE CONTROL (Cascada)
@@ -206,10 +255,16 @@ class PMSMSimulation:
             feedforward_omega_m = signals_avail.get(self.signals_routing.get('speed_Wm', 'Wm_real'), signals_avail['Wm_real'])
             
             # El LUT aprende usando d_hat_dob. Retorna > 0 solo después de aprender.
-            T_cogging_est = self.cogging_lut.step(feedforward_theta_m, feedforward_omega_m, d_hat_dob)
+            dob_for_control = d_hat_dob if self.config.enable_dob else 0.0
+            if self.config.enable_lms:
+                T_cogging_est = self.cogging_lut.step(
+                    feedforward_theta_m, feedforward_omega_m, dob_for_control
+                )
+            else:
+                T_cogging_est = 0.0
             
             # Tx es el residuo lento. Tcomp será T_cogging_est + Tx.
-            Tx = d_hat_dob
+            Tx = dob_for_control
             
             # --- Bloque 2: PID Velocidad (PI + RI + MTPA) ---
             if k % steps_speed == 0:
@@ -281,7 +336,7 @@ class PMSMSimulation:
                 curr_Iq_ref_req  = signals_avail.get(self.signals_routing.get('curr_Iq_ref', 'Iq_ref_from_speed'), signals_avail['Iq_ref_from_speed'])
                 curr_Amp_HFI     = par.Amplitud_HFI
                 curr_wh          = par.wh
-                curr_HFI_enable  = par.HFI_enable
+                curr_HFI_enable  = int(self.config.enable_hfi)
                 curr_Id_ref      = signals_avail.get(self.signals_routing.get('curr_Id_ref', 'Id_ref_from_speed'), signals_avail['Id_ref_from_speed'])
                 
                 # Compensación del torque de cogging ideal DESACTIVADA
@@ -336,6 +391,24 @@ class PMSMSimulation:
             history['theta_e'][k] = wrapPi(theta_e_real)
             history['theta_e_est'][k] = wrapPi(x_est[3] * par.P)
             history['theta_hfi_e'][k] = theta_hfi_e_val
+            history['theta_e_hfi_kf'][k] = theta_e_hfi_kf
+            history['omega_e_hfi_kf'][k] = omega_e_hfi_kf
+            history['alpha_e_hfi_kf'][k] = alpha_e_hfi_kf
+            history['omega_m_hfi_kf'][k] = omega_m_hfi_kf
+            history['innovation_hfi_kf'][k] = self.hfi_speed_kf.innovation
+
+            if self.config.observer == "papers":
+                history['theta_m_observer'][k] = theta_e_hfi_kf / par.P
+                history['omega_m_observer'][k] = omega_m_hfi_kf
+                history['theta_e_observer'][k] = theta_e_hfi_kf
+            elif self.config.observer in ("ekf", "ekf_hfi"):
+                history['theta_m_observer'][k] = x_est[3]
+                history['omega_m_observer'][k] = x_est[2]
+                history['theta_e_observer'][k] = wrapPi(x_est[3] * par.P)
+            else:
+                history['theta_m_observer'][k] = self.motor.theta_m
+                history['omega_m_observer'][k] = self.motor.omega_m
+                history['theta_e_observer'][k] = wrapPi(self.motor.theta_e)
             history['amp_hfi'][k] = amp_hfi_val
             history['threshold_hfi'][k] = threshold_hfi_val
             history['hfi_valid'][k] = 1.0 if amp_hfi_val >= threshold_hfi_val else 0.0
@@ -383,6 +456,10 @@ class PMSMSimulation:
             
         # 10. Cálculo de RMSE final
         rmse_w = np.sqrt(np.mean(history['e_w']**2))
+        rmse_w_hfi_kf = np.sqrt(np.mean((history['omega_m_hfi_kf'] - history['omega_m'])**2))
+        rmse_w_observer = np.sqrt(np.mean((history['omega_m_observer'] - history['omega_m'])**2))
+        e_theta_observer = wrapPi(history['theta_e_observer'] - history['theta_e'])
+        rmse_theta_observer = np.sqrt(np.mean(e_theta_observer**2))
         
         # e_theta_ekf ya está calculado usando wrapPi(theta_e_est - theta_e_real) en el bucle
         rmse_theta = np.sqrt(np.mean(history['e_theta_ekf']**2))
@@ -393,6 +470,11 @@ class PMSMSimulation:
         hfi_activation_ratio = np.mean(history['hfi_valid'])
         
         history['rmse_w'] = rmse_w
+        history['rmse_w_hfi_kf'] = rmse_w_hfi_kf
+        history['rmse_w_observer'] = rmse_w_observer
+        history['rmse_theta_observer'] = rmse_theta_observer
+        history['observer_name'] = self.config.observer
+        history['config'] = self.config
         history['rmse_theta'] = rmse_theta
         history['rmse_theta_deg'] = rmse_theta_deg
         history['rmse_theta_m'] = rmse_theta_m
@@ -401,6 +483,8 @@ class PMSMSimulation:
         
         print(f"\n[Métricas de Estimación]")
         print(f" - RMSE Wm       : {rmse_w:.4f} rad/s")
+        print(f" - RMSE Wm HFI-KF: {rmse_w_hfi_kf:.4f} rad/s")
+        print(f" - RMSE seleccionado: {rmse_w_observer:.4f} rad/s ({self.config.observer})")
         print(f" - RMSE Theta_e  : {rmse_theta:.4f} rad_e ({rmse_theta_deg:.2f}°_e)")
         print(f" - RMSE Theta_m  : {rmse_theta_m:.4f} rad_m")
         print(f" - RMSE Tx       : {rmse_tx:.4f} Nm")

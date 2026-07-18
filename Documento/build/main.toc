@@ -1,16 +1,14 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {chapter}{\numberline {1}Introduccion general}{1}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Estado del arte}{1}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Clinostatos}{1}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}Accionamiento y dinámicas de motores eléctricos}{1}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.1.3}Tipos de controles}{2}{subsection.1.1.3}%
-\contentsline {section}{\numberline {1.2}Problemática}{4}{section.1.2}%
+\contentsline {chapter}{\numberline {1}Introducción general}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Estado del arte}{2}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Accionamiento y dinámicas de motores eléctricos}{2}{subsection.1.1.1}%
+\contentsline {section}{\numberline {1.2}Problemática}{3}{section.1.2}%
 \contentsline {section}{\numberline {1.3}Propuesta de solución}{4}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Objetivos}{5}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Objetivo general}{5}{subsection.1.4.1}%
+\contentsline {section}{\numberline {1.4}Objetivos}{4}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Objetivo general}{4}{subsection.1.4.1}%
 \contentsline {subsection}{\numberline {1.4.2}Objetivos especificos}{5}{subsection.1.4.2}%
-\contentsline {subsection}{\numberline {1.4.3}Alcances}{6}{subsection.1.4.3}%
-\contentsline {subsection}{\numberline {1.4.4}Limitaciones}{6}{subsection.1.4.4}%
+\contentsline {subsection}{\numberline {1.4.3}Alcances}{5}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}Limitaciones}{5}{subsection.1.4.4}%
 \contentsline {chapter}{\numberline {2}Marco teórico}{7}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Motor Stepper}{7}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Modelado electromecánico del motor}{7}{section.2.2}%

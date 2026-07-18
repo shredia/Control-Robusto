@@ -1,34 +1,29 @@
-\chapter{Introduccion general}
-Dentro de la ingeniería, en especial en el área de investigación espacial o de agricultura, es común realizar investigaciones para simular condiciones comunes del espacio exterior, las cuales son, por regla general, muy distintas a las que se pueden encontrar en nuestro planeta. Una de las condiciones que gustaría generar o explorar es la de la gravedad, la cual claramente no es posible controlar hoy en día.
- Como alternativa, han nacido ideas como Clinostatos y RPM (Random Position Machine), las cuales pueden generar artificialmente, mediante fuerzas centrífugas, 	modificar el promedio temporal del vector de gravedad.
+\chapter{Introducción general}
+
+%%Importancia y aplicaciones de los motores eléctricos, ventajas de los PMSM
+Los motores eléctricos se utilizan ampliamente en aplicaciones industriales, robóticas y de automatización debido a su capacidad para transformar energía eléctrica en movimiento de manera eficiente y controlable. Entre ellos, los motores síncronos de imanes permanentes presentan ventajas como alta eficiencia, elevada densidad de potencia y buen desempeño dinámico. No obstante, su operación en aplicaciones que requieren control preciso de velocidad o posición demanda técnicas de control y estimación capaces de determinar adecuadamente el estado mecánico del rotor.
+
+%%Características de los steppers, operación a lazo abierto
+Dentro de la familia de los motores síncronos se encuentran los motores paso a paso, los cuales se utilizan principalmente en sistemas de posicionamiento y movimiento incremental. Su uso se basa en la capacidad de generar desplazamientos fijos según una cantidad determinada de pasos eléctrico, por lo cual es altamente deseable en aplicaciones donde se requiere control preciso del posicionamiento. Sin embargo, este tipo de control puede presentar pérdida de pasos, oscilaciones y deterioro del desempeño cuando el motor se somete a variaciones de carga, fricción, perturbaciones mecánicas o condiciones de operación a baja velocidad.
+
+%%Lazo cerrado y FOC, razones para eliminar sensores mecánicos.
+La incorporación de sensores mecánicos de posición o velocidad permite mejorar el desempeño del sistema,especialmente si se utiliza un esquema de control en lazo cerrado, como el control orientado a campo (FOC), que permite regular el torque y la velocidad del motor mediante la retroalimentación de variables mecánicas. Sin embargo, la instalación de sensores mecánicos puede incrementar la complejidad del sistema, los costos y los requerimientos de mantenimiento, además de introducir limitaciones físicas en aplicaciones donde el espacio es reducido o donde se requiere un diseño compacto.
+
+%%Control sin sensores, observadores de estado y HFI
+En este contexto, el control sensorless (sin sensores), ha emergido como una alternativa atractiva para mejorar el desempeño de los motores paso a paso sin recurrir a la instalación de sensores mecánicos. Este enfoque se basa en la estimación de variables mecánicas, como la velocidad y el ángulo del rotor, a partir de señales eléctricas disponibles, utilizando técnicas como observadores de estado y filtros de Kalman extendidos (EKF). Sin embargo, la implementación de estas técnicas en motores paso a paso presenta desafíos adicionales, especialmente en condiciones de operación a baja velocidad, donde la información disponible para la estimación puede ser limitada y la observabilidad del sistema puede verse comprometida.
+
+Adicionalmente, la presencia de perturbaciones mecánicas variables, puede afectar significativamente el desempeño del sistema y dificultar la estimación precisa de las variables mecánicas. En este sentido, la combinación de técnicas de control en lazo cerrado con estrategias de estimación y compensación de perturbaciones se presenta como una solución prometedora para mejorar el comportamiento dinámico del motor paso a paso en aplicaciones donde se requiere un control preciso sin recurrir a sensores mecánicos adicionales.
+
+
 
  \section{Estado del arte}
- \subsection{Clinostatos}
-    Las máquinas de ingravidez (o Clinostatos) son dispositivos que hacen girar sus ejes para evitar que el vector de gravedad permanezca fijo en un sistema de referencia y con ello provocar un promedio temporal de sus efectos sobre una muestra.
-
-
-Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, dependiendo del nivel de complejidad y del grado de libertad y movimiento requerido. El más común es un clinostato de 2D, puesto que, con este, se cumple con elrequisito mínimo para cubrir la región de una esfera, lo cual es la mejor figura para simular un verdadero ambiente de ingravidez~\cite{ArturoRojas-Moreno2018}.
-
-
- Pero para poder provocar un promedio temporal cercano a 0, es necesario mantener una velocidad constante. Esta velocidad no puede ser cualquiera, dependiendo del tipo de aplicación y de estudio, lo cual puede variar desde 1  hasta 120 [RPM]~\cite{Cacayurin2023}. Este valor depende del orden de magnitud máximo al que se quiera llegar, dependiendo también del radio del centro del eje dónde gire, puesto que contra más alejado esté menor velocidad se necesitará.
-
+ 
  \subsection{Accionamiento y dinámicas de motores eléctricos}
 
- Para generar el movimiento de los distintos ejes en un clinostato, es necesario disponer de sistemas de accionamiento basados en motores eléctricos. La selección del tipo de motor depende de diversos factores, tales como las cargas mecánicas involucradas, las velocidades de operación, la estrategia de control requerida, los costos de implementación y la disponibilidad comercial.
 
- En la literatura y en aplicaciones prácticas de clinostatos, los motores más comúnmente utilizados corresponden a motores de corriente continua (DC) y motores paso a paso (steppers), debido principalmente a su facilidad de integración y control. Los motores DC se caracterizan por su comportamiento continuo y por requerir estrategias de control que permitan regular su velocidad frente a variaciones de carga, lo cual suele implicar el uso de realimentación. Por su parte, los motores stepper destacan por su capacidad de generar movimiento incremental mediante la conmutación controlada de sus fases, permitiendo un control preciso del desplazamiento angular y un alto torque a bajas velocidades.
+ A diferencia de los motores DC, los motores stepper no operan directamente con corriente continua, sino que requieren una secuencia de excitación adecuada para generar el movimiento rotacional. Esta característica les permite asegurar desplazamientos angulares definidos a partir de una cantidad determinada de pasos eléctricos, lo que ha motivado su uso frecuente en aplicaciones donde se privilegia la simplicidad mecánica y el control del posicionamiento. Cómo desventaja, estos motores pueden presentar un mayor rizado de vibraciones mecánicas y de corriente, lo cual puede generar efectos indeseados dependiendo del caso de estudio \cite{Cacayurin2023}. 
 
- A diferencia de los motores DC, los motores stepper no operan directamente con corriente continua, sino que requieren una secuencia de excitación adecuada para generar el movimiento rotacional. Esta característica les permite asegurar desplazamientos angulares definidos a partir de una cantidad determinada de pasos eléctricos, lo que ha motivado su uso frecuente en aplicaciones donde se privilegia la simplicidad mecánica y el control del posicionamiento. Cómo desventaja, estos motores pueden presentar un mayor rizado de vibraciones mecánicas y de corriente, lo cual puede generar efectos indeseados dependiendo del caso de estudio \cite{Cacayurin2023}.
-
- En cuanto a la transmisión del movimiento, los clinostatos pueden presentar distintas configuraciones mecánicas. En algunos diseños, cada eje cuenta con un motor instalado sobre un marco móvil que acciona un eje adicional, configuraciones que pueden repetirse para obtener sistemas de dos o tres dimensiones. En estos casos, el suministro de energía y el sensado continuo suelen realizarse mediante slip-rings o sistemas de cableado rotativo, los cuales permiten la rotación sin enredos.
-
- Si bien estas soluciones facilitan la medición en tiempo real de variables como aceleración o gravedad mediante sensores inerciales o encoders, presentan limitaciones asociadas a mayores costos de implementación, requerimientos de mantenimiento, restricciones de velocidad y un aumento en la complejidad del sistema de cableado.
-
- Como alternativa, se emplean sistemas de transmisión mediante poleas, los cuales permiten transferir el movimiento desde un eje fijo hacia un marco móvil a través de elementos mecánicos como correas y rodamientos, evitando la necesidad de cableado rotativo. Esta configuración posibilita la generación de movimiento rotacional en cada eje con una menor complejidad mecánica y costos reducidos.
-
- No obstante, al prescindir del uso de slip-rings, se dificulta la incorporación de sensores mecánicos para la medición continua de variables como velocidad o posición. En consecuencia, en sistemas sometidos a condiciones de alto torque, rozamiento o cargas variables, pueden presentarse diferencias significativas entre la velocidad real del eje y la velocidad deseada, afectando el desempeño dinámico del clinostato.
-
-  \subsection{Tipos de controles}
+ Los motores paso a paso fueron diseñados inicialmente para usarse en lazos abiertos de control debido a su inherente habilidad de dar pasos discretos,lo que permite controlar la posición sin necesidad de retroalimentación. Sin embargo, la pérdida de pasos debido a perturbaciones externas, fricción o variaciones de carga puede comprometer la precisión del posicionamiento y la velocidad de operación. Por esta razón, se ha empezado a implementar técnicas de control en lazo cerrado, que permiten mejorar el desempeño dinámico del sistema y reducir la sensibilidad a perturbaciones externas. 
 
   Los esquemas de control cerrado de un motor eléctrico se basan generalmente en control PID, los cuales permiten llegar a error estacionario 0. Sin embargo, el desempeño de estos controladores dependen de  la retroalimentación de la variable a controlar y del conocimiento de los parámetros internos del motor, así como perturbaciones externas. En muchas aplicaciones, estas variables y parámetros no son medibles directamente, además de que pueden ir variando con el tiempo, por lo que su desconocimiento puede generar errores en el control de velocidad del motor.
 
@@ -38,10 +33,9 @@ Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, depen
 
   Adicionalmente, el funcionamiento de un estimador de estados necesita de información de otros estados, los cuales pueden entregar muy poca información (tal cómo la fuerza electro-motriz, la cual es proporcional a la velocidad mecánica) tanto en estado estacionario cómo en baja velocidad, comprometiendo la observabilidad del sistema\cite{Shan-Mao2009}. Una forma de resolver esto es aprovechando la saliencia de los motores híbridos que se manifiesta como una anisotropía magnética donde la inductancia de cada fase varía de forma sinusoidal según la posición angular del rotor. Esta característica es explotada por técnicas como el HFI, que permiten estimar la posición y velocidad del rotor a bajas velocidades o incluso en estado estacionario, mediante la inyección de señales de alta frecuencia y el análisis de la respuesta del sistema ~\cite{Helsing2022} \cite{Wang2025}
 
-  Se puede observar que existen métodos que implementan una mezcla de técnicas de control clásico (PID), observadores de estado y técnicas de inyección de alta frecuenca[HFI]. Por separado, estos métodos son insuficientes para resolver el problema de control de un clinostato accionado por motores stepper sin sensores mecánicos a baja velocidad, debido a las limitaciones mencionadas anteriormente. Sin embargo, la combinación de estas técnicas podría permitir mejorar el desempeño dinámico del sistema, al aprovechar las fortalezas de cada método y mitigar sus debilidades.
+  Se puede observar que existen métodos que implementan una mezcla de técnicas de control clásico (PID), observadores de estado y técnicas de inyección de alta frecuenca[HFI]. Por separado, estos métodos son insuficientes para resolver el problema de control de un motor stepper sin sensores mecánicos a baja velocidad, debido a las limitaciones mencionadas anteriormente. Sin embargo, la combinación de estas técnicas podría permitir mejorar el desempeño dinámico del sistema.
 
-  
-  A partir de la revisión del estado del arte, se observa que los clinostatos reportados en la literatura utilizan predominantemente configuraciones mecánicas y estrategias de control que dependen del uso de sensores mecánicos o inerciales, así como de sistemas de cableado rotativo como slip-rings, para asegurar un control continuo del movimiento de sus ejes. Por otra parte, las técnicas de control avanzadas y sensorless han sido ampliamente estudiadas en otros contextos de accionamiento eléctrico, pero su aplicación a motores paso a paso en clinostatos con configuraciones mecánicas simplificadas y perturbaciones no medidas ha sido escasamente abordada. Esta brecha motiva la necesidad de estudiar e implementar estrategias de control que permitan mejorar el comportamiento dinámico de clinostatos accionados por motores stepper, sin recurrir al uso de sensores mecánicos adicionales.
+ 
 
   \section{Problemática}
 

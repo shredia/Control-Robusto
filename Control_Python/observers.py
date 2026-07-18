@@ -8,6 +8,100 @@ def wrapPi(x):
     return np.arctan2(np.sin(x), np.cos(x))
 
 
+class HfiKinematicKalman:
+    """Estimador cinemático independiente a partir del ángulo eléctrico HFI.
+
+    El estado es ``[theta_e, omega_e, alpha_e]`` y el modelo supone
+    aceleración aproximadamente constante. Los cambios de aceleración se
+    representan mediante jerk blanco, cuya densidad espectral es ``q_jerk``.
+    """
+
+    def __init__(self, pole_pairs, dt, q_jerk=1.0e5,
+                 sigma_theta=0.15, initial_covariance=None):
+        if pole_pairs <= 0:
+            raise ValueError("pole_pairs debe ser positivo")
+        if dt <= 0.0:
+            raise ValueError("dt debe ser positivo")
+        if q_jerk < 0.0 or sigma_theta <= 0.0:
+            raise ValueError("q_jerk debe ser no negativo y sigma_theta positivo")
+
+        self.pole_pairs = float(pole_pairs)
+        self.dt = float(dt)
+        self.q_jerk = float(q_jerk)
+        self.R = float(sigma_theta) ** 2
+
+        T = self.dt
+        self.F = np.array([
+            [1.0, T, 0.5 * T**2],
+            [0.0, 1.0, T],
+            [0.0, 0.0, 1.0],
+        ])
+        self.H = np.array([[1.0, 0.0, 0.0]])
+        self.Q = self.q_jerk * np.array([
+            [T**5 / 20.0, T**4 / 8.0, T**3 / 6.0],
+            [T**4 / 8.0, T**3 / 3.0, T**2 / 2.0],
+            [T**3 / 6.0, T**2 / 2.0, T],
+        ])
+
+        if initial_covariance is None:
+            initial_covariance = np.diag([sigma_theta**2, 100.0**2, 1000.0**2])
+        self.P = np.asarray(initial_covariance, dtype=float).copy()
+        if self.P.shape != (3, 3):
+            raise ValueError("initial_covariance debe tener dimensión 3x3")
+
+        self.x = np.zeros(3)
+        self.initialized = False
+        self.innovation = 0.0
+
+    def step(self, theta_e_hfi, measurement_valid=True):
+        """Avanza un periodo y devuelve ``theta_e, omega_e, alpha_e, omega_m``."""
+        theta_e_hfi = float(theta_e_hfi)
+        measurement_valid = bool(measurement_valid) and np.isfinite(theta_e_hfi)
+
+        if not self.initialized:
+            if measurement_valid:
+                self.x[0] = theta_e_hfi
+                self.initialized = True
+            return self.theta_e, self.omega_e, self.alpha_e, self.omega_m
+
+        x_pred = self.F @ self.x
+        P_pred = self.F @ self.P @ self.F.T + self.Q
+
+        if measurement_valid:
+            # La innovación circular evita impulsos al cruzar 0 <-> 2*pi.
+            self.innovation = float(wrapPi(theta_e_hfi - x_pred[0]))
+            S = float((self.H @ P_pred @ self.H.T)[0, 0] + self.R)
+            K = (P_pred @ self.H.T)[:, 0] / S
+            self.x = x_pred + K * self.innovation
+
+            # Forma de Joseph para preservar simetría y semidefinición positiva.
+            I_KH = np.eye(3) - np.outer(K, self.H[0])
+            self.P = I_KH @ P_pred @ I_KH.T + np.outer(K, K) * self.R
+            self.P = 0.5 * (self.P + self.P.T)
+        else:
+            self.innovation = 0.0
+            self.x = x_pred
+            self.P = P_pred
+
+        return self.theta_e, self.omega_e, self.alpha_e, self.omega_m
+
+    @property
+    def theta_e(self):
+        return float(wrapPi(self.x[0]))
+
+    @property
+    def omega_e(self):
+        return float(self.x[1])
+
+    @property
+    def alpha_e(self):
+        return float(self.x[2])
+
+    @property
+    def omega_m(self):
+        return self.omega_e / self.pole_pairs
+
+
 class SlidingModeObserver:
     """
     Observador de Modos Deslizantes (SMO) en Tiempo Discreto 

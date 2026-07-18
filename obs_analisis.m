@@ -1,5 +1,3 @@
-clear;
-clc;
 
 %% Estados
 syms ia ib th w real
