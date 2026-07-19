@@ -4,6 +4,7 @@ w_ref = [10];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
+
 %%%Parámetros físicos del motor
 Step_angle = 1.8; %%pasos en grados del motor
 N_phases = 2; %%numero de phases
@@ -23,7 +24,11 @@ max_step_rate = 3000;
 R =  2.5; %% [Ohms]
 L = 6/1000; %% [L]
 Phi = pi/2;
-Tl = 0.15;
+Tl = 0;
+W_min = 2*sqrt(Tdm/(J_internal*N_steps))
+porcentaje_rizado = 0.1;
+w_min_rizado = sqrt(2*Tdm/(N_steps*J_internal*porcentaje_rizado))
+
 %%Saliencia
 Lq = 9.61/1000;
 Ld = 3.66/1000;
