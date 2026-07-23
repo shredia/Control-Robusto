@@ -46,7 +46,7 @@
         Te_sync  = p.Ke * (Ib*cos(Th_e) - Ia*sin(Th_e));
         
         Te = Te_sync + Te_reluc;
-        Tdtm = p.Tdm * sin(p.Nr*Th_m + p.Phi);
+        Tdtm = p.Tdm * (sin(p.Nr*Th_m + p.Phi));
     end
     
     function Outputs(block)
@@ -95,8 +95,38 @@
         % --- Dinámica Mecánica ---
         % Te_total incluye reluctancia y síncrono. Sumamos Detent Torque (Tdm)
         T_detent = p.Tdm * sin(p.Nr* Th_m + p.Phi); % Usualmente 4*P o P según el motor
+        W_eps = 0.1;
+
+        Tl = Tl*tanh(Wm/W_eps);
         dWm = (Te - Tl - p.B_real * Wm - T_detent) / p.J_real;
         dTh = Wm;
-    
-        block.Derivatives.Data = [dI_vec(1); dI_vec(2); dWm; dTh];
+      dx = [dI_vec(1); dI_vec(2); dWm; dTh];
+
+if any(~isfinite(dx))
+    fprintf('\n===== ERROR EN DERIVADAS =====\n');
+    fprintf('Tiempo: %.9f s\n', block.CurrentTime);
+
+    fprintf('Estados:\n');
+    fprintf('Ia   = %.12g\n', Ia);
+    fprintf('Ib   = %.12g\n', Ib);
+    fprintf('Wm   = %.12g\n', Wm);
+    fprintf('Th_m = %.12g\n', Th_m);
+
+    fprintf('Entradas:\n');
+    fprintf('Va = %.12g\n', Va);
+    fprintf('Vb = %.12g\n', Vb);
+    fprintf('Tl = %.12g\n', Tl);
+
+    fprintf('Derivadas:\n');
+    fprintf('dIa   = %.12g\n', dI_vec(1));
+    fprintf('dIb   = %.12g\n', dI_vec(2));
+    fprintf('dWm   = %.12g\n', dWm);
+    fprintf('dTh_m = %.12g\n', dTh);
+
+    error('Derivada no finita detectada en la S-Function');
+end
+
+block.Derivatives.Data = dx;
+        %%block.Derivatives.Data = [dI_vec(1); dI_vec(2); dWm; dTh];
     end
+

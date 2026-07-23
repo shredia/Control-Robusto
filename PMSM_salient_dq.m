@@ -96,7 +96,7 @@ function Derivatives(block)
     % =========================
     % Torque electromagnético
     % =========================
-    Te = p.Ke*Iq - p.P*(p.Ld - p.Lq)*Id*Iq;
+    Te = p.Ke*Iq + p.P*(p.Lq - p.Ld)*Id*Iq;
 
     % =========================
     % Torque detent
@@ -113,6 +113,9 @@ function Derivatives(block)
     % =========================
     % Mecánica
     % =========================
+    W_eps = 0.1;
+
+    Tl = Tl*tanh(Wm/W_eps);
     dWm  = (Te - Tl - p.B_real*Wm - Tdet) / p.J_real;
     dThm = Wm;
 

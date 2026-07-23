@@ -1,9 +1,18 @@
 Time_simulation = 0.5;
 t_ref = [0.0];
-w_ref = [1];
+w_ref = [10];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
+
+% =========================
+% Torque de carga
+% =========================
+t_load = [0.0 0.15];
+Tl_ref = [0.0 0.25 ];
+
+Tl = timeseries(Tl_ref, t_load);
+Tl = setinterpmethod(Tl, 'linear');
 %%%Parámetros físicos del motor
 Step_angle = 1.8; %%pasos en grados del motor
 N_phases = 2; %%numero de phases
@@ -12,8 +21,8 @@ N_teeths = N_steps/N_phases; %%Cantidad de dientes del rotor
 P = N_teeths/2;%%Número de pares de polos
 
 I_nom = 1.7; %%Corriente nominal del torque 
-I_max = sqrt(2*I_nom);
-Tdm = 22/1000;%%18/1000;%%Torque para que no se mueva el rotor
+I_max = sqrt(2)*I_nom;
+Tdm = 22/1000;%%22/1000;%%Torque para que no se mueva el rotor
 Thold =  392/1000; %%Torque máximo para mantener la posición
 % Cálculo de Kt basado en 2 fases excitadas
 Kt = Thold / (sqrt(2) * I_nom); 
@@ -38,8 +47,8 @@ L2 = 2.975/1000;
 B_internal = 1e-4; %%roce
 J_internal = 54e-7; %%inercia del motor 
 %%Propiedades de carga del motor (variables que desconozco)
-J_external = J_internal*1;
-B_external = B_internal*1;
+J_external = J_internal*0;
+B_external = B_internal*0;
 %%Variables del modelo (Variables que asumo más grandes) 
 J_var = J_internal;
 B_var = B_internal;
@@ -57,7 +66,7 @@ Wba = 0;2;%%breakway frictions (rad/s)
 
 InitialSpeed = 0; %%rad/s
 RI_flag = 0;
-HFI_flag = 0;
+
 
 
 
@@ -114,7 +123,7 @@ Tf_w = 10/1000;
 
 Kp_pos = 1.0;    % Ganancia Proporcional (rigidez)
 Ki_pos = 0;     % Ganancia Integral (elimina error en estado estable)
-Kd_pos = 0.05;    % Ganancia Derivativa (amortiguamiento ante cogging)
+Kd_pos = 0.1;    % Ganancia Derivativa (amortiguamiento ante cogging)
 
 
 %% ==========================
@@ -193,6 +202,7 @@ params.Phi = Phi;
 params.Nr = N_steps;
 
 %% Cálculo de parámetros del HFI
+HFI_flag = 1;
 Amplitud_HFI = 0.5;      % Voltios
 f_h = 1000;             % Frecuencia de inyección en Hz
 wh = 2 * pi * f_h;     % Frecuencia en rad/s (para la demodulación)
