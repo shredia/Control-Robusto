@@ -1,6 +1,6 @@
-Time_simulation = 0.5;
+Time_simulation = 2;
 t_ref = [0.0];
-w_ref = [10];
+w_ref = [20];
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
@@ -8,8 +8,8 @@ Wm_ref = setinterpmethod(Wm_ref,'zoh');
 % =========================
 % Torque de carga
 % =========================
-t_load = [0.0 0.15];
-Tl_ref = [0.0 0.25 ];
+t_load = [0.0 0.5]; %%tiempo
+Tl_ref = [0.0 0.25 ]; %%carga
 
 Tl = timeseries(Tl_ref, t_load);
 Tl = setinterpmethod(Tl, 'linear');
@@ -66,7 +66,7 @@ Wba = 0;2;%%breakway frictions (rad/s)
 
 InitialSpeed = 0; %%rad/s
 RI_flag = 0;
-
+DO_flaf = 0;
 
 
 
@@ -79,7 +79,7 @@ fbw_q = 500;          % Hz (BW corriente)
 wd_d = 2*pi*fbw_d;      % rad/s
 wd_q = 2*pi*fbw_q;      % rad/s 
 
-fbw_Wm = 20;         % Hz (Bw Wm)
+fbw_Wm = 10;         % Hz (Bw Wm)
 frecuency_simulation = 10e3;
 f_carrier = 20e3;
 sample_time = 1/frecuency_simulation;
@@ -103,8 +103,8 @@ Ki_d = wd_d*R;
 Kp_q = wd_q*L;
 Ki_q = wd_q*R;
 
-shi_d = 0.707;
-shi_q = 0.707;
+shi_d = 1;
+shi_q = 1;
 
 Kp_q_salient = 2*shi_q*wd_q*Lq-R
 Ki_q_salient = wd_q^2*Lq
@@ -112,18 +112,18 @@ Ki_q_salient = wd_q^2*Lq
 Kp_d_salient = 2*shi_d*wd_d*Ld -R
 Ki_d_salient = wd_d^2*Ld
 
-shi_w = 1;
+shi_w = 2;
 wn_w = 2*pi*fbw_Wm;
 
 Kp_w = (2*shi_w*wn_w*J_var )/Kt;
 Ki_w = (wn_w^2)*J_var/Kt;
-Kd_w = Kp_w/1000;
+Kd_w = Kp_w/10000;
 Tf_w = 10/1000;
 
 
-Kp_pos = 1.0;    % Ganancia Proporcional (rigidez)
-Ki_pos = 0;     % Ganancia Integral (elimina error en estado estable)
-Kd_pos = 0.1;    % Ganancia Derivativa (amortiguamiento ante cogging)
+Kp_pos = 0.5;    % Ganancia Proporcional (rigidez)
+Ki_pos = 0.2;     % Ganancia Integral (elimina error en estado estable)
+Kd_pos = 0.001;    % Ganancia Derivativa (amortiguamiento ante cogging)
 
 
 %% ==========================
@@ -203,8 +203,8 @@ params.Nr = N_steps;
 
 %% Cálculo de parámetros del HFI
 HFI_flag = 1;
-Amplitud_HFI = 0.5;      % Voltios
-f_h = 1000;             % Frecuencia de inyección en Hz
+Amplitud_HFI = 2;      % Voltios
+f_h = 500;             % Frecuencia de inyección en Hz
 wh = 2 * pi * f_h;     % Frecuencia en rad/s (para la demodulación)
 
 % Parámetros del Filtro BPF
@@ -303,3 +303,4 @@ fprintf('a1 = %.6f, a2 = %.6f\n', a1_hfi, a2_hfi);
 % 
 % fprintf('Mejora : %.2f dB\n', ...
 %     20*log10(mag_RI/mag_PI));
+
