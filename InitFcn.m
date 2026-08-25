@@ -7,17 +7,19 @@ addpath(fullfile(project_folder,'control'));
 % SIMULACIÓN Y REFERENCIAS
 % =========================================================================
 
-Time_simulation = 2;
+Time_simulation = 0.5;
 
 t_ref = [0.0];
-w_ref = [20];
+w_ref = [10];
+
+theta_ref = pi/4;
 
 Wm_ref = timeseries(w_ref, t_ref);
 Wm_ref = setinterpmethod(Wm_ref,'zoh');
 
 % Torque de carga
 t_load = [0.0 0.5];
-Tl_ref = [0.0 0.25];
+Tl_ref = [0.0 0.0];
 
 Tl = timeseries(Tl_ref, t_load);
 Tl = setinterpmethod(Tl, 'linear');
@@ -137,7 +139,7 @@ motor_params.Nr = ...
 % PARÁMETROS DEL CONTROL DE VELOCIDAD + MTPA
 % =========================================================================
 
-PI_MTPA_params.fbw_Wm = 10;
+PI_MTPA_params.fbw_Wm = 10;%%10 para control de velocidad.
 
 PI_MTPA_params.shi_w = 2;
 
@@ -180,6 +182,7 @@ PI_MTPA_params.Ld = motor_params.Ld;
 PI_MTPA_params.Lq = motor_params.Lq;
 PI_MTPA_params.Ke = motor_params.Ke;
 PI_MTPA_params.P  = motor_params.P;
+PI_MTPA_params.Tmax = 0.5;
 
 
 
@@ -195,6 +198,13 @@ PI_pos_params.Ki = 0.2;
 PI_pos_params.Kd = 0.001;
 
 PI_pos_params.Ts = Ts_pos;
+
+PI_position_params.Ts = Ts_current;
+
+PI_position_params.Wmax_pos = 20;       % rad/s
+PI_position_params.Amax_pos = 100;      % rad/s^2
+
+PI_position_params.theta_tol = 0.01;    % rad
 
 
 %% =========================================================================
@@ -236,7 +246,7 @@ EKF_params.HFI_flag = 1;
 
 EKF_params.Amplitud_HFI = 2;
 
-EKF_params.f_h = 500;
+EKF_params.f_h = 1000;
 
 EKF_params.wh = ...
     2*pi*EKF_params.f_h;
@@ -333,3 +343,53 @@ PI_dq_params.Imax = motor_params.Imax;
 PI_dq_params.Amplitud_HFI = EKF_params.Amplitud_HFI;
 PI_dq_params.wh = EKF_params.wh;
 PI_dq_params.HFI_flag = EKF_params.HFI_flag;
+
+
+
+%% ========================================================================
+% LUT ONLINE COGGING
+% =========================================================================
+
+LUT_parameters.N_LUT         = 180;
+
+LUT_parameters.Wm_min        = 1.0;
+LUT_parameters.accel_tol     = 10;
+LUT_parameters.T_steady_req  = 0.05;
+
+LUT_parameters.alpha_learn   = 0.1;
+LUT_parameters.K_learn       = 0.5;
+
+LUT_parameters.Iq_comp_max   = 0.20;
+
+LUT_parameters.Ts            = Ts_current;
+LUT_parameters.enable        = 1;
+
+
+
+% =========================================================================
+% CONTROL RESONANTE
+% =========================================================================
+
+RI_params.enable = 0;
+
+RI_params.Ts = Ts_Wm;
+
+% Velocidad fija de operación
+Wm_operacion = Wm_ref.Data;        % [rad/s]
+
+% Número de ciclos de cogging por revolución
+Nc = 200;                  % verificar según Tdtm real
+
+% Frecuencia resonante
+RI_params.wr =  1000*2*pi;    % [rad/s]
+
+% Ganancia del resonador
+RI_params.Kr = 0.05;
+
+% Amortiguamiento del resonador
+RI_params.zeta = 0.05;
+
+% Torque máximo permitido al resonador
+RI_params.T_res_max = 0.07;    % [Nm]
+
+PI_MTPA_params.RI = RI_params;

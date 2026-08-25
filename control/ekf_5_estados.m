@@ -1,4 +1,4 @@
-function x_out = ekf_5_estados(U, X, params)
+function [x_out,theta_m_hat,theta_e_hat] = ekf_5_estados(U, X, params)
 % =========================================================================
 % EKF 5 ESTADOS TIGHTLY COUPLED CON HFI
 %
@@ -411,7 +411,7 @@ end
 % 11. FILTRO PASABAJOS DEL ERROR HFI
 % =========================================================================
 
-f_lpf_hfi = 50;
+f_lpf_hfi = 200;
 
 tau_lpf = ...
     1/(2*pi*f_lpf_hfi);
@@ -677,14 +677,16 @@ x_hat(2) = min(max(x_hat(2), -Iq_max), Iq_max);
 x_hat(3) = min(max(x_hat(3), -Wm_max), Wm_max);
 x_hat(5) = min(max(x_hat(5), -Tx_max), Tx_max);
 % =========================================================================
-% 22. SALIDA
+% 22. SALIDAS
 % =========================================================================
 
 x_out = x_hat;
 
+% Ángulo eléctrico para Park/control dq
+theta_e_hat = wrap_pi(x_hat(4));
 
-% Solo se envuelve el ángulo de salida
-x_out(4) = wrap_pi(x_hat(4));
+% Posición mecánica continua para control de posición
+theta_m_hat = x_hat(4) / PP;
 
 
 end
