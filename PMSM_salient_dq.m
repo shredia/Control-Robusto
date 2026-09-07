@@ -49,8 +49,25 @@ function Outputs(block)
     % Te_PM  = Ke * Iq
     % Te_rel = P*(Ld-Lq)*Id*Iq
     Te = p.Ke*Iq - p.P*(p.Ld - p.Lq)*Id*Iq;
-    Tdtm = p.Tdm * sin(p.Nr*Th_m + p.Phi); %%Revisar si es N_steps Ó Nr (200 valles energeóticos o por pares de polos)
+    
+    % Ángulo espacial del cogging
+psi = p.Nr*Th_m + p.Phi;
 
+% Forma del cogging: armónicos 1, 3 y 5
+Tcog_shape = ...
+      1.00*sin(psi) ...
+    + 0.25*sin(3*psi) ...
+    + 0.08*sin(5*psi);
+
+% Normalización para mantener:
+%           max(abs(Tdtm)) = p.Tdm
+ Kcog = 0.8733; %%Coeficiente para normalizar el torque, con valor máximo a p.Tdm
+
+
+% Torque de cogging
+Tdtm = p.Tdm * Tcog_shape / Kcog;
+        
+       
 
     block.OutputPort(1).Data = Id;
     block.OutputPort(2).Data = Iq;
@@ -108,7 +125,23 @@ function Derivatives(block)
     % Si no tienes Nr o phi_tdm, usa phi=0 y define Nr en params.
     
 
-    Tdet = p.Tdm * sin(p.Nr*Th_m + p.Phi); %%Revisar si es N_steps Ó Nr (200 valles energeóticos o por pares de polos)
+        % Ángulo espacial del cogging
+psi = p.Nr*Th_m + p.Phi;
+
+% Forma del cogging: armónicos 1, 3 y 5
+Tcog_shape = ...
+      1.00*sin(psi) ...
+    + 0.25*sin(3*psi) ...
+    + 0.08*sin(5*psi);
+
+% Normalización para mantener:
+%           max(abs(Tdtm)) = p.Tdm
+ Kcog = 0.8733; %%Coeficiente para normalizar el torque, con valor máximo a p.Tdm
+
+
+% Torque de cogging
+Tdtm = p.Tdm * Tcog_shape / Kcog;
+        
 
     % =========================
     % Mecánica
@@ -116,7 +149,7 @@ function Derivatives(block)
     W_eps = 0.1;
 
     Tl = Tl*tanh(Wm/W_eps);
-    dWm  = (Te - Tl - p.B_real*Wm - Tdet) / p.J_real;
+    dWm  = (Te - Tl - p.B_real*Wm - Tdtm) / p.J_real;
     dThm = Wm;
 
     block.Derivatives.Data = [dId; dIq; dWm; dThm];

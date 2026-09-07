@@ -46,7 +46,22 @@
         Te_sync  = p.Ke * (Ib*cos(Th_e) - Ia*sin(Th_e));
         
         Te = Te_sync + Te_reluc;
-        Tdtm = p.Tdm * (sin(p.Nr*Th_m + p.Phi));
+         % Ángulo espacial del cogging
+psi = p.Nr*Th_m + p.Phi;
+
+% Forma del cogging: armónicos 1, 3 y 5
+Tcog_shape = ...
+      1.00*sin(psi) ...
+    + 0*sin(3*psi) ... %%0.25
+    + 0*sin(5*psi);    %%0.08
+
+% Normalización para mantener:
+%           max(abs(Tdtm)) = p.Tdm
+ Kcog = 0.8733; %%Coeficiente para normalizar el torque, con valor máximo a p.Tdm
+
+
+% Torque de cogging
+Tdtm = p.Tdm * Tcog_shape / Kcog;
     end
     
     function Outputs(block)
@@ -93,12 +108,26 @@
         dI_vec = L_mat \ rhs_elec; 
         
         % --- Dinámica Mecánica ---
-        % Te_total incluye reluctancia y síncrono. Sumamos Detent Torque (Tdm)
-        T_detent = p.Tdm * sin(p.Nr* Th_m + p.Phi); % Usualmente 4*P o P según el motor
+         % Ángulo espacial del cogging
+psi = p.Nr*Th_m + p.Phi;
+
+% Forma del cogging: armónicos 1, 3 y 5
+Tcog_shape = ...
+      1.00*sin(psi) ...
+    + 0*sin(3*psi) ... %%0.25
+    + 0*sin(5*psi);    %%0.08
+
+% Normalización para mantener:
+%           max(abs(Tdtm)) = p.Tdm
+ Kcog = 0.8733; %%Coeficiente para normalizar el torque, con valor máximo a p.Tdm 
+
+
+% Torque de cogging
+Tdtm = p.Tdm * Tcog_shape / Kcog;
         W_eps = 0.1;
 
         Tl = Tl*tanh(Wm/W_eps);
-        dWm = (Te - Tl - p.B_real * Wm - T_detent) / p.J_real;
+        dWm = (Te - Tl - p.B_real * Wm - Tdtm) / p.J_real;
         dTh = Wm;
       dx = [dI_vec(1); dI_vec(2); dWm; dTh];
 

@@ -1,10 +1,10 @@
-function [x_out,theta_m_hat,theta_e_hat] = ekf_5_estados(U, X, params)
+function [x_out,theta_m_hat,theta_e_hat] = ekf_7_estados(U, X, params)
 % =========================================================================
 % EKF 5 ESTADOS TIGHTLY COUPLED CON HFI
 %
 % Estados:
 %
-%   x = [Id; Iq; Wm; theta_e; Tx]
+%   x = [Id; Iq; Wm; theta_e; Tx,Ac,Bc]
 %
 % Entradas:
 %
@@ -98,7 +98,7 @@ if isempty(x_hat)
     % Estado inicial
     % ---------------------------------------------------------------------
 
-    x_hat = zeros(5,1);
+    x_hat = zeros(7,1);
 
 
     % ---------------------------------------------------------------------
@@ -108,9 +108,11 @@ if isempty(x_hat)
     P = diag([ ...
         1e-6, ...   % Id
         1e-6, ...   % Iq
-        1e-6, ...   % Wm
-        1e-9, ...   % theta_e
-        1e-5]);     % Tx
+        1e-2, ...   % Wm
+        1e-2, ...   % theta_e
+        1e-5,...    % Tx
+        1e-4,...
+        1e-4]);    
 
 
     % ---------------------------------------------------------------------
@@ -118,12 +120,13 @@ if isempty(x_hat)
     % ---------------------------------------------------------------------
 
     Qk = diag([ ...
-        1e-6, ...    % Id 1e-8
-        1e-6, ...    % Iq 1e-8
-        1e-3, ...    % Wm 1e-6
-        1e-12, ...   % theta_e 1e-12
-        1e-4]);      % Tx 1e-5
-
+        1e-8, ...    % Id 1e-8
+        1e-8, ...    % Iq 1e-8
+        1e-2, ...    % Wm 1e-6
+        1e-8, ...   % theta_e 1e-12
+        1e-6,...     % Tx 1e-5
+        1e-10,...
+        1e-10]);      
 
     % ---------------------------------------------------------------------
     % Estados del BPF de Ia
@@ -183,6 +186,8 @@ theta_e_state = x_hat(4);
 % Torque desconocido
 Tx = x_hat(5);
 
+Acog = x_hat(6);
+Bcog = x_hat(7);
 
 % Ángulo envuelto solamente para trigonometría
 theta_e = wrap_pi(theta_e_state);
@@ -235,6 +240,26 @@ Te = ...
       Kt*Iq ...
     - Krel*Id*Iq;
 
+%%Predicción real
+% theta_m = theta_e_state / PP;
+% 
+% psi_cog = ...
+%     params.Nr * theta_m ...
+%     + params.Phi;
+% 
+% Tcog_hat = ...
+%     params.Tdm * sin(psi_cog);
+%%Predicción normal
+
+theta_m = theta_e_state / PP;
+
+psi_cog = params.Nr * theta_m;
+
+Tcog_hat = ...
+      Acog*sin(psi_cog) ...
+    + Bcog*cos(psi_cog);
+
+
 
 % -------------------------------------------------------------------------
 % Dinámica mecánica
@@ -243,14 +268,14 @@ Te = ...
 % -------------------------------------------------------------------------
 
 dWm = ...
-    (Te - B*Wm - Tx)/J;
+    (Te - B*Wm - Tx - Tcog_hat)/J;
 
 
 % -------------------------------------------------------------------------
 % Predicción
 % -------------------------------------------------------------------------
 
-x_pred = zeros(5,1);
+x_pred = zeros(7,1);
 
 x_pred(1) = Id + Ts_eff*dId;
 
@@ -266,11 +291,17 @@ x_pred(4) = ...
 % Torque desconocido como random walk
 x_pred(5) = Tx;
 
+x_pred(6) = Acog;
+x_pred(7) = Bcog;
 
 % =========================================================================
 % 6. JACOBIANA DE TRANSICIÓN
 % =========================================================================
 
+dTcog_dtheta = ...
+    params.Tdm ...
+    * (params.Nr / PP) ...
+    * cos(psi_cog);
 
 A = [ ...
 
@@ -278,34 +309,60 @@ A = [ ...
      PP*Wm*Lq/Ld, ...
      PP*Lq*Iq/Ld, ...
      Vq/Ld, ...
+     0,...
+     0,...
      0;
 
     -PP*Wm*Ld/Lq, ...
     -R/Lq, ...
     -(PP*Ld*Id + Ke)/Lq, ...
     -Vd/Lq, ...
+     0,...
+     0,...
      0;
 
      -Krel*Iq/J, ...
      (Kt - Krel*Id)/J, ...
     -B/J, ...
-     0, ...
-    -1/J;
+     -dTcog_dtheta/J, ...
+    -1/J...
+     -sin(psi_cog)/J,...
+     -cos(psi_cog)/J;
 
      0, ...
      0, ...
      PP, ...
      0, ...
+     0,...
+     0,...
      0;
 
      0, ...
      0, ...
      0, ...
      0, ...
+     0,...
+     0,...
+     0;
+     
+     0, ...
+     0, ...
+     0, ...
+     0, ...
+     0,...
+     0,...
+     0;
+     
+     0, ...
+     0, ...
+     0, ...
+     0, ...
+     0,...
+     0,...
      0];
 
 
-Phi = eye(5) + Ts_eff*A;
+Phi = eye(7) + Ts_eff*A;
 
 
 % =========================================================================
@@ -566,11 +623,11 @@ dEps_dtheta_e = 0;%%-1
 
 Ck = [ ...
 
-    cp, -sp, 0, dIa_dtheta_e, 0;
+    cp, -sp, 0, dIa_dtheta_e, 0,0,0;
 
-    sp,  cp, 0, dIb_dtheta_e, 0;
+    sp,  cp, 0, dIb_dtheta_e, 0,0,0;
 
-    0,   0,  0, dEps_dtheta_e, 0];
+    0,   0,  0, dEps_dtheta_e, 0,0,0];
 
 
 % =========================================================================
@@ -638,7 +695,7 @@ x_corr_ekf = ...
 % Forma de Joseph
 % =========================================================================
 
-I5 = eye(5);
+I5 = eye(7);
 
 
 P = ...
@@ -676,6 +733,11 @@ x_hat(1) = min(max(x_hat(1), -Id_max), Id_max);
 x_hat(2) = min(max(x_hat(2), -Iq_max), Iq_max);
 x_hat(3) = min(max(x_hat(3), -Wm_max), Wm_max);
 x_hat(5) = min(max(x_hat(5), -Tx_max), Tx_max);
+Acog_max = 0.025;
+Bcog_max = 0.025;
+
+x_hat(6) = min(max(x_hat(6), -Acog_max), Acog_max);
+x_hat(7) = min(max(x_hat(7), -Bcog_max), Bcog_max);
 % =========================================================================
 % 22. SALIDAS
 % =========================================================================
