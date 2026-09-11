@@ -868,3 +868,5 @@ title( ...
 
 
 hold off;
+
+Simulink.sdi.view

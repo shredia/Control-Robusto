@@ -121,59 +121,38 @@ resultado.timeWindow = timeWindow;
 % EXTRAER SEÑALES M1
 % ========================================================================
 
-M1.Wm_real = ...
-    obtener_senal(simOut,'Wm_planta_M1');
+M1.Wm_real = obtener_senal(simOut,'Wm_real_M1');
+M1.Wm_obs  = obtener_senal(simOut,'Wm_obs_M1');
 
-M1.Wm_obs = ...
-    obtener_senal(simOut,'Wm_obs_M1');
+M1.Iq_ref = obtener_senal(simOut,'Iq_ref_M1');
+M1.Iq     = obtener_senal(simOut,'Iq_M1');
 
-M1.Iq_ref = ...
-    obtener_senal(simOut,'Iq_ref_M1');
+M1.theta_real = obtener_senal(simOut,'theta_e_planta_M1');
+M1.theta_obs  = obtener_senal(simOut,'theta_e_obs_M1');
 
-M1.Iq = ...
-    obtener_senal(simOut,'Iq_M1');
+M1.Tdtm = obtener_senal(simOut,'Tdtm_M1');
 
-M1.theta_real = ...
-    obtener_senal(simOut,'theta_e_planta_M1');
-
-M1.theta_obs = ...
-    obtener_senal(simOut,'theta_e_obs_M1');
-
-M1.Tdtm = ...
-    obtener_senal(simOut,'Tdtm_M1');
-
-M1.T_PR = ...
-    obtener_senal(simOut,'T_PR_M1');
+% Si T_res corresponde a la salida del resonador/PR
+M1.T_PR = obtener_senal(simOut,'T_res_M1');
 
 
 %% ========================================================================
 % EXTRAER SEÑALES M2
 % ========================================================================
 
-M2.Wm_real = ...
-    obtener_senal(simOut,'Wm_planta_M2');
+M2.Wm_real = obtener_senal(simOut,'Wm_real_M2');
+M2.Wm_obs  = obtener_senal(simOut,'Wm_obs_M2');
 
-M2.Wm_obs = ...
-    obtener_senal(simOut,'Wm_obs_M2');
+M2.Iq_ref = obtener_senal(simOut,'Iq_ref_M2');
+M2.Iq     = obtener_senal(simOut,'Iq_M2');
 
-M2.Iq_ref = ...
-    obtener_senal(simOut,'Iq_ref_M2');
+M2.theta_real = obtener_senal(simOut,'theta_e_planta_M2');
+M2.theta_obs  = obtener_senal(simOut,'theta_e_obs_M2');
 
-M2.Iq = ...
-    obtener_senal(simOut,'Iq_M2');
+M2.Tdtm = obtener_senal(simOut,'Tdtm_M2');
 
-M2.theta_real = ...
-    obtener_senal(simOut,'theta_e_planta_M2');
-
-M2.theta_obs = ...
-    obtener_senal(simOut,'theta_e_obs_M2');
-
-M2.Tdtm = ...
-    obtener_senal(simOut,'Tdtm_M2');
-
-M2.T_PR = ...
-    obtener_senal(simOut,'T_PR_M2');
-
+% Si T_res corresponde a la salida resonante
+M2.T_PR = obtener_senal(simOut,'T_res_M2');
 
 %% ========================================================================
 % ANALIZAR MOTOR 1
@@ -418,35 +397,130 @@ end
 %% ========================================================================
 % FUNCIÓN: OBTENER SEÑAL DESDE simOut
 % ========================================================================
+%% ========================================================================
+% FUNCIÓN: OBTENER SEÑAL DESDE logsout
+% ========================================================================
 
-function signal = obtener_senal(simOut,nombre)
+function x = obtener_senal(simOut, nombre)
+
+% =========================================================================
+% OBTENER_SENAL
+%
+% Busca exclusivamente una señal dentro del Dataset:
+%
+%       simOut.logsout
+%
+% Devuelve:
+%
+%       timeseries
+%
+% Esto permite mantener todas las señales utilizadas por FinishFcn
+% agrupadas dentro de Signal Logging.
+% =========================================================================
 
 
-signal = ...
-    simOut.get(nombre);
+%% ========================================================================
+% VERIFICAR SimulationOutput
+% ========================================================================
 
-
-if isempty(signal)
+if ~isa(simOut,'Simulink.SimulationOutput')
 
     error( ...
-        'No se encontró la señal "%s" dentro de simOut.', ...
-        nombre);
+        'FinishFcn:InvalidSimulationOutput', ...
+        'simOut debe ser un objeto Simulink.SimulationOutput.');
 
 end
 
 
-if ~isa(signal,'timeseries')
+%% ========================================================================
+% VERIFICAR logsout
+% ========================================================================
+
+variables = simOut.who;
+
+if ~any(strcmp(variables,'logsout'))
 
     error( ...
-        'La señal "%s" debe ser una timeseries.', ...
-        nombre);
+        'FinishFcn:LogsoutNotFound', ...
+        ['No existe "logsout" dentro de SimulationOutput. ' ...
+         'Verifique que Signal Logging esté activado.']);
 
 end
 
 
+logsout = simOut.get('logsout');
+
+
+if isempty(logsout)
+
+    error( ...
+        'FinishFcn:LogsoutEmpty', ...
+        'El Dataset logsout está vacío.');
+
 end
 
 
+%% ========================================================================
+% BUSCAR SEÑAL
+% ========================================================================
+
+try
+
+    elemento = logsout.getElement(nombre);
+
+catch
+
+    elemento = [];
+
+end
+
+
+%% ========================================================================
+% VERIFICAR RESULTADO
+% ========================================================================
+
+if ~isempty(elemento)
+
+    x = elemento.Values;
+
+    return;
+
+end
+
+
+%% ========================================================================
+% SEÑAL NO ENCONTRADA
+% ========================================================================
+
+fprintf('\n');
+fprintf('=============================================================\n');
+fprintf(' SEÑAL NO ENCONTRADA EN logsout\n');
+fprintf('=============================================================\n');
+
+fprintf('Buscada: %s\n\n',nombre);
+
+fprintf('Señales disponibles:\n');
+
+for k = 1:logsout.numElements
+
+    elem = logsout.getElement(k);
+
+    fprintf( ...
+        '%3d | %s\n', ...
+        k, ...
+        elem.Name);
+
+end
+
+fprintf('=============================================================\n');
+
+
+error( ...
+    'FinishFcn:SignalNotFound', ...
+    'No se encontró la señal "%s" dentro de logsout.', ...
+    nombre);
+
+end
 %% ========================================================================
 % FUNCIÓN: IMPRIMIR RESULTADOS DE UN MOTOR
 % ========================================================================

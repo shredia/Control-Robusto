@@ -331,8 +331,8 @@ INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
-OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\eccc1200.tfm
+OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.toc
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.lof
@@ -348,6 +348,7 @@ INPUT .\capitulos\01_Introduccion.tex
 INPUT .\capitulos\01_Introduccion.tex
 INPUT capitulos\01_Introduccion.tex
 INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1728.tfm
+INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecti1200.tfm
 INPUT .\capitulos\02_Marco_teorico.tex
 INPUT .\capitulos\02_Marco_teorico.tex
 OUTPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\02_Marco_teorico.aux
@@ -385,7 +386,6 @@ INPUT .\imagenes\anexos\medicion_inductancia.png
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.bbl
-INPUT C:\Users\damia\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecti1200.tfm
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\main.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\01_Introduccion.aux
 INPUT d:\Utal\Memoria_Clinostato\Memoria-clinostato\Control Robusto\Documento\build\capitulos\01_Introduccion.aux

@@ -1,100 +1,702 @@
-\chapter{Introduccion general}
-Dentro de la ingeniería, en especial en el área de investigación espacial o de agricultura, es común realizar investigaciones para simular condiciones comunes del espacio exterior, las cuales son, por regla general, muy distintas a las que se pueden encontrar en nuestro planeta. Una de las condiciones que gustaría generar o explorar es la de la gravedad, la cual claramente no es posible controlar hoy en día.
- Como alternativa, han nacido ideas como Clinostatos y RPM (Random Position Machine), las cuales pueden generar artificialmente, mediante fuerzas centrífugas, 	modificar el promedio temporal del vector de gravedad.
+% ============================================================
+% CAPÍTULO 1: INTRODUCCIÓN
+% ============================================================
 
- \section{Estado del arte}
- \subsection{Clinostatos}
-    Las máquinas de ingravidez (o Clinostatos) son dispositivos que hacen girar sus ejes para evitar que el vector de gravedad permanezca fijo en un sistema de referencia y con ello provocar un promedio temporal de sus efectos sobre una muestra.
+\chapter{Introducción}
 
 
-Los Clinostatos pueden construirse desde uno hasta tres ejes de rotación, dependiendo del nivel de complejidad y del grado de libertad y movimiento requerido. El más común es un clinostato de 2D, puesto que, con este, se cumple con elrequisito mínimo para cubrir la región de una esfera, lo cual es la mejor figura para simular un verdadero ambiente de ingravidez~\cite{ArturoRojas-Moreno2018}.
+% ------------------------------------------------------------
+\section{Descripción del problema}
+% ------------------------------------------------------------
+
+% PÁRRAFO 1: CONTEXTO GENERAL
+% Introducir los accionamientos eléctricos y su importancia.
+% Hablar brevemente de la evolución desde máquinas de CC hacia
+% máquinas de CA gracias al desarrollo de electrónica de potencia
+% y procesadores digitales.
+% Explicar que muchas aplicaciones requieren control preciso de
+% velocidad y/o posición.
+%
+% NO entrar todavía en clasificación detallada de motores.
+% NO incluir ecuaciones.
 
 
- Pero para poder provocar un promedio temporal cercano a 0, es necesario mantener una velocidad constante. Esta velocidad no puede ser cualquiera, dependiendo del tipo de aplicación y de estudio, lo cual puede variar desde 1  hasta 120 [RPM]~\cite{Cacayurin2023}. Este valor depende del orden de magnitud máximo al que se quiera llegar, dependiendo también del radio del centro del eje dónde gire, puesto que contra más alejado esté menor velocidad se necesitará.
+Los motores eléctricos son máquinas que transforman energia electrica en movimiento mecánico, por lo que son usadas en un sinfin de aplicaciones. Inicialmente, se utilizaban motores de corriente continua, sin embargo, con el avance de dispositivos electrónicos, controladores y procesadores digitales, se ha optado por utilizar máquinas de corriente alterna. Si bien su control es más complejo, pueden llegar a ser menos costosos, con mayor potencia, mejor respuesta dinámica,velocidad máxima, mantenimiento,entre otros factores. \cite{vierbergenPredictingImprovingBehaviour} \cite{deangeloControlParaMaquinas2004}.
 
- \subsection{Accionamiento y dinámicas de motores eléctricos}
+A medida que ha avanzado la tecnología,la necesidad de precisión ha crecido también.
+Para esto  se suele usar un sensor de posición ó velocidad para cerrar el lazo de control y maximizar la precisión de velocidad ó posición. Sin embargo, hay aplicaciones dónde por la naturaleza del sistema, se necesita un control preciso y constante sin estos sensores. 
 
- Para generar el movimiento de los distintos ejes en un clinostato, es necesario disponer de sistemas de accionamiento basados en motores eléctricos. La selección del tipo de motor depende de diversos factores, tales como las cargas mecánicas involucradas, las velocidades de operación, la estrategia de control requerida, los costos de implementación y la disponibilidad comercial.
 
- En la literatura y en aplicaciones prácticas de clinostatos, los motores más comúnmente utilizados corresponden a motores de corriente continua (DC) y motores paso a paso (steppers), debido principalmente a su facilidad de integración y control. Los motores DC se caracterizan por su comportamiento continuo y por requerir estrategias de control que permitan regular su velocidad frente a variaciones de carga, lo cual suele implicar el uso de realimentación. Por su parte, los motores stepper destacan por su capacidad de generar movimiento incremental mediante la conmutación controlada de sus fases, permitiendo un control preciso del desplazamiento angular y un alto torque a bajas velocidades.
 
- A diferencia de los motores DC, los motores stepper no operan directamente con corriente continua, sino que requieren una secuencia de excitación adecuada para generar el movimiento rotacional. Esta característica les permite asegurar desplazamientos angulares definidos a partir de una cantidad determinada de pasos eléctricos, lo que ha motivado su uso frecuente en aplicaciones donde se privilegia la simplicidad mecánica y el control del posicionamiento. Cómo desventaja, estos motores pueden presentar un mayor rizado de vibraciones mecánicas y de corriente, lo cual puede generar efectos indeseados dependiendo del caso de estudio \cite{Cacayurin2023}.
+% PÁRRAFO 2: INTRODUCCIÓN AL MOTOR PASO A PASO
+% Reducir el problema general hacia los motores paso a paso.
+% Explicar por qué son atractivos:
+%   - Movimiento incremental.
+%   - Posibilidad de controlar posición mediante excitación eléctrica.
+%   - Operación tradicional a lazo abierto.
+%   - Simplicidad y costo.
+%   - Uso en aplicaciones de posicionamiento y baja velocidad.
+%
+% Solo introducir el stepper.
+% La clasificación VR / PM / híbrido va en el Marco Teórico.
 
- En cuanto a la transmisión del movimiento, los clinostatos pueden presentar distintas configuraciones mecánicas. En algunos diseños, cada eje cuenta con un motor instalado sobre un marco móvil que acciona un eje adicional, configuraciones que pueden repetirse para obtener sistemas de dos o tres dimensiones. En estos casos, el suministro de energía y el sensado continuo suelen realizarse mediante slip-rings o sistemas de cableado rotativo, los cuales permiten la rotación sin enredos.
+Para ello, salen alternativas cómo los motores paso a paso(de ahora en adelante, steppers), que pueden mejorar esta precisión a lazo abierto mediante la aplicación de pasos eléctricos.Estos motores, son motores que tienen un movimiento incremental,es decir, que tiene pequeños incrementos angulares discretos, ó pasos. Esto se realiza mediante un cambio ó excitación de las fases de este tipo de motor.
+Por esto mismo, este tipo de motor se utiliza bastante, puesto que, puede comandarse en lazo abierto .Adicionalmente, la facilidad de su uso mediante drivers, librerías, y su fácil mantenimiento y costo lo hacen bastante atractivo para la industria ó proyectos de por si.
 
- Si bien estas soluciones facilitan la medición en tiempo real de variables como aceleración o gravedad mediante sensores inerciales o encoders, presentan limitaciones asociadas a mayores costos de implementación, requerimientos de mantenimiento, restricciones de velocidad y un aumento en la complejidad del sistema de cableado.
 
- Como alternativa, se emplean sistemas de transmisión mediante poleas, los cuales permiten transferir el movimiento desde un eje fijo hacia un marco móvil a través de elementos mecánicos como correas y rodamientos, evitando la necesidad de cableado rotativo. Esta configuración posibilita la generación de movimiento rotacional en cada eje con una menor complejidad mecánica y costos reducidos.
 
- No obstante, al prescindir del uso de slip-rings, se dificulta la incorporación de sensores mecánicos para la medición continua de variables como velocidad o posición. En consecuencia, en sistemas sometidos a condiciones de alto torque, rozamiento o cargas variables, pueden presentarse diferencias significativas entre la velocidad real del eje y la velocidad deseada, afectando el desempeño dinámico del clinostato.
+% PÁRRAFO 3: LIMITACIONES DEL CONTROL A LAZO ABIERTO
+% Explicar que la posición eléctrica impuesta no garantiza que
+% el rotor siga perfectamente la referencia.
+%
+% Introducir problemas como:
+%   - Perturbaciones de carga.
+%   - Variaciones paramétricas.
+%   - Pérdida de pasos.
+%   - Oscilaciones.
+%   - Resonancias.
+%   - Ripple de velocidad y/o par.
+%
+% Destacar que estos efectos son relevantes cuando se requiere
+% movimiento suave y preciso, especialmente a baja velocidad.
 
-  \subsection{Tipos de controles}
+Aunque estos motores tienden a presentar una alta capacidad de torque, su precisión tanto en velocidad como en posición puede variar dependiendo de las perturbaciones. Al aplicar una velocidad de pasos para un motor sin carga no es lo mismo que aplicar la misma velocidad pero con carga del 50,70 ó 100 \%.
+Esto se puede traducir en una pérdida de pasos, oscilaciones, ripple en la velocidad,etc.
+Una forma que se realiza para reducir este tipo de desconocimiento de parámetros ó perturbaciones, es aplicar la mayor capacidad de corriente independiente de la carga, intentando realizar un control con todo el potencial eléctrico. Esto no asegura necesariamente que no haya perdida de pasos, además de aumentar el consumo de corriente, aumentar temperatura y disminuir el tiempo de vida del motor.
+Estos efectos son tema de estudio para contrarrestarse y lograr un movimiento suave y preciso, especialmente a baja velocidad, dónde las perturbaciones afectan la velocidad comaprado a alta velocidad,situación dónde se podrían hasta despreciar.
 
-  Los esquemas de control cerrado de un motor eléctrico se basan generalmente en control PID, los cuales permiten llegar a error estacionario 0. Sin embargo, el desempeño de estos controladores dependen de  la retroalimentación de la variable a controlar y del conocimiento de los parámetros internos del motor, así como perturbaciones externas. En muchas aplicaciones, estas variables y parámetros no son medibles directamente, además de que pueden ir variando con el tiempo, por lo que su desconocimiento puede generar errores en el control de velocidad del motor.
 
-  Frente a estas limitaciones, se ha demostrado la implementación de técnicas de estimación basadas en observadores de estado, que permiten reconstruir variables del sistema, cómo la velocidad mecánica, mediante la lectura de señales eléctricas\cite{Nicola2023},\cite{Nicola2024},\cite{Lascu2020}. Adicionalmente, los observadores de perturbaciones han sido propuestos como una herramienta complementaria para estimar efectos externos no modelados explícitamente, como lo podrían ser torque variable y roce\cite{Yu2025}.
+% PÁRRAFO 4: CONTROL EN LAZO CERRADO
+% Introducir el control realimentado como solución a las
+% limitaciones anteriores.
+%
+% Explicar que conocer la posición y/o velocidad real del rotor
+% permite:
+%   - Mejorar precisión.
+%   - Rechazar perturbaciones.
+%   - Evitar pérdida de sincronismo.
+%   - Mejorar desempeño dinámico.
+%
+% Mencionar encoder/resolver únicamente como ejemplos.
 
-  Si bien la estimación de la velocidad y del torque es relevante para el desempeño dinámico del sistema, su estimación simultánea incrementa la complejidad del esquema de control y la sensibilidad a incertidumbres del modelo. En particular, formular un estimador capaz de reconstruir un torque de carga variable, considerar parámetros mecánicos parcialmente desconocidos (por ejemplo, rozamiento) y, al mismo tiempo, lograr un control con error estacionario cercano a cero constituye un desafío, especialmente en condiciones de operación variables.
+Para contrarrestar esto,se suelen colocar encoders ó sensores de posición, los cuales pueden aumentar esta necesitada precisión, rechazar perturbaciones, mejorar el desempeño,etc. Pero estos sensores se traducen en mayor costo, cableado, mantenimiento, y pierde una de las ventajas de los motores paso a paso comparado a otro motor de CA, que es el poder óperar a lazo abierto.
 
-  Adicionalmente, el funcionamiento de un estimador de estados necesita de información de otros estados, los cuales pueden entregar muy poca información (tal cómo la fuerza electro-motriz, la cual es proporcional a la velocidad mecánica) tanto en estado estacionario cómo en baja velocidad, comprometiendo la observabilidad del sistema\cite{Shan-Mao2009}. Una forma de resolver esto es aprovechando la saliencia de los motores híbridos que se manifiesta como una anisotropía magnética donde la inductancia de cada fase varía de forma sinusoidal según la posición angular del rotor. Esta característica es explotada por técnicas como el HFI, que permiten estimar la posición y velocidad del rotor a bajas velocidades o incluso en estado estacionario, mediante la inyección de señales de alta frecuencia y el análisis de la respuesta del sistema ~\cite{Helsing2022} \cite{Wang2025}
+% PÁRRAFO 5: PROBLEMA DE LOS SENSORES MECÁNICOS
+% Explicar las desventajas de utilizar sensores:
+%   - Mayor costo.
+%   - Cableado adicional.
+%   - Mayor volumen.
+%   - Complejidad de integración.
+%   - Mantenimiento.
+%   - Confiabilidad en ciertos ambientes.
+%
+% Este párrafo debe conducir naturalmente hacia el concepto
+% de control sensorless.
 
-  Se puede observar que existen métodos que implementan una mezcla de técnicas de control clásico (PID), observadores de estado y técnicas de inyección de alta frecuenca[HFI]. Por separado, estos métodos son insuficientes para resolver el problema de control de un clinostato accionado por motores stepper sin sensores mecánicos a baja velocidad, debido a las limitaciones mencionadas anteriormente. Sin embargo, la combinación de estas técnicas podría permitir mejorar el desempeño dinámico del sistema, al aprovechar las fortalezas de cada método y mitigar sus debilidades.
 
-  
-  A partir de la revisión del estado del arte, se observa que los clinostatos reportados en la literatura utilizan predominantemente configuraciones mecánicas y estrategias de control que dependen del uso de sensores mecánicos o inerciales, así como de sistemas de cableado rotativo como slip-rings, para asegurar un control continuo del movimiento de sus ejes. Por otra parte, las técnicas de control avanzadas y sensorless han sido ampliamente estudiadas en otros contextos de accionamiento eléctrico, pero su aplicación a motores paso a paso en clinostatos con configuraciones mecánicas simplificadas y perturbaciones no medidas ha sido escasamente abordada. Esta brecha motiva la necesidad de estudiar e implementar estrategias de control que permitan mejorar el comportamiento dinámico de clinostatos accionados por motores stepper, sin recurrir al uso de sensores mecánicos adicionales.
+% PÁRRAFO 6: CONTROL SENSORLESS
+% Introducir el control sin sensores mecánicos.
+%
+% Explicar conceptualmente que posición y velocidad pueden
+% estimarse utilizando:
+%   - Tensiones.
+%   - Corrientes.
+%   - Modelo matemático de la máquina.
+%   - Observadores/estimadores.
+%
+% Se puede mencionar el EKF como una alternativa existente,
+% pero SIN desarrollar todavía sus ecuaciones.
 
-  \section{Problemática}
+Sin embargo, hay técnicas que permiten observar y/ó estimar la velocidad de un motor de CA. Para esto, es necesario realizar una medición de algunas variables del motor, tales cómo el voltaje, corriente, algunos parámetros de la máquina y desarrollar un observador ó estimador apropiado.
 
-  
-En el presente trabajo se aborda el estudio de un clinostato bidimensional accionado mediante motores paso a paso y un sistema de transmisión por poleas, cuya configuración permite mantener los motores fijos y prescindir del uso de sistemas de cableado rotativo como slip-rings. Si bien esta solución simplifica la implementación mecánica y reduce los costos y requerimientos de mantenimiento, introduce desafíos relevantes desde el punto de vista del control del movimiento.
+% PÁRRAFO 7: PROBLEMA SENSORLESS A BAJA VELOCIDAD
+% Este es uno de los puntos centrales de la problemática.
+%
+% Explicar:
+%   - Disminución de la FEM a baja velocidad.
+%   - Menor información disponible para estimar estados mecánicos.
+%   - Problemas de observabilidad.
+%   - Mayor sensibilidad frente a errores de modelo.
+%   - Mayor efecto relativo del ruido y las perturbaciones.
+%
+% Respaldar estas afirmaciones con papers.
+%
+% Conducir hacia la idea de que el control sensorless a baja
+% velocidad continúa siendo una condición desafiante.
 
-Debido a la geometría del sistema de poleas, el torque resistente aplicado sobre el eje del motor no es constante, sino que varía en función de la posición angular del sistema. En particular, determinadas posiciones implican mayores esfuerzos mecánicos, mientras que otras presentan menores exigencias de torque. Esta variación de carga constituye una perturbación mecánica no medible por un sensor por la naturaleza del sistea, que afecta directamente el comportamiento dinámico del motor.
+Una de las problemáticas de observar las variables de un motor se presenta al observar con una baja velocidad mecánica, debido a la disminución de la FEM, puesto que depende de la velocidad del rotor, disminuyendo la información disponible para la estimación de los estados del motor. Por ende, las señales utilizadas presentar una menor relación señal-ruido y es más sensible a perturbaciones, ruido de mediciones y errores de modelo. Esto dificulta distinguir si las variables observadas corresponden al comportamiento real del sistema ó a ótros efectos, deteriorando la estimación de las variables. Sin embargo, hay técnicas de estimación que permiten extender este limite inferior de observabilidad, aumentando las corrientes de flujo  ó campo eléctrico, sin embargo, esto no asegura la observabilidad a velocidad zero. \cite{wangParameterRobustnessImprovement2026}.
 
-Cuando se utilizan motores paso a paso operando a lazo abierto, estas perturbaciones pueden generar desviaciones significativas entre la velocidad deseada y la velocidad real del eje, además de incrementar las vibraciones mecánicas y el rizado de corriente. Estas variaciones comprometen la estabilidad del movimiento y dificultan la obtención de un régimen de giro uniforme, condición fundamental para el correcto funcionamiento de un clinostato.
+% PÁRRAFO 8: PERTURBACIONES PERIÓDICAS Y RIPPLE
+%
+% IDEA:
+% Hasta este punto se estableció que la estimación sensorless se vuelve
+% más compleja a baja velocidad. Ahora introducir una segunda problemática:
+% las perturbaciones periódicas propias de la máquina.
+%
+% ORDEN RECOMENDADO:
+%
+% 1. Explicar que el torque desarrollado por una máquina real no es
+%    perfectamente constante, sino que puede contener componentes
+%    periódicas.
+% 2. Introducir el concepto de torque ripple como las oscilaciones
+%    del torque alrededor de su valor medio.
+%
+% 3. Explicar que estas oscilaciones pueden tener distintos orígenes:
+%       - geometría de la máquina;
+%       - armónicos electromagnéticos;
+%       - conmutación/excitación;
+%       - interacción rotor-estator;
+%       - detent torque.
+%
+% 4. Particularizar hacia motores paso a paso.
+%    Introducir el detent torque como una perturbación periódica
+%    asociada a la posición del rotor que puede existir incluso
+%    cuando las fases no están energizadas.
+%
+% 5. Explicar la consecuencia mecánica:
+%
+%       perturbación periódica de torque
+%                     ↓
+%             oscilación de torque
+%                     ↓
+%             ripple de velocidad
+%
+% 6. Conectar esto con BAJA VELOCIDAD:
+%    a bajas velocidades, estas perturbaciones pueden adquirir
+%    mayor importancia relativa respecto del torque requerido
+%    para mantener el movimiento.
+%
+% 7. Finalmente conectar con SENSORLESS:
+%    si la velocidad utilizada por el controlador proviene de un
+%    observador, la perturbación afecta a la planta mientras que
+%    la compensación depende de variables mecánicas estimadas.
+%
+% IMPORTANTE:
+% No desarrollar todavía la ecuación sinusoidal del detent torque.
+% Eso corresponde al marco teórico/modelado.
+%
+% Tampoco afirmar todavía que el detent torque es "la principal"
+% causa del ripple. Eso deberá justificarse bibliográficamente.
+La capacidad de un motor para generar torque sin variaciones de carga es idealmente constante, pero la realidad es algo diferente. Dentro de las propiedades internas existen ciertas configuraciones propias del motor que pueden generar componentes periódicos en el torque generado por el motor. A estas oscilaciones se les llama como torque ripple, las cuales pueden ser generadas por distintas variables, cómo la geometría del motor, armónicos electromagnéticos, el tipo de conmutación, interacción rotor-stator o torque de detención. Muchas de estas perturbaciones son en función de la posición, por lo tanto,están presente independiente de si el motor está energizado ó no. Los motores stepper son capaces de generar pasos con precisión, en gran medida gracias a estas características,puesto que son construidos pensados aprovechando este tipo de diseño. 
 
-Adicionalmente, la ausencia de sensores mecánicos o inerciales instalados de forma permanente en los ejes impide la medición continua de variables como la velocidad o el torque de carga. Esta limitación restringe la aplicación de esquemas de control convencionales basados en realimentación directa, y obliga a enfrentar el problema del control del movimiento bajo condiciones de información parcial del sistema.
+Durante el movimiento del rotor, estas componentes periódicas de torque pueden producir oscilaciones en la velocidad del motor.Estos efectos pueden aumentar a baja velocidad, dónde las variaciones pueden ser mucho más significativas, deteriorando el comportamiendo de velocidad.Debido a la diversidad de fenómenos que pueden contribuir a estas oscilaciones,el presente trabajo se centrará específicamente en la componente
+periódica asociada al \textit{cogging torque}, estudiando su efecto
+sobre la velocidad del motor y su posterior compensación.
 
-En este contexto, surge la necesidad de desarrollar e implementar estrategias de control que permitan mejorar el desempeño dinámico del clinostato frente a perturbaciones mecánicas variables, manteniendo un comportamiento de velocidad estable sin recurrir al uso de sensores mecánicos adicionales.
+En cuestión del cogging, este se suele compensar para disminuir ó eliminar sus efectos. En la literatura, las principales formas de compensación son:
 
-\section{Propuesta de solución}
-Con el fin de abordar la problemática descrita, se propone implementar un esquema de control en lazo cerrado orientado a mantener un comportamiento de velocidad estable en un clinostato 2D accionado por motores paso a paso, considerando la presencia de perturbaciones mecánicas variables y la ausencia de sensado mecánico continuo.
-La estrategia propuesta se basa en la integración de un controlador de corriente y velocidad con técnicas de estimación, de manera que la retroalimentación necesaria para el control no dependa de sensores mecánicos adicionales. En particular, se plantea utilizar un control orientado a campo (FOC) para gobernar las variables eléctricas del motor en un sistema de referencia dq, permitiendo regular el torque a través de la componente de corriente asociada y mejorar el comportamiento dinámico frente a variaciones de carga.
-Dado que no se dispone de medición directa de velocidad, se incorpora un observador de estados para estimar la velocidad del sistema a partir de señales eléctricas disponibles (principalmente corrientes y voltajes) y de la respuesta a la inyección de señales de alta frecuencia, garantizando observabilidad a baja velocidad. Adicionalmente, se considera la inclusión de un esquema de estimación o compensación de perturbaciones, de modo de atenuar el efecto de un torque resistente variable asociado a la transmisión por poleas y a condiciones mecánicas no modeladas explícitamente, como el rozamiento.
-Para evaluar el desempeño de la solución propuesta, se plantea comparar el comportamiento del sistema operando a lazo abierto y a lazo cerrado con estimación, analizando la capacidad 	de seguimiento de una referencia de velocidad y la respuesta frente a perturbaciones. Complementariamente, se utilizarán variables eléctricas medibles (por ejemplo, rizado de corriente y esfuerzo de control) como indicadores indirectos del desempeño dinámico del motor, permitiendo cuantificar mejoras asociadas a la estrategia implementada.
-Finalmente, la propuesta considera validar la factibilidad de la estrategia mediante simulación y una implementación experimental acotada en el prototipo de clinostato, de modo de demostrar su aplicabilidad práctica bajo las restricciones de sensado del sistema.
 
+\begin{enumerate}
+    \item \textbf{Métodos pasivos:} corresponden a modificaciones
+    constructivas de la máquina destinadas a reducir la perturbación
+    desde su origen, tales como modificaciones en la geometría del
+    rotor o estator.
+
+    \item \textbf{Métodos activos:} utilizan estrategias de control
+    para reducir o compensar el efecto de la perturbación durante
+    el funcionamiento del motor. Estos métodos pueden clasificarse
+    a su vez en:
+
+    \begin{enumerate}
+        \item \textbf{Métodos offline:} la perturbación es caracterizada
+        o identificada previamente, utilizando posteriormente esta
+        información durante la operación del motor.
+
+        \item \textbf{Métodos online:} la perturbación es estimada o
+        identificada durante el funcionamiento del motor, permitiendo
+        adaptar la acción de compensación a las condiciones de operación.
+    \end{enumerate}
+\end{enumerate}
+
+
+% PÁRRAFO 9:
+% Introducir de manera GENERAL las alternativas de compensación.
+%
+% Puedes separar conceptualmente:
+%
+% 1. MÉTODOS PASIVOS / CONSTRUCTIVOS
+%    Modifican el diseño de la máquina para reducir la generación
+%    de la perturbación.
+%
+%    Ejemplos:
+%       - geometría del rotor/estator;
+%       - modificación de dientes;
+%       - skewing;
+%       - optimización electromagnética.
+%
+% 2. MÉTODOS ACTIVOS / DE CONTROL
+%    No modifican físicamente la máquina, sino que intentan
+%    contrarrestar la perturbación mediante el accionamiento.
+%
+%    Ejemplos generales:
+%       - modificación de las referencias de corriente;
+%       - compensación feedforward;
+%       - control resonante;
+%       - observadores de perturbación.
+%
+% Dentro de las estrategias activas puedes introducir otra
+% clasificación importante para TU tesis:
+%
+%       OFFLINE                     ONLINE
+%          |                           |
+% identificación previa       estimación/adaptación
+% de la perturbación          durante el funcionamiento
+%          |                           |
+% LUT / mapa / perfil         observador / estimador /
+% predefinido                 compensación adaptativa
+%
+%
+% IMPORTANTE:
+% En esta sección NO hacer todavía una revisión paper por paper.
+%
+% Solo quieres demostrar:
+%
+% "El problema existe y hay distintas formas de abordarlo,
+% pero algunas requieren conocimiento previo de la perturbación
+% o información mecánica del rotor."
+%
+% Esto prepara directamente el problema específico de tu tesis.
+
+% ============================================================
+\section{Antecedentes del tema}
+% ============================================================
+
+% Esta sección corresponde principalmente al ESTADO DEL ARTE.
+% Aquí se utilizan los papers seleccionados para mostrar:
+%
+%   1. Qué se ha hecho.
+%   2. Cómo se ha hecho.
+%   3. Qué resultados se han obtenido.
+%   4. Qué limitaciones permanecen.
+%
+% Debe conducir progresivamente hacia el GAP de investigación.
+
+
+% ------------------------------------------------------------
+\subsection{Control de motores paso a paso}
+% ------------------------------------------------------------
+
+% Revisar trabajos relacionados con:
+%   - Control tradicional de steppers.
+%   - Microstepping.
+%   - Control de corriente.
+%   - Control de velocidad.
+%   - Control de posición.
+%   - Control vectorial / FOC aplicado a steppers.
+%   - Lazo abierto versus lazo cerrado.
+%
+% El objetivo NO es explicar matemáticamente cada estrategia.
+% El objetivo es mostrar la evolución de las técnicas de control.
+
+
+% ------------------------------------------------------------
+\subsection{Control sensorless de motores paso a paso}
+% ------------------------------------------------------------
+
+% Revisar específicamente los métodos sensorless encontrados
+% en la literatura.
+%
+% Por ejemplo:
+%   - Métodos basados en FEM.
+%   - Observadores de estado.
+%   - EKF.
+%   - Sliding Mode Observer.
+%   - MRAS, si aparece en tus papers.
+%   - HFI/LFI.
+%   - Métodos basados en saliencia.
+%
+% Comparar:
+%   - Qué estiman.
+%   - Qué variables utilizan.
+%   - Rango de velocidad.
+%   - Requerimientos.
+%   - Limitaciones.
+%
+% Esta subsección debería conducir hacia:
+%
+%       SENSORLESS
+%           ↓
+%   PROBLEMAS A BAJA VELOCIDAD
+
+
+% ------------------------------------------------------------
+\subsection{Control sensorless a baja velocidad}
+% ------------------------------------------------------------
+
+% Hacer zoom específicamente en la región de baja velocidad.
+%
+% Revisar:
+%   - Problemas de observabilidad.
+%   - Disminución de FEM.
+%   - Saliencia.
+%   - HFI.
+%   - LFI.
+%   - Observadores no lineales.
+%   - EKF a baja velocidad.
+%
+% Analizar hasta qué velocidad trabajan los papers.
+%
+% Esto es especialmente importante para justificar por qué
+% estudiar aproximadamente 1--10 rad/s (o el rango definitivo
+% de la tesis) constituye un problema relevante.
+
+
+% ------------------------------------------------------------
+\subsection{Perturbaciones periódicas y ripple}
+% ------------------------------------------------------------
+
+% Revisar literatura relacionada con:
+%   - Detent torque.
+%   - Cogging torque.
+%   - Torque ripple.
+%   - Armónicos espaciales.
+%   - Ripple de velocidad.
+%
+% Analizar:
+%   - Origen físico.
+%   - Dependencia con posición.
+%   - Dependencia con velocidad.
+%   - Frecuencias características.
+%   - Modelos utilizados en los papers.
+%
+% Se pueden mencionar representaciones sinusoidales/Fourier,
+% pero el desarrollo matemático detallado debe quedar para
+% el Marco Teórico.
+
+
+% ------------------------------------------------------------
+\subsection{Métodos de reducción y compensación del ripple}
+% ------------------------------------------------------------
+
+% Revisar las estrategias encontradas para reducir ripple.
+%
+% Una forma útil de organizar esta sección sería:
+%
+% A) MÉTODOS OFFLINE
+%   - Look-up tables.
+%   - Mapas de compensación.
+%   - Perfiles de corriente preidentificados.
+%   - Identificación previa de armónicos.
+%
+% B) MÉTODOS ONLINE
+%   - Observadores de perturbación.
+%   - Estimadores de torque.
+%   - Métodos adaptativos.
+%   - Control resonante.
+%   - Estimación armónica online.
+%
+% Para cada paper interesa identificar:
+%   - ¿Usa sensor mecánico?
+%   - ¿Es sensorless?
+%   - ¿Trabaja a baja velocidad?
+%   - ¿Estima la perturbación?
+%   - ¿La compensación es online?
+%   - ¿Reduce ripple de velocidad o de torque?
+%   - ¿Requiere conocer previamente la perturbación?
+
+
+% ------------------------------------------------------------
+\subsection{Brecha de investigación}
+% ------------------------------------------------------------
+
+% Esta subsección debe ser el resultado de TODA la revisión anterior.
+%
+% La lógica esperada sería:
+%
+%   CONTROL DE STEPPERS
+%          ↓
+%   CONTROL SENSORLESS
+%          ↓
+%   BAJA VELOCIDAD
+%          ↓
+%   PERTURBACIONES PERIÓDICAS
+%          ↓
+%   COMPENSACIÓN DEL RIPPLE
+%          ↓
+%   ESTIMACIÓN/COMPENSACIÓN ONLINE
+%          ↓
+%        GAP
+%
+% El GAP debe construirse exclusivamente a partir de lo que
+% realmente indiquen los papers revisados.
+%
+% Hipótesis preliminar del GAP:
+%
+% "Existe una oportunidad de desarrollar estrategias capaces
+% de estimar y compensar en línea perturbaciones periódicas en
+% accionamientos stepper sensorless operando a baja velocidad,
+% utilizando las variables estimadas por el propio sistema de
+% observación para reducir el ripple de velocidad."
+%
+% NO dejar esta frase definitiva hasta terminar la comparación
+% de los papers seleccionados.
+
+
+
+% ============================================================
 \section{Objetivos}
+% ============================================================
 
 
+% ------------------------------------------------------------
 \subsection{Objetivo general}
-Implementar 	un sistema de control sin sensores basada en EKF y observadores de estado para motores stepper híbridos, con el fin de garantizar la estabilidad de una baja velocidad en un clinostato 2D frente a perturbaciones de torque no sensadas.
+% ------------------------------------------------------------
 
-\subsection{Objetivos especificos}
-\begin{enumerate}
-    \item Modelar el sistema electro-mecánico del motor stepper, incorporando la  dinámica relevante(saliencia) y una representación del torque resistente variable asociado a la posición correspondiente a un clinostato.
-    \item Evaluar el desempeño del clinostato operando a lazo abierto frente a perturbaciones mecánicas, mediante indicadores dinámicos y eléctricos observables.
-    \item Diseñar un esquema de control en lazo cerrado para el control de velocidad basado en FOC.
-    \item Estimar la velocidad del sistema mediante un filtro de Kalman Extendido (EKF) a partir de señales eléctricas disponibles, analizando su robustez frente a incertidumbres paramétricas.
-    \item Mitigar el efecto de perturbaciones mecánicas variables mediante la estimación y compensación por feed-forward.
-    \item Integrar una técnica de inyección de señales de alta frecuencia (HFI) para garantizar la observabilidad de la posición del rotor en régimenes de baja y nula velocidad.
-    \item Comparar el desempeño del sistema en lazo abierto y lazo cerrado sensorless utilizando métricas cuantitativas de seguimiento de velocidad y variables eléctricas indirectas.
-\end{enumerate}
-
-\subsection{Alcances}
-
-\begin{enumerate}
-    \item 	Lazo de control: Se realizará un lazo de control FOC, para el desacoplamiento de las corrientes y voltajes en los ejes d y q.
-    \item 	Estimación Sensorless: Se utilizará un filtro de Kalman extendido (EKF) para filtrar las señales y compararlas con las mediciones esperadas. Este filtro permitirá también poder visualizar variables no medibles por la naturaleza del sistema, tales como velocidad mecánica y angulo eléctrico, además de una perturbación desconocida y difícil de medir.
-    \item 	Inyección de alta frecuencia: Debido a que el EKF pierde observabilidad al estar a baja velocidad, se utilizará un HFI para estimar el ángulo eléctrico a baja y nula velocidad.
-    \item Estimación de variables de interés inclusive a baja velocidad.
-    
-\end{enumerate}
-\subsection{Limitaciones}
+% Debe responder directamente al GAP identificado.
+%
+% Versión preliminar:
+%
+% "Desarrollar una estrategia de control sensorless para un motor
+% paso a paso que permita estimar y compensar en línea perturbaciones
+% periódicas, con el propósito de reducir el ripple de velocidad
+% durante la operación a baja velocidad."
 
 
-\begin{enumerate}
-    \item 	Limitaciones respecto al ruido: El EKF es sensible al ruido de las señales eléctricas, lo que puede afectar la precisión de la estimación de velocidad y perturbaciones, especialmente en condiciones de operación con bajo nivel de señal o alta interferencia.
-    \item Limitaciones respecto a la modelación: El desempeño del EKF depende de la precisión del modelo del sistema, incluyendo la representación de la dinámica del motor y las perturbaciones. Cualquier discrepancia entre el modelo y el comportamiento real puede generar errores en la estimación.
-    \item Limitaciones respecto a la implementación: La implementación de un esquema de control en lazo cerrado con estimación sensorless puede requerir recursos computacionales significativos, lo que podría limitar su aplicabilidad en sistemas con restricciones de procesamiento o memoria.
-    \item Limitaciones respecto a la validación experimental: La validación de la estrategia propuesta se realizará en un prototipo de clinostato y en un motor sin clinostato, lo que podría no reflejar completamente las condiciones de operación reales del sistema final, limitando la generalización de los resultados obtenidos.
-\end{enumerate}
+% ------------------------------------------------------------
+\subsection{Objetivos específicos}
+% ------------------------------------------------------------
+
+% Los objetivos específicos deberían seguir la metodología real
+% de la tesis.
+%
+% Posible secuencia:
+%
+% 1. Modelar matemáticamente el motor paso a paso considerando
+%    las perturbaciones periódicas relevantes.
+%
+% 2. Implementar una estrategia de estimación sensorless de
+%    las variables mecánicas del motor.
+%
+% 3. Caracterizar el efecto de las perturbaciones periódicas
+%    sobre la velocidad y sobre el estimador.
+%
+% 4. Desarrollar un método para estimar en línea la perturbación.
+%
+% 5. Diseñar una estrategia para compensar la perturbación estimada.
+%
+% 6. Integrar el estimador y el compensador dentro del sistema
+%    de control sensorless.
+%
+% 7. Evaluar la reducción del ripple y el desempeño del sistema
+%    mediante simulaciones y/o validación experimental.
+
+
+
+% ============================================================
+\section{Contribuciones de esta memoria}
+% ============================================================
+
+% Aquí NO repetir simplemente los objetivos.
+%
+% Los objetivos dicen:
+%       "qué se pretende hacer".
+%
+% Las contribuciones dicen:
+%       "qué aporta este trabajo respecto al estado del arte".
+%
+% Posibles contribuciones, sujetas a los resultados finales:
+%
+%   - Estrategia de estimación online de perturbaciones periódicas.
+%
+%   - Integración de dicha estimación con un esquema sensorless
+%     basado en EKF.
+%
+%   - Compensación de perturbaciones sin utilizar medición mecánica
+%     directa de posición o velocidad.
+%
+%   - Reducción del ripple de velocidad durante operación
+%     a baja velocidad.
+%
+%   - Análisis del efecto del desfase/error del observador sobre
+%     la compensación.
+%
+%   - Comparación cuantitativa entre operación con y sin
+%     compensación.
+%
+% IMPORTANTE:
+% Dejar únicamente las contribuciones que finalmente puedan
+% demostrarse mediante resultados.
+
+
+
+% ============================================================
+\section{Organización de la memoria}
+% ============================================================
+
+% Describir brevemente qué contiene cada capítulo.
+%
+% Ejemplo:
+%
+% Capítulo 1:
+% Introducción, problemática, antecedentes, brecha de investigación,
+% objetivos y contribuciones.
+%
+% Capítulo 2:
+% Fundamentos teóricos y modelo matemático del motor paso a paso.
+%
+% Capítulo 3:
+% Desarrollo de la estrategia de control y estimación sensorless.
+%
+% Capítulo 4:
+% Desarrollo de la estrategia de estimación y compensación
+% de perturbaciones periódicas.
+%
+% Capítulo 5:
+% Resultados, comparación de estrategias y discusión.
+%
+% Capítulo 6:
+% Conclusiones y líneas de trabajo futuro.
+
+
+
+% ============================================================
+% CAPÍTULO 2: MARCO TEÓRICO
+% ============================================================
+
+\chapter{Marco teórico}
+
+
+% ------------------------------------------------------------
+\section{Motores eléctricos}
+% ------------------------------------------------------------
+
+% AQUÍ sí introducir formalmente los tipos de motores.
+%
+% Hacer una clasificación breve para llegar rápidamente al stepper.
+% No transformar esta sección en una revisión general de todas
+% las máquinas eléctricas.
+
+
+% ------------------------------------------------------------
+\section{Motores paso a paso}
+% ------------------------------------------------------------
+
+% Explicar:
+%   - Principio de funcionamiento.
+%   - Construcción.
+%   - Rotor y estator.
+%   - Número de polos/dientes.
+%   - Paso mecánico.
+%   - Excitación de fases.
+
+
+% ------------------------------------------------------------
+\subsection{Tipos de motores paso a paso}
+% ------------------------------------------------------------
+
+% Aquí colocar:
+%   - Reluctancia variable (VR).
+%   - Imán permanente (PM).
+%   - Híbrido (HB).
+%
+% Explicar diferencias constructivas y justificar cuál se utiliza
+% en esta memoria.
+
+
+% ------------------------------------------------------------
+\section{Modelo matemático del motor paso a paso}
+% ------------------------------------------------------------
+
+% Aquí comienza el desarrollo matemático formal.
+%
+% Incluir según corresponda:
+%   - Modelo eléctrico.
+%   - Modelo mecánico.
+%   - FEM.
+%   - Torque electromagnético.
+%   - Inductancias.
+%   - Saliencia.
+
+
+% ------------------------------------------------------------
+\section{Transformaciones de coordenadas}
+% ------------------------------------------------------------
+
+% Explicar:
+%   - alpha-beta.
+%   - d-q.
+%   - Transformaciones utilizadas.
+%   - Significado físico.
+%   - Relación entre ángulo eléctrico y mecánico.
+
+
+% ------------------------------------------------------------
+\section{Control vectorial del motor paso a paso}
+% ------------------------------------------------------------
+
+% Explicar formalmente:
+%   - Control de Id.
+%   - Control de Iq.
+%   - PI de corriente.
+%   - Control de velocidad.
+%   - Generación de referencias.
+%   - Saturaciones.
+%   - MTPA si finalmente forma parte de la estrategia.
+
+
+% ------------------------------------------------------------
+\section{Control sensorless}
+% ------------------------------------------------------------
+
+% Fundamentos matemáticos necesarios para comprender el estimador.
+%
+% Evitar repetir el estado del arte del Capítulo 1.
+%
+% Capítulo 1:
+%   "qué métodos existen y qué hicieron otros autores".
+%
+% Capítulo 2:
+%   "cómo funcionan matemáticamente los métodos que YO necesito".
+
+
+% ------------------------------------------------------------
+\subsection{Filtro de Kalman extendido}
+% ------------------------------------------------------------
+
+% Desarrollar:
+%   - Modelo de estados.
+%   - Predicción.
+%   - Corrección.
+%   - Matrices Q y R.
+%   - Jacobianos.
+%   - Estados estimados.
+%
+% Luego particularizarlo al modelo del stepper.
+
+
+% ------------------------------------------------------------
+\section{Perturbaciones periódicas}
+% ------------------------------------------------------------
+
+% Fundamentos físicos y matemáticos.
+%
+% Incluir:
+%   - Cogging/detent torque.
+%   - Torque ripple.
+%   - Periodicidad respecto a theta_m.
+%   - Frecuencia de perturbación respecto a Wm.
+%   - Representación mediante series de Fourier.
+%
+% Aquí sí corresponde desarrollar expresiones como:
+%
+%       T_d = T_{dm}\sin(N_r\theta_m + \phi)
+%
+% y posteriormente sus armónicos si son utilizados.
+
+
+% ------------------------------------------------------------
+\section{Compensación de perturbaciones periódicas}
+% ------------------------------------------------------------
+
+% Fundamentos matemáticos necesarios para tu propuesta.
+%
+% Según la versión final:
+%   - Control resonante.
+%   - PR.
+%   - Estimación armónica.
+%   - Compensación feedforward.
+%   - Compensación adaptativa.
+%   - Desfase del sistema.
+%
+% Esta sección debería entregar las herramientas necesarias para
+% entender posteriormente tu metodología propuesta.

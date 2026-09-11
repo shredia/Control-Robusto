@@ -96,7 +96,9 @@ Se puede comprobar, que el valor de $L_0$ calculado a partir de las mediciones e
 
 \section{Control PI}
 
-Para realizar el control del motor PMSM, se implementó un controlador proporcional-integral (PI) para regular la corriente en los ejes d y q, además de la velocidad.Como la planta es altamente no-lineal, se utilizó un desacople en cada eje, lo cual permitire tratar cada eje como un sistema SISO, lo que simplifica el diseño del controlador. Para esto, se utilizan las ecuaciones (\ref{eq: dq}) y se obtienen las siguientes ecuaciones de desacople:
+\begin{sloppypar}
+Para realizar el control del motor PMSM, se implementó un controlador proporcional-integral (PI) para regular la corriente en los ejes d y q, además de la velocidad. Como la planta es altamente no lineal, se utilizó un desacople en cada eje, lo cual permite tratar cada eje como un sistema SISO y simplifica el diseño del controlador. Para esto, se utilizan las ecuaciones (\ref{eq: dq}) y se obtienen las siguientes ecuaciones de desacople:
+\end{sloppypar}
 
 
 \begin{equation}
@@ -357,6 +359,7 @@ Utilizando la ecuación \ref{eq: dq}, se utilizaron los siguientes parámetros p
     \centering
     \caption{Tabla de parámetros punto de operación}
     \label{tab:punto de operacion}
+    \resizebox{\linewidth}{!}{%
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
         \hline
         \textbf{Parámetro} &  $R $ & Ld  & Lq  & Ke & Kt & J & B & P & $W_{m}$ & $I_{d}$ & $I_{q}$ & $T_{x}$ & $V_{d}$ & $V_{q}$ \\
@@ -365,6 +368,7 @@ Utilizando la ecuación \ref{eq: dq}, se utilizaron los siguientes parámetros p
         \textbf{Valor} &2.5 & 3.2& 8.1 & 0.045 & 0.045 & 0.01 & 0.11 & 50 & 0.1 & 0 & 1 & 0.2& 0 &10 \\
         \hline
     \end{tabular}
+    }
 \end{table}
 
 Después de calcular las matrices de observabilidad y controlabilidad, se evaluó su rango para determinar la observabilidad y controlabilidad del sistema.Se utilizó el programa de Matlab como apoyo a esto.  Se encontró que el sistema es parcialmente observable y parcialmente controlable, lo que implica que no todos los estados pueden ser estimados o controlados directamente. Sin embargo, el EKF se diseñó para aprovechar la información disponible y proporcionar estimaciones precisas de los estados relevantes para el control del motor paso a paso.
