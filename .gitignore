@@ -1,4 +1,8 @@
-# Autosave files
+# =========================
+# MATLAB / Simulink
+# =========================
+
+# Autosave / backup
 *.asv
 *.m~
 *.autosave
@@ -8,32 +12,76 @@
 # Derived content-obscured files
 *.p
 
-# Compiled MEX files
+# Compiled MEX
 *.mex*
 
-# Packaged app and toolbox files
+# Packaged apps/toolboxes
 *.mlappinstall
 *.mltbx
 
 # Deployable archives
 *.ctf
 
-# Generated helpsearch folders
+# Generated help
 helpsearch*/
 
-# Code generation folders
+# Code generation / cache
 slprj/
 sccprj/
 codegen/
-
-# Cache files
 *.slxc
 
-# Cloud based storage dotfile
+# MATLAB Drive
 .MATLABDriveTag
-slprj/sim/varcache/Simulacion_stepper/varInfo.mat
-slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat
-slprj/sim/varcache/Simulacion_stepper/checksumOfCache.mat
+
+
+# =========================
+# Simulink experiments
+# =========================
+
 barrido_J_resultados.mat
 barrido_J
 barrido_B
+
+
+# =========================
+# LaTeX
+# =========================
+
+# Tu carpeta de compilación
+# =========================
+# LaTeX - archivos temporales
+# =========================
+
+Documento/build/*.log
+Documento/build/*.blg
+Documento/build/*.bbl
+Documento/build/*.fdb_latexmk
+Documento/build/*.fls
+Documento/build/*.synctex.gz
+Documento/build/*.toc
+Documento/build/*.lof
+Documento/build/*.lot
+Documento/build/*.out
+
+# Mantener versionados
+!Documento/build/main.pdf
+!Documento/build/main.aux
+!Documento/build/capitulos/
+!Documento/build/capitulos/*.aux
+
+# Archivos auxiliares LaTeX
+*.aux
+*.log
+*.blg
+*.bbl
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.out
+*.nav
+*.snm
+*.vrb
