@@ -1,0 +1,223 @@
+
+PAGE 1
+7224 IEEE TRANSACTIONS ON INDUSTRIAL ELECTRONICS, VOL. 62, NO. 11, NOVEMBER 2015
+Letters
+Discussion on “AC Drive Observability Analysis”
+Mohamad Koteich, Abdelmalek Maloum, Gilles Duc, and Guillaume Sandou
+Abstract— In the paper by Vaclavek et al. (IEEE Trans. Ind.
+Electron., vol. 60, no. 8, pp. 3047–3059, Aug. 2013), the local
+observability of both i nduction machine and permanent-magnet
+synchronous machine (PMSM) under motion-sensorless operation
+is studied. In this letter, the “slowly varying” speed assumption is
+discussed, and the PMS M observability c ondition at standstill is
+revisited.
+Index Terms— AC drives, induction machine (IM), observab ility
+analysis, sensorless control, synchronous machine.
+I. I NTRODUCTION
+I
+N the above paper [1], the local observability of the induction
+machine (IM) and the permanent-magnet synchronous machine
+(PMSM) is studied. Obviously, it is a very good paper as it has
+been referred to by many others since it was published [2]–[4]. To
+the best of our knowledge, it is the ﬁrst paper that presents the
+PMSM observability conditions in the rotating reference frame, which
+provides useful explicit conditions.
+The observability analysis in [1] is restricted to the “slowly varying”
+speeds. This means that the obtained observability conditions for both
+machines are valid only under constant (or nearly constant) speed
+operating conditions. One can argue that this is not the case for a wide
+range of electrical drive applications.
+II. F
+URTHER REMARKS ON THE IM O BSERVABILITY
+It is worth mentioning that the IM observability study made by de
+Wit et al. [5] covers both cases: 1) constant speed, which leads to
+the 5-D machine model adopted in [1]; and 2) varying speed under
+slowly varying load torque assumption, which leads to a 6-D model
+by adding the load torque to the state vector [6]. The only additional
+parameter needed in the second case is the rotor and load inertia, which
+can be fairly accurately known in numerous applications. The observ-
+ability condition of t he 6-D model can be expressed, using the same
+notations as [1], as
+ξ
+2
+ω2
+e +ξ2
+2
+dωe
+dt Ψ∗
+r · Ψr −dΨr
+dt × Ψr ̸=0 . (1)
+Manuscript received February 18, 2015; revised April 3, 2015;
+accepted May 2, 2015. Date of publication June 1, 2015; date of current
+version October 7, 2015.
+M. Koteich is with the Renault SAS Technocentre, 78288 Guyancourt,
+France, and also with L2S–CentraleSupélec–CNRS–University of
+Paris-Sud, 91192 Gif-sur-Yvette, France (e-mail: mohamad.koteich@
+renault.com).
+A. Maloum is with the Renault SAS Technocentre, 78288 Guyancourt,
+France (e-mail: abdelmalek.maloum@renault.com).
+G. Duc and G. Sandou are with L2S–CentraleSupélec–CNRS–
+University of Paris-Sud, 91192 Gif-sur-Yvette, France (e-mail:
+gilles.duc@centralesupelec.fr; guillaume.sandou@centralesupelec.fr).
+Digital Object Identiﬁer 10.1109/TIE.2015.2438777
+One can design an observer for the IM under slowly varying speed
+operating conditions. In this case, the observab ility condition (1)
+becomes equivalent to the condition calculated for the 5-D model (as
+discussed in [5]). This provides a more general IM local observability
+analysis.
+III. C
+OMMENTS ON THE PMSM O BSERVABILITY
+The slowly varying speed assumption is not required in the PMSM
+observability analysis, where only the ﬁrst-order derivatives of the
+stator currents are evaluated. Thus, the PMSM observability conditions
+presented in [1] are valid for any rotor acceleration.
+The determinant of the observability matrix numbered (97) in the
+paper under discussion can be written as1
+D = 1
+LdLq
+[
+(ΔLid +Ke)2 +ΔL2i2
+q
+]
+ωe
++ ΔL
+LdLq
+[
+ΔLdid
+dt iq −(ΔLid +Ke)diq
+dt
+]
+. (2)
+In their analysis of this equation, the authors in [1] formulate the
+following observability condition at standstill:
+⏐⏐
+⏐
+id + Ke
+ΔL
+⏐⏐
+⏐
+|C| ̸= |iq|. (3)
+They claim that it is not necessary to determine the value of the con-
+stant C and that, in the zero- or low-speed region, “the rotor position
+will be observable if stator current components in rotating reference
+frame i
+d,iq are changing and not kept to be linearly dependent. Stator
+current space vector should change not only its magnitude but also
+direction in the rotating reference frame.”
+This conclusion is unclear and yet inaccurate. First of all, the
+conclusion should not only concern the rotor position; the rotor angular
+speed observability should also be of concern. Although it seems to
+be intuitive that the loss of observability rather concerns the position,
+this cannot be proved unless a detailed study of the indistinguishable
+dynamics is done, similarly to the study done in [7] for IMs. In
+addition, the stator current space vector can change both its magnitude
+and direction without ensuring the motor observability at standstill, as
+shown in the sequel.
+The observability conditionD ̸=0 can be written as
+ωe ̸= (ΔLid +Ke)ΔL
+diq
+dt −ΔL did
+dt ΔLiq
+(ΔLid +Ke)2 +ΔL2i2
+q
+(4)
+which gives
+ωe ̸= d
+dt arctan
+(
+ΔLiq
+ΔLid +Ke
+)
+. (5)
+1Symbolic math software is used to reproduce the determinant expression.
+0278-0046 © 2015 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See http://www.ieee.org/publications_standards/publications/rights/index.html for more information.Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:11:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 2
+IEEE TRANSACTIONS ON INDUSTRIAL ELECTRONICS, VOL. 62, NO. 11, NOVEMBER 2015 7225
+Fig. 1. Vector diagram of the ﬁctitious observability vector (dashed).
+Let us deﬁne a ﬁctitious observability vector ΨO =ΨOd +jΨOq ,
+which has the following components in the rotating (dq) reference
+frame:
+ΨOd =ΔLid +Ke (6)
+ΨOq =ΔLiq. (7)
+Then, condition (5) can be formulated as
+ωe ̸= d
+dtθO (8)
+whereθO is the phase of the vectorΨO in the rotating reference frame
+(see Fig. 1). The following sufﬁcient condition for the PMSM local
+observability can be stated.
+Proposition 1: The PMSM is locally observable if the angular
+speed of the ﬁctitious vectorΨO in thedq reference frame is different
+from the rotor electrical angular speed in the stator reference frame.
+At standstill, the above c ondition becomes: the vector ΨO should
+change its orientation in order to ensure local observability. This
+provides a better formulation of the PMSM observability conditions.
+It turns out that the d-axis component of the vector Ψ
+O is nothing
+but the so-called “active ﬂux” introduced by Boldea et al. in [8]
+(also called “ﬁctitious ﬂux” by Koonlaboon and Sangwongwanich [9]),
+which is, by deﬁnition, the torque-producing ﬂux aligned to the rotor
+d-axis. The q-axis component of the vector ΨO is related to the
+saliency (ΔL) of the machine and is aligned to the rotor q-axis.
+Fig. 2 shows two observability vectors, i.e., ΨO1 (dotted) and ΨO2
+(dashed), that correspond to two different (in magnitude and direction)
+current space vectors
+i1 =id1 +jiq1;(id1 < 0,i q1 > 0) (9)
+i2 =id2 +jiq2;(id2 > 0,i q2 > 0). (10)
+It is obvious that, contrary to the conclusion drawn in [1] for the
+interior PMSM, at standstill (ωe =0 ), the stator current space vector
+can change both its magnitude and direction, following the constant-
+θO trajectory, without fulﬁlling the observability condition (8). It
+should be noticed that this is related to the constant C of (3), whose
+value is judged to be unnecessary in the paper under discussion.
+As for the surface-mounted PMSM (SPMSM) (ΔL =0 ) under
+sensorless operation, the ﬁctitious observability vector is equal to
+Fig. 2. Vector diagram illustrating two observability vectors that corre-
+spond to two stator current space vectors that differ in magnitude and
+direction.
+the rotor permanent-magnet ﬂux vector, which is ﬁxed in the dq
+reference frame. This means that the observability problem arises
+only at standstill, which is consistent with the conclusion on SPMSM
+observability in the discussed paper [1].
+IV. E
+RRATUM
+In the list of references of [1], reference [17] is not correctly
+cited; the name of the ﬁrst author is omitted. The correct citation
+is [10].
+R
+EFERENCES
+[1] P. Vaclavek, P. Blaha, and I. Herman, “AC drive observability analysis,”
+IEEE Trans. Ind. Electron., vol. 60, no. 8, pp. 3047–3059, Aug. 2013.
+[2] G. Foo, X. Zhang, and D. Vilathgamuwa, “A sensor fault detection and
+isolation method in interior permanent-magnet synchronous motor drives
+based on an extended Kalman ﬁlter,” IEEE Trans. Ind. Electron., vol. 60,
+no. 8, pp. 3485–3495, Aug. 2013.
+[3] P. Alkorta, O. Barambones, J. Cortajarena, and A. Zubizarrreta, “Efﬁcient
+multivariable generalized predictive control for sensorless induction mo-
+tor drives,” IEEE Trans. Ind. Electron. , vol. 61, no. 9, pp. 5126–5134,
+Sep. 2014.
+[4] L. Amezquita-Brooks, J. Liceaga-Ca stro, and E. Liceaga-Castro, “Speed
+and position controllers using indirect ﬁeld-oriented control: A clas-
+sical control approach,” IEEE Trans. Ind. Electron. , vol. 61, no. 4,
+pp. 1928–1943, Apr. 2014.
+[5] C. de Wit, A. Youssef, J. P. Barbot, P. Martin, and F. Malrait, “Observ-
+ability conditions of induction motors at low frequencies,” in Proc. 39th
+IEEE Conf. Decis. Control, 2000, vol. 3, pp. 2044–2049.
+[6] M. Barut, S. Bogosyan, and M. Gokasan, “Speed-sensorless estimation
+for induction motors using extended Kalman ﬁlters,” IEEE Trans. Ind.
+Electron., vol. 54, no. 1, pp. 272–280, Feb. 2007.
+[7] S. Ibarra-Rojas, J. Moreno, and G. E spinosa-Pérez, “Global observabil-
+ity analysis of sensorless induction motors,” Automatica, vol. 40, no. 6,
+pp. 1079–1085, Jun. 2004.
+[8] I. Boldea, M. Paicu, and G. Andreescu, “Active ﬂux concept for motion-
+sensorless uniﬁed ac drives,” IEEE Trans. Power Electron., vol. 23, no. 5,
+pp. 2612–2618, Sep. 2008.
+[9] S. Koonlaboon and S. Sangwongwanich, “Sensorless control of interior
+permanent-magnet synchronous motors based on a ﬁctitious permanent-
+magnet ﬂux model,” in Conf. Rec. IEEE IAS Annu. Meeting , Oct. 2005,
+vol. 1, pp. 311–318.
+[10] M. Li, J. Chiasson, M. Bodson, and L. Tolbert, “Observability of speed in
+an induction motor from stator currents and voltages,” inProc. 44th IEEE
+Conf. Decis. Control/Eur . Control Conf., Dec. 2005, pp. 3438–3443.
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:11:02 UTC from IEEE Xplore.  Restrictions apply. 

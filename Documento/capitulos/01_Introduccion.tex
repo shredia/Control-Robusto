@@ -209,228 +209,1851 @@ En cuestión del cogging, este se suele compensar para disminuir ó eliminar sus
 \end{enumerate}
 
 
-% PÁRRAFO 9:
-% Introducir de manera GENERAL las alternativas de compensación.
-%
-% Puedes separar conceptualmente:
-%
-% 1. MÉTODOS PASIVOS / CONSTRUCTIVOS
-%    Modifican el diseño de la máquina para reducir la generación
-%    de la perturbación.
-%
-%    Ejemplos:
-%       - geometría del rotor/estator;
-%       - modificación de dientes;
-%       - skewing;
-%       - optimización electromagnética.
-%
-% 2. MÉTODOS ACTIVOS / DE CONTROL
-%    No modifican físicamente la máquina, sino que intentan
-%    contrarrestar la perturbación mediante el accionamiento.
-%
-%    Ejemplos generales:
-%       - modificación de las referencias de corriente;
-%       - compensación feedforward;
-%       - control resonante;
-%       - observadores de perturbación.
-%
-% Dentro de las estrategias activas puedes introducir otra
-% clasificación importante para TU tesis:
-%
-%       OFFLINE                     ONLINE
-%          |                           |
-% identificación previa       estimación/adaptación
-% de la perturbación          durante el funcionamiento
-%          |                           |
-% LUT / mapa / perfil         observador / estimador /
-% predefinido                 compensación adaptativa
-%
-%
-% IMPORTANTE:
-% En esta sección NO hacer todavía una revisión paper por paper.
-%
-% Solo quieres demostrar:
-%
-% "El problema existe y hay distintas formas de abordarlo,
-% pero algunas requieren conocimiento previo de la perturbación
-% o información mecánica del rotor."
-%
-% Esto prepara directamente el problema específico de tu tesis.
+
+Esta clasificación permite distinguir entre estrategias que requieren una caracterización previa de la perturbación y aquellas capaces de determinarla durante la operación. Esta diferencia adquiere especial relevancia en sistemas sensorless, donde las variables mecánicas necesarias para caracterizar o compensar la perturbación no se encuentran disponibles mediante medición directa. En consecuencia, resulta necesario analizar las estrategias propuestas en la literatura para el control sensorless a baja velocidad y la reducción de perturbaciones periódicas.
+
+
 
 % ============================================================
-\section{Antecedentes del tema}
+\section{Estado del arte}
+En esta sección se presenta una revisión de las principales investigaciones relacionadas con el control y la estimación de estados en motores paso a paso y máquinas síncronas de imanes permanentes (PMSM), con especial énfasis en estrategias sensorless, operación a baja velocidad y métodos de reducción y compensación de perturbaciones periódicas.
+
+Si bien los motores paso a paso presentan características constructivas y de operación particulares, determinados tipos, como los motores paso a paso híbridos, pueden ser descritos mediante modelos electromagnéticos similares a los utilizados en máquinas síncronas de imanes permanentes. Esta similitud permite aplicar estrategias de control vectorial y estimación de estados desarrolladas originalmente para PMSM. Sin embargo, características como su elevado número de pares de polos y las perturbaciones periódicas asociadas a su construcción deben ser consideradas al trasladar estas estrategias hacia motores paso a paso.
+
+A partir de esta relación, la revisión considera trabajos desarrollados tanto en motores paso a paso como en PMSM, analizando progresivamente las estrategias de control sensorless, sus limitaciones durante la operación a baja velocidad y los métodos utilizados para reducir las oscilaciones de torque y velocidad producidas por perturbaciones periódicas. Finalmente, la comparación de estas investigaciones permitirá identificar las limitaciones existentes y establecer la brecha de investigación abordada en este trabajo.
 % ============================================================
-
-% Esta sección corresponde principalmente al ESTADO DEL ARTE.
-% Aquí se utilizan los papers seleccionados para mostrar:
+% OBJETIVO DE LA SECCIÓN
+% ============================================================
 %
-%   1. Qué se ha hecho.
-%   2. Cómo se ha hecho.
-%   3. Qué resultados se han obtenido.
-%   4. Qué limitaciones permanecen.
+% Construir progresivamente el estado del arte hasta identificar
+% la brecha de investigación.
 %
-% Debe conducir progresivamente hacia el GAP de investigación.
-
-
-% ------------------------------------------------------------
-\subsection{Control de motores paso a paso}
-% ------------------------------------------------------------
-
-% Revisar trabajos relacionados con:
-%   - Control tradicional de steppers.
-%   - Microstepping.
-%   - Control de corriente.
-%   - Control de velocidad.
-%   - Control de posición.
-%   - Control vectorial / FOC aplicado a steppers.
-%   - Lazo abierto versus lazo cerrado.
+% La progresión será:
 %
-% El objetivo NO es explicar matemáticamente cada estrategia.
-% El objetivo es mostrar la evolución de las técnicas de control.
-
-
-% ------------------------------------------------------------
-\subsection{Control sensorless de motores paso a paso}
-% ------------------------------------------------------------
-
-% Revisar específicamente los métodos sensorless encontrados
-% en la literatura.
-%
-% Por ejemplo:
-%   - Métodos basados en FEM.
-%   - Observadores de estado.
-%   - EKF.
-%   - Sliding Mode Observer.
-%   - MRAS, si aparece en tus papers.
-%   - HFI/LFI.
-%   - Métodos basados en saliencia.
-%
-% Comparar:
-%   - Qué estiman.
-%   - Qué variables utilizan.
-%   - Rango de velocidad.
-%   - Requerimientos.
-%   - Limitaciones.
-%
-% Esta subsección debería conducir hacia:
-%
-%       SENSORLESS
-%           ↓
-%   PROBLEMAS A BAJA VELOCIDAD
-
-
-% ------------------------------------------------------------
-\subsection{Control sensorless a baja velocidad}
-% ------------------------------------------------------------
-
-% Hacer zoom específicamente en la región de baja velocidad.
-%
-% Revisar:
-%   - Problemas de observabilidad.
-%   - Disminución de FEM.
-%   - Saliencia.
-%   - HFI.
-%   - LFI.
-%   - Observadores no lineales.
-%   - EKF a baja velocidad.
-%
-% Analizar hasta qué velocidad trabajan los papers.
-%
-% Esto es especialmente importante para justificar por qué
-% estudiar aproximadamente 1--10 rad/s (o el rango definitivo
-% de la tesis) constituye un problema relevante.
-
-
-% ------------------------------------------------------------
-\subsection{Perturbaciones periódicas y ripple}
-% ------------------------------------------------------------
-
-% Revisar literatura relacionada con:
-%   - Detent torque.
-%   - Cogging torque.
-%   - Torque ripple.
-%   - Armónicos espaciales.
-%   - Ripple de velocidad.
-%
-% Analizar:
-%   - Origen físico.
-%   - Dependencia con posición.
-%   - Dependencia con velocidad.
-%   - Frecuencias características.
-%   - Modelos utilizados en los papers.
-%
-% Se pueden mencionar representaciones sinusoidales/Fourier,
-% pero el desarrollo matemático detallado debe quedar para
-% el Marco Teórico.
-
-
-% ------------------------------------------------------------
-\subsection{Métodos de reducción y compensación del ripple}
-% ------------------------------------------------------------
-
-% Revisar las estrategias encontradas para reducir ripple.
-%
-% Una forma útil de organizar esta sección sería:
-%
-% A) MÉTODOS OFFLINE
-%   - Look-up tables.
-%   - Mapas de compensación.
-%   - Perfiles de corriente preidentificados.
-%   - Identificación previa de armónicos.
-%
-% B) MÉTODOS ONLINE
-%   - Observadores de perturbación.
-%   - Estimadores de torque.
-%   - Métodos adaptativos.
-%   - Control resonante.
-%   - Estimación armónica online.
-%
-% Para cada paper interesa identificar:
-%   - ¿Usa sensor mecánico?
-%   - ¿Es sensorless?
-%   - ¿Trabaja a baja velocidad?
-%   - ¿Estima la perturbación?
-%   - ¿La compensación es online?
-%   - ¿Reduce ripple de velocidad o de torque?
-%   - ¿Requiere conocer previamente la perturbación?
-
-
-% ------------------------------------------------------------
-\subsection{Brecha de investigación}
-% ------------------------------------------------------------
-
-% Esta subsección debe ser el resultado de TODA la revisión anterior.
-%
-% La lógica esperada sería:
-%
-%   CONTROL DE STEPPERS
+%   ACCIONAMIENTO STEPPER
+%          ↓
+%   CONTROL EN LAZO CERRADO / VECTORIAL
 %          ↓
 %   CONTROL SENSORLESS
 %          ↓
-%   BAJA VELOCIDAD
+%   PROBLEMA A BAJA VELOCIDAD
 %          ↓
-%   PERTURBACIONES PERIÓDICAS
+%   PERTURBACIONES PERIÓDICAS / COGGING
 %          ↓
-%   COMPENSACIÓN DEL RIPPLE
+%   MÉTODOS DE COMPENSACIÓN
 %          ↓
-%   ESTIMACIÓN/COMPENSACIÓN ONLINE
+%   COMPENSACIÓN ONLINE + SENSORLESS
 %          ↓
-%        GAP
+%          GAP
 %
-% El GAP debe construirse exclusivamente a partir de lo que
-% realmente indiquen los papers revisados.
+% IMPORTANTE:
+% Esta sección responde principalmente:
 %
-% Hipótesis preliminar del GAP:
+%   ¿Qué han hecho otros autores?
+%   ¿Cómo lo han hecho?
+%   ¿Qué consiguieron?
+%   ¿Qué limitaciones quedan?
 %
-% "Existe una oportunidad de desarrollar estrategias capaces
-% de estimar y compensar en línea perturbaciones periódicas en
-% accionamientos stepper sensorless operando a baja velocidad,
-% utilizando las variables estimadas por el propio sistema de
-% observación para reducir el ripple de velocidad."
-%
-% NO dejar esta frase definitiva hasta terminar la comparación
-% de los papers seleccionados.
+% Las ecuaciones y explicaciones matemáticas detalladas
+% pertenecen al Marco Teórico.
 
+
+% ============================================================
+\subsection{Estrategias de accionamiento y control de motores paso a paso}
+% ============================================================
+
+
+% ============================================================
+% PÁRRAFO 1 — ACCIONAMIENTO TRADICIONAL
+% ============================================================
+%
+% Idea:
+% Una de las ventajas históricas del stepper es poder controlar
+% posición sin realimentación mecánica.
+%
+% Mencionar:
+% - Operación tradicional en lazo abierto.
+% - Excitación secuencial de las fases.
+% - Full-step / half-step / microstepping.
+%
+% NO explicar todavía matemáticamente cómo funcionan.
+%
+% Referencias posibles:
+% - Arias: posicionamiento sin sensor mediante microstepping.
+% - Vierbergen: posiciones discretas y operación sin encoder.
+
+Una de las ventajas más destacadas de los motores paso a paso es su capacidad de controlar la posición mecánica en lazo abierto. El accionamiento de estos motores puede realizarse mediante diferentes modos de excitación de sus fases, entre los que se encuentran el full-step, half-step y microstepping. Estos métodos se diferencian principalmente en la forma en que se establecen las corrientes de fase y, consecuentemente, en las posiciones intermedias que pueden ser comandadas durante el movimiento \cite{lydellSensorlessHybridFieldOriented}.
+% ============================================================
+% PÁRRAFO 2 — MICROSTEPPING
+% ============================================================
+%
+% Idea:
+% Entre las estrategias anteriores, microstepping permite
+% generar posiciones intermedias mediante la regulación de
+% las corrientes de las fases.
+%
+% Mencionar:
+% - Referencias de corriente aproximadamente sinusoidales.
+% - Mayor resolución/suavidad respecto a modos de paso más
+%   discretos, SOLO si las referencias lo respaldan.
+% - Sigue siendo posible utilizarlo sin conocer directamente
+%   la posición real del rotor.
+%
+% Referencias posibles:
+% - Arias.
+% - Lydell.
+%
+% IMPORTANTE:
+% No gastar demasiado espacio aquí; microstepping no es
+% el tema de la tesis.
+Ahora, esa explicación no es la más exacta. El microstepping extiende el principio del half-step mediante la regulación de las corrientes de fase siguiendo referencias sinusoidales y cosenoidales, permitiendo generar posiciones intermedias entre los pasos naturales del motor \cite{lydellSensorlessHybridFieldOriented}. A pesar del aumento de resolución obtenido mediante esta estrategia, su implementación convencional continúa siendo en lazo abierto, por lo que la posición comandada no necesariamente representa la posición mecánica real del rotor.
+
+
+% ============================================================
+% PÁRRAFO 3 — LIMITACIONES DEL LAZO ABIERTO
+% ============================================================
+%
+% Aquí comienza el problema.
+%
+% Comparar lo reportado en diferentes trabajos:
+%
+% - Pérdida de pasos.
+% - Error de posición.
+% - Ausencia de información sobre la posición real.
+% - Elevado consumo de corriente / calentamiento.
+% - Oscilaciones o resonancias.
+%
+% Referencias posibles:
+% - Arias:
+%       pérdida de pasos + corriente máxima/eficiencia.
+%
+% - Vierbergen:
+%       alto consumo a baja velocidad;
+%       comportamiento oscilatorio;
+%       necesidad de conocimiento a priori debido a la
+%       ausencia de feedback.
+%
+% Aquí ya conviene SINTETIZAR autores, no explicar un paper
+% completo.
+
+Sin embargo, la operación en lazo abierto presenta diferentes limitaciones. Arias et al. \cite{ariasReducingCoggingTorque2019} identifican entre ellas la posibilidad de pérdida de pasos y la utilización ineficiente de la corriente, asociada a un aumento de las pérdidas y del calentamiento del motor. Por otra parte, Picatoste \cite{picatosteruilopeModellingControlStepper2014} señala que, ante condiciones de carga que comprometan el seguimiento de la posición comandada, resulta necesario disponer de información sobre la posición real del rotor para detectar y corregir posibles desalineamientos o pérdidas de pasos. Adicionalmente, el movimiento discreto característico de estas estrategias puede generar importantes oscilaciones de velocidad \cite{picatosteruilopeModellingControlStepper2014}.
+
+
+% ------------------------------------------------------------
+% PÁRRAFO 4 — CONTROL EN LAZO CERRADO
+% ------------------------------------------------------------
+%
+% Las limitaciones del open-loop motivan cerrar el lazo.
+%
+% Introducir trabajos que utilizan:
+% - Encoder/resolver
+% - Control de posición
+% - Control de velocidad
+% - Control de corriente
+%
+% AQUÍ pueden entrar perfectamente tus papers NO sensorless.
+%
+% Preguntas para comparar:
+% - ¿Qué variable controlan?
+% - ¿Qué estructura utilizan?
+% - ¿Qué mejora respecto del open-loop?
+% - ¿Cómo responden ante perturbaciones/carga?
+
+Por este motivo, se han desarrollado estrategias de control en lazo cerrado [...] En este contexto, el control orientado al campo (FOC) permite transformar las variables eléctricas a un sistema de referencia rotante \(dq\), facilitando la regulación independiente de las componentes de corriente asociadas a la generación de flujo y torque.
+
+% ------------------------------------------------------------
+% PÁRRAFO 5 — CONTROL VECTORIAL / FOC
+% ------------------------------------------------------------
+%
+% Dentro de las estrategias closed-loop, introducir FOC.
+%
+% Explicar conceptualmente:
+% - dq
+% - Id / Iq
+% - control independiente de flujo/torque
+% - lazos de corriente
+% - lazo externo de velocidad/posición
+%
+% SIN desarrollar ecuaciones.
+%
+% Aquí nuevamente pueden entrar papers CON SENSOR.
+%
+% Comparar resultados:
+% - seguimiento de velocidad
+% - respuesta dinámica
+% - eficiencia
+% - rechazo de carga
+% - ripple
+
+La aplicación de estrategias de control vectorial ha sido estudiada tanto en motores paso a paso como en otras máquinas síncronas de imanes permanentes. Arias et al. \cite{ariasReducingCoggingTorque2019} implementan FOC en un motor paso a paso mediante una estructura en cascada, compuesta por un lazo de control de torque y lazos internos de regulación de corriente. Por otra parte, Wu et al. \cite{wuSpeedControlLowSpeed2025} proponen una estrategia FOC en la cual la regulación de torque se realiza principalmente mediante la componente \(I_q\), manteniendo la referencia \(I_d\) en cero. Esta configuración simplifica la estrategia de control; sin embargo, en máquinas que presentan saliencia puede no aprovechar completamente la contribución del torque de reluctancia.
+% ------------------------------------------------------------
+% PÁRRAFO 6 — ESTRATEGIAS DE CONTROL DE VELOCIDAD
+% ------------------------------------------------------------
+%
+% Aquí puedes concentrar los papers que tienes.
+%
+% No organizarlos:
+%
+% Paper A...
+% Paper B...
+% Paper C...
+%
+% Sino por estrategias:
+%
+% - PI/PID
+% - control robusto
+% - control adaptativo
+% - control resonante
+% - feedforward
+% - etc.
+%
+% y comparar qué problema intenta resolver cada familia.
+Sin embargo, la regulación de las corrientes y de la velocidad no necesariamente elimina el efecto de las perturbaciones presentes en el sistema. Por este motivo, se han desarrollado diferentes estrategias orientadas a mejorar su rechazo o compensación. Estas pueden diferenciarse, entre otros aspectos, por la información disponible sobre la perturbación y por la forma en que esta información es incorporada al sistema de control.
+
+Una de las alternativas corresponde a las estrategias de compensación *feedforward*, donde se genera una acción de control a partir del conocimiento o de una estimación de la perturbación. Para ello, esta puede ser representada mediante modelos analíticos, componentes armónicas \cite{deangeloControlParaMaquinas2004}, tablas de búsqueda (*lookup tables*, LUT) \cite{piccoliCoggingTorqueRipple2014a} \cite{wenCurrentSensorlessModel2024} \cite{wuDesignImplementationPositionBased2019} \cite{guzinskiSensorlessLowSpeed2019}, modelos obtenidos mediante técnicas de aprendizaje \cite{mandraPerformanceEnhancedRobustIterative2019}  ó sólamente asumiendo que se conoce el modelo de perturbación \cite{zhangSmoothSensorlessStartup2026} \cite{picatosteruilopeModellingControlStepper2014}.
+Otra alternativa consiste en estimar las perturbaciones durante la operación del sistema. Para ello, diferentes trabajos han utilizado estrategias de estimación online de perturbaciones, incluyendo observadores de perturbaciones (DOB), observadores de estado extendido y estimadores basados en filtros de Kalman. \cite{deangeloControlParaMaquinas2004} \cite{picatosteruilopeModellingControlStepper2014} \cite{yuSimultaneousStateDisturbances2025}.
+
+Por otra parte, cuando las perturbaciones presentan un comportamiento periódico, es posible abordar su rechazo a partir de su contenido frecuencial. Dentro de estas estrategias se encuentran los controladores resonantes, los cuales permiten introducir una elevada acción de control alrededor de frecuencias determinadas \cite{ariasReducingCoggingTorque2019}\cite{wuSpeedControlLowSpeed2025} \cite{sekineSuppressionVelocityPulsations2024} .De esta manera, las estrategias de compensación pueden utilizar información previamente caracterizada de la perturbación (cómo el cogging), estimarla durante la operación del sistema (como la carga) o aprovechar características conocidas de su comportamiento periódico para reducir su efecto sobre las variables controladas (Harmónicos ó cogging en tiempo real).
+
+
+
+
+
+
+% ------------------------------------------------------------
+% PÁRRAFO 7 — QUÉ TIENEN EN COMÚN
+% ------------------------------------------------------------
+%
+% Aquí aparece la transición importante:
+%
+% Muchas de estas estrategias muestran buen desempeño,
+% PERO utilizan:
+%
+%       theta_m medida
+%       omega_m medida
+%               ↓
+%         encoder/resolver
+%
+% Por lo tanto, sus resultados demuestran que las estrategias
+% de control funcionan cuando las variables mecánicas están
+% disponibles, pero no resuelven necesariamente cómo obtenerlas.
+
+
+
+% ------------------------------------------------------------
+% PÁRRAFO 8 — PUENTE A SENSORLESS
+% ------------------------------------------------------------
+%
+% Para eliminar el sensor mecánico es necesario sustituir
+% las variables medidas por variables estimadas.
+%
+% Esto abre:
+%
+
+
+Si bien estas estrategias permiten mejorar el desempeño del accionamiento respecto de las técnicas convencionales en lazo abierto, su implementación requiere disponer de información sobre el estado mecánico del rotor. En particular, la aplicación del control vectorial requiere conocer su posición para establecer correctamente el sistema de referencia utilizado en la regulación de las corrientes, mientras que los lazos de velocidad y posición requieren realimentar las respectivas variables mecánicas. Esta información puede obtenerse mediante sensores mecánicos, como encoders o resolvers; sin embargo, su incorporación aumenta el número de componentes, el cableado y la complejidad del accionamiento. Por este motivo, se han desarrollado estrategias sensorless orientadas a reconstruir estas variables a partir de las magnitudes eléctricas disponibles y del modelo de la máquina.
+
+
+
+% ============================================================
+\subsection{Control sensorless de motores síncronos}
+% ============================================================
+
+% OBJETIVO GENERAL:
+%
+% Revisar las estrategias utilizadas para estimar las variables
+% mecánicas necesarias para el control de máquinas síncronas
+% sin utilizar sensores mecánicos de posición o velocidad.
+%
+% Esta subsección debe responder:
+%
+% ¿Qué variables necesita conocer el controlador?
+% ¿Cómo se estiman sin encoder?
+% ¿Qué familias de métodos existen?
+% ¿Qué información utilizan?
+% ¿Qué limitaciones generales presentan?
+%
+% NO profundizar todavía en:
+%
+% - problema específico de baja velocidad;
+% - cogging torque;
+% - compensación de perturbaciones;
+% - GAP.
+%
+% Estos temas aparecen en las subsecciones siguientes.
+
+
+% ------------------------------------------------------------
+% PÁRRAFO 1 — NECESIDAD DE LA INFORMACIÓN MECÁNICA
+% ------------------------------------------------------------
+%
+% Retomar directamente el párrafo anterior sobre FOC.
+%
+% Idea:
+%
+% El control vectorial requiere conocer la posición eléctrica
+% del rotor para realizar las transformaciones de coordenadas.
+% Además, el control de velocidad necesita conocer omega_m.
+%
+% Tradicionalmente:
+%
+%       encoder/resolver
+%              ↓
+%       theta_m, omega_m
+%
+% Sensorless:
+%
+%       V, I, modelo
+%              ↓
+%       estimador/observador
+%              ↓
+%       theta_hat, omega_hat
+%
+% Introducir aquí el concepto sensorless.
+%
+% No explicar todavía algoritmos específicos.
+
+Como se mencionó anteriormente, la implementación de un control FOC requiere conocer la posición eléctrica del rotor para realizar el control de las corrientes. Asimismo, es necesario disponer de información sobre la velocidad mecánica del rotor para cerrar el lazo externo de velocidad. Estas variables pueden obtenerse directamente mediante sensores mecánicos de posición o velocidad; sin embargo, cuando se busca prescindir de estos elementos, es necesario recurrir a estrategias de estimación \textit{sensorless}.
+
+Estas estrategias buscan reconstruir la posición y velocidad del rotor utilizando información disponible en el accionamiento, como las tensiones y corrientes de la máquina, junto con su modelo matemático. Para ello, se han desarrollado diferentes métodos de estimación que difieren tanto en la información utilizada como en el principio empleado para obtener las variables mecánicas.
+
+% ------------------------------------------------------------
+% PÁRRAFO 2 — CLASIFICACIÓN GENERAL DE MÉTODOS SENSORLESS
+% ------------------------------------------------------------
+%
+% Presentar las principales familias que EFECTIVAMENTE aparezcan
+% en los papers revisados.
+%
+% Posible clasificación:
+%
+% 1. Métodos basados en modelo / FEM.
+% 2. Observadores de estado.
+% 3. Métodos basados en inyección de señales.
+% 4. Estrategias híbridas.
+%
+% IMPORTANTE:
+%
+% No es necesario forzar todos los papers dentro de estas
+% categorías si la literatura utiliza otra clasificación.
+%
+% Este párrafo solamente presenta el mapa general.
+
+Las estrategias de estimación \textit{sensorless} pueden clasificarse de acuerdo con el principio utilizado para extraer información sobre la posición y velocidad del rotor. De manera general, estas se dividen en métodos basados en el modelo de la máquina (\textit{model-based}) y métodos basados en las características de saliencia (\textit{saliency-based}), como se muestra en la Figura~\ref{fig:Categorias_sensorless}. Los primeros utilizan el modelo electromagnético y las variables eléctricas disponibles para reconstruir información asociada al estado del rotor, pudiendo implementarse mediante estrategias de estimación en lazo abierto o cerrado. Por otra parte, los métodos basados en saliencia aprovechan la dependencia entre las propiedades eléctricas de la máquina y la posición del rotor, mediante técnicas de inyección de señales o estrategias basadas en la excitación fundamental producida por la modulación PWM (FPE).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/Introduccion/Categorias_sensorless.png}
+    \caption{Clasificación de las principales estrategias de control sensorless en PMSM. Fuente: \cite{wangPositionSensorlessPermanent2020}} 
+    \label{fig:Categorias_sensorless} % Esta es la "llave" para referenciarlo
+\end{figure}
+
+% ------------------------------------------------------------
+% PÁRRAFO 3 — MÉTODOS BASADOS EN MODELO Y FEM
+% ------------------------------------------------------------
+%
+% Revisar trabajos que reconstruyen posición/velocidad utilizando:
+%
+% - tensiones;
+% - corrientes;
+% - FEM;
+% - flujo;
+% - modelo electromagnético de la máquina.
+%
+% Comparar:
+%
+% ¿Qué miden?
+% ¿Qué estiman?
+% ¿Qué parámetros necesitan?
+%
+% Interesa empezar a identificar una característica:
+%
+% la información asociada a FEM depende del movimiento del rotor.
+%
+% PERO no desarrollar todavía extensamente el problema de
+% baja velocidad. Eso corresponde a la subsección siguiente.
+Uno de los métodos utilizados para prescindir de sensores mecánicos de posición y velocidad consiste en aprovechar la información contenida en la fuerza contraelectromotriz (FEM) inducida en los devanados del motor. Esta variable se encuentra relacionada con el movimiento y la posición del rotor, por lo que puede ser reconstruida a partir de las tensiones y corrientes de la máquina para posteriormente estimar sus variables mecánicas.
+
+Para ello, estas estrategias utilizan las variables eléctricas disponibles, principalmente las tensiones aplicadas y las corrientes de los devanados, en conjunto con un modelo electromagnético de la máquina. Dependiendo del método utilizado, pueden reconstruirse variables como la FEM o el flujo magnético \cite{baiSensorlessControlUltraHighSpeed2025,luoOptimizedLuenbergerObserverBased2022}, a partir de las cuales se obtiene información sobre la posición y velocidad del rotor. En consecuencia, el desempeño de estas estrategias depende tanto de las mediciones eléctricas como del conocimiento de los parámetros utilizados en el modelo del motor.
+
+Sin embargo, la FEM no constituye la única variable que puede utilizarse para obtener información sobre el estado mecánico del rotor. Otros estudios recurren a la estimación de variables intermedias, como el error angular entre el campo del estator y la posición eléctrica del rotor \cite{derammelaereSensorlessLoadAngle2017}, o a la reconstrucción del flujo magnético \cite{horvathLoadTorquePermanent2023}. De esta forma, aunque los métodos difieren en la variable reconstruida y en el modelo empleado, comparten el objetivo de extraer desde las variables eléctricas información que permita determinar indirectamente la posición y velocidad del rotor.
+
+
+% ------------------------------------------------------------
+% PÁRRAFO 4 — ESTIMACIÓN DE POSICIÓN Y VELOCIDAD
+% EN MÉTODOS BASADOS EN MODELO
+% ------------------------------------------------------------
+%
+% Una vez reconstruida la FEM, flujo u otra variable:
+% ¿cómo obtengo theta_hat y omega_hat?
+%
+% Introducir dos posibilidades generales:
+%
+% 1. Obtención directa de posición a partir de la
+%    variable reconstruida.
+%
+% 2. Uso de un estimador/observador para obtener
+%    posición y velocidad.
+%
+% Aquí introducir el concepto de observador.
+% Todavía NO explicar ecuaciones del EKF.
+
+La obtención de las variables mecánicas a partir del modelo de la máquina puede realizarse mediante diferentes estrategias. Algunos métodos reconstruyen inicialmente variables electromagnéticas, como la FEM o el flujo magnético, a partir de las cuales se obtiene posteriormente la posición y velocidad del rotor. Alternativamente, pueden utilizarse observadores de estado que incorporan directamente el modelo dinámico de la máquina y las variables medidas para estimar los estados no disponibles. En estos últimos, el modelo permite predecir la evolución de los estados, mientras que la diferencia entre las variables medidas y sus valores estimados proporciona información para corregir la estimación.
+
+% ------------------------------------------------------------
+% PÁRRAFO 5 — OBSERVADORES Y ESTIMADORES DE ESTADO
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Mostrar las distintas estructuras utilizadas para reconstruir
+% las variables no medidas del sistema.
+%
+% Alternativas encontradas:
+%
+% - PLL / estimadores de posición y velocidad;
+% - observadores de Luenberger;
+% - observadores de modo deslizante (SMO);
+% - filtros de Kalman extendidos (EKF);
+% - otros observadores no lineales.
+%
+% Comparar principalmente:
+%
+% ¿Qué estiman?
+%     - posición;
+%     - velocidad;
+%     - FEM / flujo;
+%     - perturbaciones, cuando corresponda.
+%
+% ¿Qué información utilizan?
+%     - tensiones;
+%     - corrientes;
+%     - modelo dinámico;
+%     - variables electromagnéticas reconstruidas.
+%
+% ¿Cómo realizan la estimación?
+%     - cálculo o seguimiento de una señal de error;
+%     - predicción mediante el modelo;
+%     - corrección a partir del error entre variables
+%       medidas y estimadas.
+%
+% IMPORTANTE:
+% Aquí interesa comparar la ESTRUCTURA de estimación.
+% No desarrollar todavía sus limitaciones en profundidad.
+
+Dentro de este último grupo se han desarrollado diferentes estructuras de observación, las cuales difieren tanto en los estados considerados como en el mecanismo utilizado para realizar y corregir su estimación. De manera general, los observadores utilizan el modelo dinámico de la máquina junto con las variables eléctricas disponibles para reconstruir estados que no pueden ser medidos directamente. Los observadores de Luenberger incorporan términos de corrección determinados mediante ganancias de observación, mientras que los observadores de modo deslizante (SMO) emplean una acción correctiva destinada a forzar la convergencia del error de estimación. Por otra parte, el filtro de Kalman extendido (EKF) permite abordar modelos no lineales mediante etapas sucesivas de predicción y actualización, ponderando la corrección de los estados de acuerdo con las incertidumbres consideradas en el modelo y las mediciones \cite{luoOptimizedLuenbergerObserverBased2022}.
+
+Las estructuras utilizadas también difieren en las variables que buscan reconstruir. La posición y velocidad pueden estimarse conjuntamente como estados del sistema o, alternativamente, la velocidad puede obtenerse a partir de la posición estimada. Sin embargo, la utilización de una derivada para este propósito puede amplificar el ruido de alta frecuencia, por lo que se han desarrollado estructuras que permiten estimar ambas variables simultáneamente \cite{wangPositionSensorlessPermanent2020}. Asimismo, algoritmos de seguimiento como el PLL pueden utilizar una señal de error angular para realizar el seguimiento de la posición y obtener información de velocidad, evitando la obtención directa de esta última mediante derivación. Dependiendo de la formulación del observador, también pueden incorporarse estados adicionales asociados a variables eléctricas, mecánicas o perturbaciones.
+% ------------------------------------------------------------
+% PÁRRAFO 6 — LIMITACIONES DE LOS MÉTODOS BASADOS EN MODELO
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Mostrar qué condiciona la calidad de la estimación.
+%
+% Comparar:
+%
+% - dependencia de parámetros del motor;
+% - incertidumbres y errores de modelado;
+% - ruido en las variables medidas;
+% - dinámica no modelada;
+% - observabilidad de los estados;
+% - compromiso entre corrección del observador y
+%   sensibilidad al ruido.
+%
+% Introducir una idea importante:
+%
+% agregar estados al observador NO garantiza que estos
+% puedan reconstruirse a partir de las mediciones disponibles.
+%
+% Esto permite introducir brevemente la observabilidad.
+%
+% NO desarrollar todavía:
+%
+% - pérdida de observabilidad a baja velocidad;
+% - reducción de FEM con la velocidad;
+% - condiciones matemáticas de observabilidad.
+%
+% Esos problemas se desarrollan posteriormente.
+
+A pesar de las distintas estructuras disponibles, su desempeño se encuentra condicionado tanto por las características propias del método como por la correspondencia entre el modelo utilizado y el comportamiento real de la máquina. Las variaciones de los parámetros, las dinámicas no modeladas y el ruido presente en las variables medidas pueden introducir errores en la reconstrucción de los estados. Estas condiciones afectan de manera diferente a cada estrategia; por ejemplo, se ha reportado una elevada dependencia paramétrica en métodos adaptativos basados en modelos de referencia (MRAS), mientras que los observadores de flujo pueden presentar problemas asociados a componentes continuas y armónicas. Por su parte, los SMO presentan ventajas en términos de simplicidad y robustez, aunque su acción discontinua puede producir \textit{chattering}, mientras que el EKF permite considerar modelos no lineales y diferentes fuentes de incertidumbre a costa de una mayor complejidad computacional \cite{luoOptimizedLuenbergerObserverBased2022}.
+
+Estas limitaciones no dependen únicamente de la estructura seleccionada. En observadores de lazo cerrado existe además un compromiso entre la corrección de las incertidumbres del modelo y la sensibilidad frente al ruido y los errores de medición \cite{wangPositionSensorlessPermanent2020}. Asimismo, la incorporación de nuevas variables dentro del vector de estados no garantiza que estas puedan reconstruirse a partir de las mediciones disponibles. Para ello, es necesario que la dinámica del sistema permita que los estados considerados produzcan información distinguible en las variables medidas, condición asociada a la observabilidad del sistema \cite{wangPositionSensorlessPermanent2020}. Por lo tanto, la precisión del modelo, la calidad de las mediciones y la información disponible sobre los estados condicionan conjuntamente el desempeño de la estimación.
+% ------------------------------------------------------------
+% PÁRRAFO 7 — MÉTODOS BASADOS EN SALIENCIA
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Introducir una fuente de información de posición distinta
+% de la utilizada por los métodos basados en modelo/FEM.
+%
+% Principio:
+%
+% En máquinas con saliencia, las propiedades eléctricas
+% dependen de la posición del rotor.
+%
+% Una excitación eléctrica puede producir una respuesta
+% dependiente de theta_e:
+%
+%       señal inyectada
+%              ↓
+%       saliencia del motor
+%              ↓
+%       respuesta de corriente
+%              ↓
+%       información de posición
+%
+% Introducir:
+%
+% - inyección de señales de alta frecuencia (HFI);
+% - señales rotantes;
+% - señales pulsantes;
+% - FPE, solamente si aparece de forma relevante
+%   en los trabajos revisados.
+%
+% IMPORTANTE:
+% No explicar todavía filtros, demodulación,
+% frecuencia de inyección ni ecuaciones.
+
+Una fuente alternativa de información para la estimación de la posición del rotor corresponde a la saliencia magnética de la máquina. Esta característica se presenta cuando las propiedades magnéticas del motor varían en función de la orientación del rotor, produciendo diferencias en sus inductancias según el eje considerado. Como consecuencia, la respuesta eléctrica de la máquina frente a una determinada excitación depende de la posición del rotor, permitiendo utilizar esta variación para obtener información sobre su posición sin recurrir directamente a sensores mecánicos \cite{wangOptimizedNonlinearHighFrequency2025}.
+
+A partir de este principio se han desarrollado estrategias que aplican deliberadamente una señal eléctrica adicional y analizan la respuesta generada en las corrientes del motor. Entre ellas se encuentran los métodos de inyección de señales de alta frecuencia (HFI), en los cuales a respuesta de la máquina frente a la señal inyectada se encuentra modulada por su saliencia y, por tanto, contiene información dependiente de la posición del rotor. Esta información puede posteriormente ser extraída y utilizada por el sistema de estimación para reconstruir su posición eléctrica. Dependiendo de la estrategia empleada, la excitación puede realizarse mediante señales rotantes o pulsantes, utilizando diferentes formas de onda y mecanismos para extraer la información de posición \cite{wangPositionSensorlessPermanent2020,lascuPLLPositionSpeed2020}.
+% ------------------------------------------------------------
+% PÁRRAFO 8 — COMBINACIÓN DE ESTRATEGIAS
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Mostrar que las familias anteriores no necesariamente
+% son excluyentes.
+%
+% Explicar:
+%
+% - métodos basados en modelo presentan ventajas en
+%   determinadas condiciones de operación;
+%
+% - métodos basados en saliencia permiten obtener otra
+%   fuente de información sobre posición;
+%
+% - pueden combinarse ambos principios;
+%
+% - existen estrategias que utilizan distintos métodos
+%   dependiendo de la región de operación.
+%
+% NO desarrollar todavía por qué uno funciona mejor
+% específicamente a baja velocidad.
+%
+% Eso sirve como puente hacia la subsección siguiente.
+
+Las estrategias basadas en modelo y aquellas basadas en saliencia no necesariamente se utilizan de manera independiente, sino que pueden combinarse dentro de una misma estructura de estimación. En estos casos, la información obtenida a partir de la respuesta eléctrica asociada a la saliencia puede complementar aquella proporcionada por el modelo dinámico de la máquina y sus variables eléctricas. De esta manera, se han desarrollado esquemas híbridos que integran diferentes fuentes de información para estimar la posición y velocidad del rotor, pudiendo utilizar distintos principios de estimación de acuerdo con las condiciones de operación de la máquina \cite{wangOptimizedNonlinearHighFrequency2025}.
+
+% ------------------------------------------------------------
+% PÁRRAFO 9 — APLICACIÓN A MOTORES PASO A PASO
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Volver desde la literatura general de PMSM hacia el stepper.
+%
+% Revisar específicamente:
+%
+% - estrategias sensorless aplicadas a stepper / PMHSM;
+% - variables utilizadas para estimar posición/velocidad;ch
+% - observadores empleados;
+% - uso de saliencia o inyección, si aparece;
+% - semejanzas con PMSM;
+% - particularidades del stepper.
+%
+% Este bloque puede ocupar MÁS DE UN PÁRRAFO si existen
+% suficientes trabajos específicos.
+
+Debido a las similitudes existentes entre el modelo electromagnético de los motores paso a paso híbridos y otras máquinas síncronas de imanes permanentes, determinados principios de control y estimación desarrollados para PMSM pueden ser considerados para su aplicación en este tipo de motores \cite{lydellSensorlessHybridFieldOriented,picatosteruilopeModellingControlStepper2014}. En particular, diferentes trabajos han abordado el control \textit{sensorless} de motores paso a paso utilizando [FEM/load angle/observador/etc.] \cite{lydellSensorlessHybridFieldOriented}  \cite{derammelaereSensorlessLoadAngle2017} \cite{picatosteruilopeModellingControlStepper2014}. Sin embargo, dentro de los trabajos revisados, las estrategias basadas específicamente en saliencia e inyección de señales se encuentran considerablemente menos representadas en motores paso a paso que en PMSM.
+% ------------------------------------------------------------
+% PÁRRAFO 10 — SÍNTESIS Y PUENTE A BAJA VELOCIDAD
+% ------------------------------------------------------------
+%
+% Sintetizar:
+%
+% Existen distintas fuentes de información para realizar
+% control sensorless:
+%
+%       modelo / FEM / flujo
+%                 +
+%       saliencia / señales inyectadas
+%
+% y diferentes estructuras para procesar esa información:
+%
+%       cálculo directo / PLL / observadores / EKF / SMO...
+%
+% Sin embargo, la capacidad de reconstruir las variables
+% mecánicas depende de las condiciones de operación.
+%
+% Introducir:
+%
+% al disminuir la velocidad aparecen dificultades particulares
+% relacionadas con:
+%
+% - reducción de FEM;
+% - relación señal/ruido;
+% - incertidumbres del modelo;
+% - observabilidad.
+%
+% NO resolverlas aquí.
+%
+% -> \subsection{Control sensorless a baja velocidad}
+
+En conjunto, las estrategias revisadas muestran que la estimación \textit{sensorless} de las variables mecánicas puede realizarse utilizando distintas fuentes de información. Los métodos basados en modelo recurren principalmente a las variables eléctricas y al modelo dinámico de la máquina, mientras que las estrategias basadas en saliencia permiten obtener información sobre la posición a partir de la respuesta eléctrica dependiente de la orientación del rotor. Asimismo, ambas fuentes de información pueden ser utilizadas de manera complementaria mediante diferentes estructuras de estimación.
+
+Sin embargo, la capacidad de reconstruir la posición y velocidad del rotor depende de las condiciones de operación de la máquina. En particular, al disminuir la velocidad aparecen dificultades asociadas a la reducción de las señales utilizadas por determinados métodos de estimación, la relación señal-ruido, las incertidumbres del modelo y la observabilidad de los estados. Estas condiciones hacen que la operación \textit{sensorless} a baja velocidad constituya un problema particular, cuyo análisis resulta necesario para determinar las estrategias que permiten mantener la estimación de las variables mecánicas en esta región de operación. 
+
+
+% ============================================================
+\subsection{Control sensorless a baja velocidad}
+% ============================================================
+% OBJETIVO:
+%
+% Revisar las dificultades reportadas en la literatura para la
+% estimación sensorless a baja y nula velocidad, así como las
+% estrategias utilizadas para mantener la estimación de las
+% variables mecánicas en esta región de operación.
+%
+% En esta subsección se presentan y comparan los resultados
+% reportados por la literatura.
+%
+% El fundamento matemático de la pérdida de información y las
+% condiciones de observabilidad se desarrolla posteriormente
+% en el marco teórico.
+%
+% IMPORTANTE:
+%
+% El objetivo de esta subsección NO es demostrar que el control
+% sensorless necesariamente falla a baja velocidad.
+%
+% La literatura muestra que existen estrategias capaces de mantener
+% una estimación adecuada de posición y velocidad incluso a velocidades
+% reducidas y, bajo determinadas condiciones, en standstill.
+%
+% La secuencia argumental debe ser:
+%
+%   baja velocidad
+%        ↓
+%   menor información para determinados métodos
+%        ↓
+%   dificultades de estimación / observabilidad
+%        ↓
+%   estrategias para incorporar información adicional
+%        ↓
+%   HFI / saliencia / observadores / estrategias híbridas
+%        ↓
+%   operación sensorless a baja velocidad es posible
+%        ↓
+%   PERO una estimación correcta no garantiza velocidad uniforme
+%
+%
+% ------------------------------------------------------------
+% BLOQUE 1 — DIFICULTADES A BAJA VELOCIDAD
+% ------------------------------------------------------------
+%
+% Explicar por qué determinadas estrategias sensorless presentan
+% dificultades cuando disminuye la velocidad.
+%
+% Buscar evidencia sobre:
+%
+% - reducción de FEM con la velocidad;
+% - disminución de la relación señal/ruido;
+% - errores de medición;
+% - incertidumbre paramétrica;
+% - no linealidades del inversor;
+% - errores del modelo;
+% - degradación de la estimación.
+%
+% IMPORTANTE:
+%
+% No escribir:
+% "los métodos sensorless fallan a baja velocidad".
+%
+% Especificar qué método, qué información utiliza y bajo qué
+% condiciones se degrada.
+
+Una de las principales dificultades para la estimación \textit{sensorless} se presenta cuando la máquina opera a bajas velocidades. En particular, las estrategias que utilizan información asociada a la fuerza contraelectromotriz (FEM) pueden experimentar una degradación de su desempeño debido a que la magnitud de esta señal disminuye junto con la velocidad de rotación. Como consecuencia, adquieren mayor relevancia factores como el ruido de medición, las incertidumbres paramétricas, los errores de modelado y las no linealidades introducidas por el inversor \cite{wangParameterRobustnessImprovement2026}.
+
+Sin embargo, las limitaciones a baja velocidad dependen del principio de estimación utilizado. Por ejemplo, los observadores de flujo han sido propuestos para extender la estimación a un amplio rango de velocidades, particularmente mediante formulaciones basadas en flujo activo; no obstante, la literatura continúa identificando dificultades específicas en la región de baja velocidad, entre ellas problemas asociados a la observabilidad de la posición del rotor y a la estabilidad del observador \cite{wangParameterRobustnessImprovement2026}. Por lo tanto, la reducción de velocidad no implica necesariamente la pérdida de la estimación \textit{sensorless}, sino un cambio en las condiciones bajo las cuales las variables mecánicas pueden ser reconstruidas adecuadamente.
+% ------------------------------------------------------------
+% BLOQUE 2 — OBSERVABILIDAD
+% ------------------------------------------------------------
+%
+% Relacionar la pérdida de información con la observabilidad
+% del sistema.
+%
+% Revisar papers que analicen:
+%
+% - condiciones de observabilidad;
+% - dependencia con velocidad/punto de operación;
+% - baja velocidad;
+% - standstill;
+% - estados que pueden o no reconstruirse;
+% - efecto de incorporar estados adicionales.
+%
+% Utilizar aquí papers que explícitamente demuestren pérdida
+% de observabilidad en determinadas condiciones.
+%
+% IMPORTANTE:
+%
+% No universalizar resultados particulares.
+%
+% Si un paper establece que SU modelo no es observable en
+% standstill, indicarlo de esa forma.
+
+Una de las dificultades asociadas a la estimación \textit{sensorless} a baja velocidad se encuentra relacionada con la observabilidad del modelo utilizado. Esta propiedad determina si los estados no medidos pueden ser reconstruidos a partir de las entradas y salidas disponibles, y depende tanto de la estructura del modelo como de las condiciones de operación de la máquina. Por este motivo, la disminución de velocidad no conduce necesariamente a una pérdida de observabilidad en todos los sistemas, sino que deben analizarse las condiciones particulares bajo las cuales se realiza la estimación.
+
+Zaltni et al. \cite{zaltniObservabilityAnalysisPMSM2009} analizan esta problemática en máquinas síncronas de imanes permanentes considerando como vector de estados las corrientes del estator, la posición y la velocidad del rotor, mientras que las corrientes constituyen las variables medidas. Para una SPMSM, los autores identifican condiciones de pérdida de observabilidad cuando la máquina se encuentra simultáneamente a velocidad y aceleración nulas. En este caso, la ausencia de movimiento elimina la información de posición asociada a la FEM utilizada por el modelo para reconstruir las variables mecánicas. En cambio, para máquinas con saliencia, la dependencia de las inductancias respecto de la posición introduce una fuente adicional de información que puede ser aprovechada durante la estimación.
+
+Posteriormente, Vaclavek et al. \cite{vaclavekACDriveObservability2013} estudian la observabilidad local de máquinas síncronas considerando igualmente las corrientes del estator como variables medidas y la posición y velocidad del rotor como estados no medidos. Sus resultados muestran nuevamente diferencias entre máquinas salientes y no salientes, destacando que la saliencia puede introducir información dependiente de la posición que no se encuentra disponible en el modelo de una máquina sin saliencia.
+
+Las condiciones anteriores son posteriormente revisadas por Koteich et al. \cite{koteichDiscussionACDrive2015}, quienes muestran que, para una máquina saliente en condiciones de velocidad nula, no resulta suficiente considerar únicamente variaciones en la magnitud y dirección del vector de corriente para garantizar la observabilidad. Los autores formulan la condición mediante un vector ficticio de observabilidad, cuya orientación respecto del rotor permite caracterizar con mayor precisión las condiciones bajo las cuales puede mantenerse la observabilidad local.
+
+En conjunto, estos análisis muestran que la observabilidad a baja y nula velocidad no depende únicamente de la velocidad del rotor, sino también de la estructura electromagnética de la máquina, del punto de operación, de las variables utilizadas durante la estimación y de la excitación aplicada. En consecuencia, cuando la dinámica natural de la máquina no proporciona información suficiente sobre la posición, es posible recurrir a estrategias destinadas a introducir excitaciones adicionales que hagan observable su dependencia respecto de la orientación del rotor.
+% ------------------------------------------------------------
+% BLOQUE 3 — ESTRATEGIAS PARA BAJA VELOCIDAD
+% ------------------------------------------------------------
+%
+% Mostrar cómo la literatura aborda las limitaciones anteriores.
+%
+% Revisar:
+%
+% - HFI / HFSI;
+% - saliencia;
+% - observadores de estado;
+% - EKF;
+% - SMO;
+% - PLL;
+% - estrategias híbridas;
+% - combinación HFI + observador.
+%
+% Para HFI:
+%
+%   señal HF
+%      ↓
+%   saliencia
+%      ↓
+%   respuesta de corriente dependiente de theta_e
+%      ↓
+%   información adicional de posición
+%
+% Aquí SÍ explicar por qué esta información resulta útil
+% específicamente a baja velocidad.
+%
+% Comparar papers concretos:
+%
+% - tipo de motor;
+% - estrategia utilizada;
+% - rango de velocidad ensayado;
+% - operación o no en standstill;
+% - variables estimadas;
+% - limitaciones reportadas.
+
+Frente a las dificultades de observabilidad que pueden presentarse a baja y nula velocidad, una de las estrategias utilizadas consiste en introducir una excitación eléctrica adicional que permita obtener información sobre la posición del rotor. En máquinas que presentan saliencia, la respuesta eléctrica frente a esta excitación depende de la orientación del rotor, permitiendo incorporar información de posición incluso cuando la máquina se encuentra detenida. Vaclavek et al. \cite{vaclavekACDriveObservability2013} verifican experimentalmente este principio en una IPMSM mediante la aplicación, a velocidad nula, de una señal adicional de tensión de alta frecuencia, utilizando posteriormente un EKF para reconstruir la posición del rotor.
+
+A partir de este principio, diferentes estrategias de inyección de señales han sido desarrolladas para la operación \textit{sensorless} en la región de baja velocidad. Entre ellas se encuentran las técnicas de inyección de señales de alta frecuencia (HFI), las cuales aprovechan la dependencia de la respuesta eléctrica de la máquina respecto de la posición del rotor producida por su saliencia. La excitación inyectada puede adoptar diferentes formas y orientaciones, incluyendo señales pulsantes o rotantes, mientras que las componentes de alta frecuencia presentes en la respuesta de corriente son posteriormente procesadas para extraer información relacionada con la posición del rotor \cite{wangPositionSensorlessPermanent2020}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparación de estrategias de estimación \textit{sensorless}
+    para operación a baja y nula velocidad. Fuente: Propia}
+    \label{tab:comparacion_sensorless_baja_velocidad}
+
+    \small
+    \renewcommand{\arraystretch}{1.3}
+
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lllllll}
+        \toprule
+
+        \textbf{Referencia} &
+        \textbf{Motor} &
+        \textbf{Estrategia} &
+        \textbf{Excitación} &
+        \textbf{Variables estimadas} &
+        \textbf{Velocidad nula} &
+        \textbf{Característica principal} \\
+
+        \midrule
+
+        Vaclavek et al. \cite{vaclavekACDriveObservability2013} &
+        PMSM &
+        HFI + EKF &
+        HF &
+        Posición &
+        Sí &
+        Excitación adicional para observabilidad \\
+
+        \addlinespace
+
+        Petro et al. \cite{petroHFPulseSignal2025} &
+        PMSM &
+        HFI + Observador &
+        Sinusoidal &
+        Posición &
+        No &
+        Presenta perturbaciones \\
+
+        \addlinespace
+
+        Guzinski et al. \cite{guzinskiSensorlessLowSpeed2019} &
+        PMSM &
+        EKF &
+        No &
+        Posición&
+        No &
+        Presenta perturbaciones \\
+
+        \addlinespace
+
+        Trancho et al. \cite{tranchoNovelPMSMHybrid2016} &
+        PMSM &
+        HFI + PLL + back-emf observador&
+        Sinusoidal &
+        Posición y velocidad &
+        Sí &
+        Combinación de low-speed and high-speed control \\
+
+        \addlinespace
+
+        Wen et al.\cite{wenObservabilityAnalysisEKFbased2017} &
+        PMSM &
+        HFI + ekf &
+        Sinusoidal &
+        Posición y velocidad &
+        Sí &
+        comparación EKF vs EKF + HFI \\
+
+
+        \addlinespace
+
+        Lascu et al.\cite{lascuPLLPositionSpeed2020} &
+        PMSM &
+        HFI + PLL + Luenberger &
+        Sinusoidal &
+        Posición y velocidad &
+        No &
+        Presenta perturbaciones\\
+
+        \addlinespace
+
+        Jul-ki et al.\cite{jul-kiseokSensorlessSpeedControl2006} &
+        SPMSM &
+        Método basado en regulador &
+        -- &
+        Posición y velocidad &
+        Limitado &
+        Alternativa sin HFI \\
+
+         \addlinespace
+
+        Wang et al. \cite{wangOptimizedNonlinearHighFrequency2025} &
+        PMSM &
+        HFI adaptativo + EKF &
+        Sinusoidal &
+        Posición y velocidad &
+        No &
+        Presenta ripple\\
+
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+
+Como se observa en la Tabla \ref{tab:comparacion_sensorless_baja_velocidad}, la estimación \textit{sensorless} a baja velocidad ha sido abordada mediante diferentes estrategias. Una parte importante de los trabajos revisados utiliza técnicas de inyección de señales de alta frecuencia, ya sea de manera independiente o combinadas con observadores y mecanismos de seguimiento como EKF y PLL. Asimismo, se han desarrollado estrategias híbridas que utilizan diferentes fuentes de información dependiendo de la región de operación, así como métodos que prescinden de la inyección de señales de alta frecuencia. En conjunto, estos trabajos muestran que las dificultades asociadas a la reducción de velocidad pueden ser abordadas mediante distintas estructuras de estimación, sin que la operación a baja velocidad implique necesariamente la pérdida de la estimación de las variables mecánicas.
+
+% ------------------------------------------------------------
+% BLOQUE FINAL — CONCLUSIÓN Y TRANSICIÓN
+% ------------------------------------------------------------
+%
+% Esta es la conclusión importante:
+%
+% La literatura demuestra que es posible mantener la estimación
+% sensorless de posición y velocidad a bajas velocidades mediante
+% diferentes estrategias.
+%
+% Por lo tanto:
+%
+%   baja velocidad
+%       ≠
+%   necesariamente pérdida de estimación sensorless
+%
+% PERO:
+%
+% una estimación adecuada de theta y omega no implica que la
+% velocidad real del rotor sea constante.
+%
+% Es posible tener:
+%
+%   theta_hat ≈ theta
+%   omega_hat ≈ omega
+%
+% mientras:
+%
+%   omega = omega_ref + ripple
+%
+% debido a perturbaciones reales presentes en la máquina.
+%
+% Esto permite cambiar el foco desde:
+%
+%   "¿es posible estimar a baja velocidad?"
+%
+% hacia:
+%
+%   "¿qué ocurre con el desempeño a baja velocidad cuando existen
+%    perturbaciones periódicas?"
+%
+% Conduce a:
+En conjunto, los trabajos revisados muestran que la operación \textit{sensorless} a baja velocidad puede abordarse mediante diferentes estrategias de estimación. En particular, la incorporación de información asociada a la saliencia mediante técnicas de inyección de señales permite complementar la información disponible en aquellas condiciones donde determinados métodos basados en el modelo presentan dificultades. Asimismo, su combinación con observadores y mecanismos de seguimiento permite extender la estimación de las variables mecánicas hacia regiones de baja e incluso nula velocidad.
+
+Sin embargo, una estimación adecuada de la posición y velocidad del rotor no implica necesariamente que el comportamiento mecánico de la máquina se encuentre libre de oscilaciones. Aun cuando la velocidad estimada siga correctamente a la velocidad real, esta última puede presentar variaciones originadas por perturbaciones internas o externas al sistema. Entre ellas, resultan de especial interés aquellas de carácter periódico, debido a que pueden introducir componentes oscilatorias en el torque y, consecuentemente, producir ripple en la velocidad del rotor. Por este motivo, resulta necesario analizar el origen y las características de estas perturbaciones, particularmente durante la operación a baja velocidad.
+
+\subsection{Perturbaciones y ripple a baja velocidad}
+
+% ============================================================
+% OBJETIVO DE LA SUBSECCIÓN
+% ============================================================
+%
+% Mostrar que el desempeño del motor puede verse afectado por
+% diferentes perturbaciones aun cuando las variables mecánicas
+% sean estimadas adecuadamente.
+%
+% Comenzar desde una visión general de las perturbaciones presentes
+% en máquinas eléctricas y reducir progresivamente el análisis hacia
+% las dos perturbaciones consideradas en esta tesis:
+%
+%   1. Cogging/detent torque -> perturbación interna y periódica.
+%
+%   2. Torque de carga T_L -> perturbación externa aplicada al eje.
+%
+% La subsección NO debe desarrollar todavía las estrategias de
+% compensación. Su objetivo es caracterizar el problema.
+%
+% Secuencia:
+%
+%       perturbaciones en el motor
+%                  |
+%        -----------------------
+%        |                     |
+%   perturbaciones        perturbaciones
+%      internas              externas
+%        |                     |
+%      cogging              torque de carga
+%        |                     |
+%        ----------- -----------
+%                  |
+%          dinámica mecánica
+%                  |
+%            error / ripple
+%              de velocidad
+%
+% Finalmente conectar ambas perturbaciones con la operación
+% sensorless y a baja velocidad.
+
+
+% ------------------------------------------------------------
+% BLOQUE 1 — PERTURBACIONES EN MÁQUINAS ELÉCTRICAS
+% ------------------------------------------------------------
+%
+% Introducir de manera GENERAL que el torque y la velocidad de una
+% máquina pueden verse afectados por diferentes perturbaciones.
+%
+% Revisar literatura sobre:
+%
+% - armónicos electromagnéticos;
+% - variaciones de flujo;
+% - conmutación;
+% - no linealidades del inversor;
+% - geometría rotor-estator;
+% - cogging/detent torque;
+% - fricción;
+% - torque de carga;
+% - variaciones de carga.
+%
+% NO desarrollar cada perturbación en profundidad.
+%
+% La idea es mostrar que existen perturbaciones de distinta
+% naturaleza y origen.
+%
+% Distinguir conceptualmente entre:
+%
+%   perturbaciones internas
+%       -> asociadas a características electromagnéticas,
+%          constructivas o dinámicas de la propia máquina.
+%
+%   perturbaciones externas
+%       -> asociadas principalmente a la carga conectada al eje.
+%
+% IMPORTANTE:
+%
+% No afirmar que todas estas perturbaciones son periódicas.
+% En particular, el torque de carga puede ser constante,
+% variable, transitorio o eventualmente periódico dependiendo
+% de la aplicación.
+%
+% OBJETIVO DEL BLOQUE:
+%
+% Terminar indicando que, entre las distintas perturbaciones
+% existentes, esta investigación se concentra específicamente
+% en el cogging/detent torque y en las variaciones del torque
+% de carga.
+
+Durante la operación de una máquina eléctrica, su comportamiento puede verse afectado por fenómenos de distinta naturaleza que modifican el torque resultante y, consecuentemente, su respuesta mecánica. Estas perturbaciones pueden estar asociadas tanto a características propias de la máquina y de su accionamiento como a la interacción con la carga mecánica conectada al eje. En motores paso a paso, esta interacción adquiere especial relevancia debido a que la respuesta del conjunto depende de parámetros como la rigidez electromagnética, la inercia y el amortiguamiento, pudiendo presentarse oscilaciones e incluso fenómenos de resonancia mecánica bajo determinadas condiciones de operación \cite{vierbergenPredictingImprovingBehaviour}.
+
+Además de estos fenómenos dinámicos, el torque desarrollado por una máquina puede verse afectado por diferentes fuentes de perturbación, tales como armónicos electromagnéticos, no linealidades asociadas al accionamiento, componentes dependientes de la posición del rotor y variaciones del torque de carga \cite{deangeloControlParaMaquinas2004}. Dependiendo de su origen, estas perturbaciones pueden presentar comportamientos constantes, transitorios o periódicos, produciendo desviaciones u oscilaciones en las variables mecánicas del sistema.
+% ------------------------------------------------------------
+% BLOQUE 2 — TORQUE RIPPLE Y SPEED RIPPLE
+% ------------------------------------------------------------
+%
+% Explicar las consecuencias de las perturbaciones sobre el
+% comportamiento mecánico.
+%
+% Definir brevemente:
+%
+% - torque ripple;
+% - speed ripple.
+%
+% IMPORTANTE:
+%
+% Torque ripple NO es una perturbación específica.
+%
+% Es una variación/oscilación del torque que puede ser producida
+% por diferentes fenómenos.
+%
+% De manera similar, una variación del torque aplicado a la
+% dinámica mecánica puede producir variaciones en la velocidad.
+%
+% Buscar evidencia sobre:
+%
+% - oscilaciones de torque;
+% - oscilaciones de velocidad;
+% - error de seguimiento de velocidad;
+% - movimiento no uniforme;
+% - efecto de perturbaciones sobre el lazo de velocidad.
+%
+% OBJETIVO:
+%
+% Establecer la cadena conceptual:
+%
+%      perturbación de torque
+%               ↓
+%       dinámica mecánica
+%               ↓
+%      variación de velocidad
+%
+% SIN afirmar todavía que todas las perturbaciones producen
+% necesariamente oscilaciones periódicas.
+
+Como se observó en la Tabla \ref{tab:comparacion_sensorless_baja_velocidad}, diferentes estrategias \textit{sensorless} han permitido extender la estimación de posición y velocidad hacia regiones de baja velocidad. Sin embargo, algunos de los trabajos revisados reportan, además de las dificultades propias de la estimación en esta región de operación, la presencia de oscilaciones o rizado en la velocidad asociados a perturbaciones propias de la máquina. Si bien ambos fenómenos no presentan necesariamente una relación causal, su coexistencia resulta especialmente relevante cuando se busca obtener una operación estable y precisa a bajas velocidades.
+
+En este sentido, resulta necesario distinguir entre las oscilaciones producidas por errores en la estimación de las variables mecánicas y aquellas que corresponden a variaciones reales en el movimiento del rotor. Un observador puede reconstruir adecuadamente la velocidad del motor y, aun así, estimar una señal oscilatoria si la velocidad real presenta variaciones como consecuencia de perturbaciones de torque. Por lo tanto, mejorar la estimación \textit{sensorless} a baja velocidad no implica necesariamente eliminar el rizado presente en la respuesta mecánica.
+
+Las perturbaciones que actúan sobre el torque de una máquina pueden modificar el equilibrio mecánico del sistema y, consecuentemente, producir variaciones en su velocidad de rotación. Cuando estas variaciones presentan un comportamiento oscilatorio, pueden manifestarse como un rizado de torque (\textit{torque ripple}) y, a través de la dinámica mecánica del conjunto rotor-carga, como un rizado en la velocidad (\textit{speed ripple}). La magnitud y frecuencia de estas oscilaciones no dependen únicamente de la perturbación que las origina, sino también de las características dinámicas del sistema, tales como la inercia, el amortiguamiento y la rigidez electromagnética.
+
+Este comportamiento resulta particularmente relevante en motores paso a paso, donde la respuesta del rotor frente a variaciones del torque puede presentar un carácter oscilatorio. Vierbergen \cite{vierbergenPredictingImprovingBehaviour} muestra que la interacción entre la rigidez electromagnética y la inercia del conjunto rotor-carga determina una frecuencia natural del sistema, pudiendo amplificarse determinadas componentes de la respuesta cuando la excitación se aproxima a dicha frecuencia. Por lo tanto, las oscilaciones observadas en la velocidad no pueden atribuirse necesariamente a una única fuente de perturbación, sino que pueden encontrarse condicionadas por la propia dinámica mecánica de la máquina.
+
+Asimismo, resulta necesario distinguir entre una perturbación periódica y el rizado que esta puede producir sobre las variables mecánicas. Una componente periódica de torque, como aquella asociada al \textit{cogging torque}, puede generar oscilaciones periódicas en la velocidad; sin embargo, otras perturbaciones, como una variación transitoria o escalonada del torque de carga, pueden producir principalmente una desviación y una respuesta transitoria de la velocidad, sin constituir necesariamente una fuente periódica de \textit{speed ripple}.
+
+Entre las diferentes fuentes capaces de introducir componentes periódicas en el torque desarrollado, el \textit{cogging torque} resulta de particular interés debido a su dependencia con la posición del rotor. Esta característica determina una estructura espacial periódica que puede traducirse en oscilaciones de torque y velocidad durante el movimiento de la máquina, especialmente relevantes para aplicaciones que requieren un control preciso a bajas velocidades.
+% ------------------------------------------------------------
+% BLOQUE 3 — COGGING / DETENT TORQUE
+% ------------------------------------------------------------
+%
+% A partir de aquí comenzar a concentrarse en las perturbaciones
+% consideradas específicamente en la tesis.
+%
+% Introducir primero el cogging/detent torque.
+%
+% Revisar:
+%
+% - origen físico;
+% - interacción rotor-estator;
+% - imanes permanentes;
+% - variación de reluctancia;
+% - geometría del motor;
+% - dependencia con theta_m;
+% - periodicidad espacial;
+% - componentes armónicas;
+% - relación con polos/dientes/ranuras.
+%
+% Establecer claramente que:
+%
+%   T_cog = f(theta_m)
+%
+% conceptualmente, sin necesidad de desarrollar todavía su
+% representación matemática.
+%
+% Mostrar que esta dependencia con la posición produce una
+% perturbación repetitiva durante el movimiento del rotor.
+%
+% ------------------------------------------------------------
+% TERMINOLOGÍA EN STEPPER
+% ------------------------------------------------------------
+%
+% Revisar específicamente:
+%
+% - cogging torque;
+% - detent torque;
+% - holding torque.
+%
+% Determinar cómo utilizan estos términos los papers de stepper.
+%
+% No asumir que cogging y detent son exactamente equivalentes
+% en toda la literatura.
+%
+% No confundir detent torque con holding torque.
+%
+% No afirmar que el cogging/detent es lo que permite que el
+% motor avance en pasos.
+%
+% OBJETIVO DEL BLOQUE:
+%
+% Dejar establecido que el cogging/detent constituye una
+% perturbación interna, dependiente de la posición y periódica,
+% que será una de las perturbaciones consideradas en la tesis.
+
+En máquinas de imanes permanentes, el \textit{cogging torque} se origina a partir de la interacción entre el campo magnético producido por los imanes del rotor y las variaciones de reluctancia asociadas a la geometría de la máquina \cite{guzinskiSensorlessLowSpeed2019,piccoliCoggingTorqueRipple2014a}. Como consecuencia de esta interacción, el rotor presenta posiciones preferentes de alineamiento, generándose un torque dependiente de su posición incluso en ausencia de corriente en los devanados \cite{piccoliCoggingTorqueRipple2014a}. Debido a la repetición espacial de la geometría de la máquina, este fenómeno presenta un comportamiento periódico respecto de la posición mecánica del rotor.
+
+En motores paso a paso híbridos, este fenómeno se encuentra estrechamente relacionado con el denominado \textit{detent torque}, correspondiente al torque que experimenta el rotor cuando los devanados se encuentran desenergizados. La estructura dentada del rotor y del estator, junto con la presencia del imán permanente, genera variaciones periódicas de reluctancia y, por tanto, posiciones preferentes de alineamiento \cite{vierbergenPredictingImprovingBehaviour}. Sin embargo, este fenómeno debe distinguirse del \textit{holding torque}, correspondiente al torque disponible para mantener una determinada posición cuando las fases del motor se encuentran energizadas.
+
+Durante el movimiento del rotor, la naturaleza periódica del \textit{cogging torque} introduce una componente de perturbación cuyo valor cambia con la posición mecánica. En consecuencia, incluso ante una referencia de torque constante, el torque resultante puede experimentar variaciones periódicas que se transmiten a la dinámica mecánica del sistema y pueden manifestarse como oscilaciones en la velocidad. Si bien existen otras fuentes de rizado, tales como los armónicos de flujo, errores en la medición de corriente, efectos asociados al inversor y perturbaciones de carga, diferentes trabajos identifican al \textit{cogging torque} como una componente particularmente relevante del rizado de velocidad en determinadas aplicaciones de baja velocidad \cite{buSpeedRippleReduction2021,wuSpeedControlLowSpeed2025}.
+
+Esta relevancia a baja velocidad no implica necesariamente un aumento de la magnitud del \textit{cogging torque} al disminuir la velocidad. Por el contrario, su efecto sobre la respuesta mecánica puede adquirir mayor importancia relativa en esta región de operación. A velocidades mayores, determinadas componentes oscilatorias pueden ser atenuadas por la dinámica mecánica y la inercia del conjunto rotor-carga, mientras que a bajas velocidades su influencia sobre la uniformidad del movimiento puede resultar más evidente \cite{houariSpeedRipplesReduction2022}. Esto adquiere especial importancia en aplicaciones que requieren un control preciso y uniforme de la velocidad.
+
+La periodicidad del \textit{cogging torque} se encuentra determinada por las características constructivas de la máquina, tales como la distribución de polos, dientes y otras periodicidades geométricas presentes en la interacción rotor-estator. Por esta razón, su comportamiento puede describirse mediante componentes armónicas asociadas a la posición del rotor \cite{guzinskiSensorlessLowSpeed2019,piccoliCoggingTorqueRipple2014a}, lo que permite representar esta perturbación mediante una combinación de componentes periódicas. Esta característica ha motivado el desarrollo de diferentes estrategias orientadas a identificar, estimar o compensar sus efectos sobre el comportamiento mecánico de la máquina.
+
+% ------------------------------------------------------------
+% BLOQUE 4 — TORQUE DE CARGA
+% ------------------------------------------------------------
+%
+% Introducir la segunda perturbación considerada en la tesis:
+% el torque de carga T_L.
+%
+% Explicar que corresponde al torque externo que la carga
+% mecánica conectada al eje ejerce sobre el motor.
+%
+% Revisar literatura sobre:
+%
+% - cambios de carga;
+% - perturbaciones de carga;
+% - rechazo de perturbaciones;
+% - load torque estimation;
+% - respuesta del control ante escalones de carga;
+% - cargas variables durante la operación.
+%
+% IMPORTANTE:
+%
+% Diferenciar claramente el torque de carga del cogging:
+%
+% COGGING:
+%
+% - origen interno;
+% - asociado a características electromagnéticas/geométricas;
+% - dependiente de theta_m;
+% - comportamiento periódico respecto de la posición.
+%
+% TORQUE DE CARGA:
+%
+% - origen externo;
+% - asociado a la carga mecánica;
+% - no necesariamente depende de theta_m;
+% - no necesariamente es periódico;
+% - puede variar durante la operación.
+%
+% Buscar papers que estudien cambios o escalones de carga y
+% observar:
+%
+% - caída/transitorio de velocidad;
+% - tiempo de recuperación;
+% - error de velocidad;
+% - capacidad de rechazo de perturbaciones.
+%
+% OBJETIVO DEL BLOQUE:
+%
+% Establecer la segunda perturbación que deberá enfrentar
+% el sistema de control.
+
+A diferencia del \textit{cogging torque}, cuyo origen se encuentra asociado
+a características internas de la máquina, el torque de carga corresponde a
+una acción mecánica externa aplicada sobre el eje del motor. Su magnitud
+depende de las condiciones de operación de la carga conectada y, por tanto,
+puede ser desconocida o variar durante el funcionamiento del sistema.
+
+Las variaciones del torque de carga modifican el balance mecánico de la
+máquina y pueden producir desviaciones de la velocidad respecto de su valor
+de referencia. En un sistema de control de velocidad, estas desviaciones
+pueden ser rechazadas mediante la acción del propio controlador; sin embargo,
+esto no implica necesariamente conocer la magnitud de la perturbación aplicada.
+Por este motivo, diferentes trabajos han propuesto incorporar mecanismos de
+observación que permitan estimar el torque de carga durante la operación
+\cite{yuSimultaneousStateDisturbances2025,
+horvathLoadTorquePermanent2023,
+picatosteruilopeModellingControlStepper2014,
+deangeloControlParaMaquinas2004}.
+
+La incorporación del torque de carga dentro del proceso de estimación permite
+disponer de información adicional sobre la perturbación que actúa sobre la
+dinámica mecánica y utilizarla posteriormente para mejorar su rechazo. De
+Angelo \cite{deangeloControlParaMaquinas2004}, por ejemplo, incorpora el
+torque de carga como una variable adicional del observador y emplea su
+estimación para compensar su efecto sobre la respuesta de velocidad. Este
+tipo de formulaciones muestra que la estimación de las variables mecánicas
+del rotor y la estimación de las perturbaciones que actúan sobre este
+constituyen problemas relacionados, pero no necesariamente equivalentes.
+% ------------------------------------------------------------
+% BLOQUE 5 — RELEVANCIA A BAJA VELOCIDAD
+% ------------------------------------------------------------
+%
+% Analizar cómo cogging y carga afectan el desempeño cuando
+% se requiere mantener velocidades reducidas.
+%
+% Para COGGING buscar evidencia sobre:
+%
+% - speed ripple;
+% - movimiento no uniforme;
+% - oscilaciones periódicas;
+% - armónicos;
+% - efecto sobre precisión de velocidad;
+% - efecto a baja velocidad.
+%
+% IMPORTANTE:
+%
+% NO afirmar:
+%
+%   "el cogging aumenta cuando disminuye la velocidad".
+%
+% La amplitud física del cogging no necesariamente aumenta.
+% Lo que interesa estudiar es su efecto sobre el desempeño
+% del sistema a baja velocidad.
+%
+%
+% Para TORQUE DE CARGA buscar:
+%
+% - rechazo de perturbaciones a baja velocidad;
+% - cambios de carga;
+% - desviaciones respecto de omega_ref;
+% - recuperación del controlador;
+% - estimación de carga si corresponde.
+%
+% IMPORTANTE:
+%
+% No intentar forzar cogging y torque de carga dentro del mismo
+% comportamiento.
+%
+% Son perturbaciones diferentes y pueden producir respuestas
+% mecánicas diferentes.
+
+Los efectos de estas perturbaciones adquieren especial relevancia cuando se
+requiere mantener una operación precisa a bajas velocidades. Como se mencionó
+anteriormente, las componentes periódicas asociadas al \textit{cogging torque}
+pueden manifestarse como oscilaciones en la velocidad y afectar la uniformidad
+del movimiento. Por otra parte, las variaciones del torque de carga modifican
+el equilibrio mecánico del sistema y pueden producir desviaciones respecto de
+la velocidad de referencia. Aunque ambas perturbaciones presentan naturalezas
+diferentes, sus efectos deben ser considerados cuando se busca mantener el
+desempeño del control frente a condiciones de operación variables.
+% ------------------------------------------------------------
+% BLOQUE 6 — RELACIÓN CON OPERACIÓN SENSORLESS
+% ------------------------------------------------------------
+%
+% Conectar esta subsección con "Control sensorless a baja velocidad".
+%
+% Idea fundamental:
+%
+% Una estimación adecuada de las variables mecánicas no garantiza
+% que la velocidad real siga perfectamente su referencia.
+%
+% Distinguir:
+%
+%       error de estimación
+%
+%             de
+%
+%       error de control / perturbación real.
+%
+%
+% Puede ocurrir:
+%
+%       omega_hat ≈ omega
+%
+% pero:
+%
+%       omega != omega_ref
+%
+% debido a una perturbación real.
+%
+%
+% CASO COGGING:
+%
+% El observador puede estimar correctamente una velocidad que
+% contiene ripple producido por el cogging.
+%
+% Además, como:
+%
+%       T_cog depende de theta_m
+%
+% en un sistema sensorless la posición utilizada para caracterizar
+% esta perturbación tampoco se obtiene directamente mediante un
+% sensor mecánico.
+%
+%
+% CASO TORQUE DE CARGA:
+%
+% Una variación de T_L puede modificar la velocidad real del motor.
+%
+% El observador puede seguir correctamente esa variación de
+% velocidad sin que ello signifique que T_L esté siendo estimado.
+%
+% IMPORTANTE:
+%
+%       estimar omega
+%            !=
+%       estimar T_L
+%
+% del mismo modo que:
+%
+%       estimar theta
+%            !=
+%       estimar T_cog
+%
+%
+% OBJETIVO DEL BLOQUE:
+%
+% Mostrar que conocer correctamente theta y omega no significa
+% necesariamente conocer las perturbaciones que están produciendo
+% las variaciones mecánicas.
+En un sistema \textit{sensorless}, la presencia de estas perturbaciones debe
+distinguirse de los errores asociados al proceso de estimación. Una estimación
+adecuada de las variables mecánicas no implica necesariamente que la velocidad
+real del rotor coincida con su referencia, puesto que una perturbación puede
+modificar físicamente el estado de movimiento de la máquina. En consecuencia,
+un observador puede reconstruir correctamente una velocidad que presenta
+oscilaciones o desviaciones producidas por perturbaciones reales del sistema.
+
+Esta distinción también resulta relevante al considerar las variables
+estimadas por el observador. La reconstrucción de la posición y velocidad del
+rotor no implica necesariamente disponer de una estimación de las
+perturbaciones que originan sus variaciones. Por ejemplo, una modificación del
+torque de carga puede producir una variación de la velocidad que sea
+correctamente seguida por el observador, sin que ello signifique que la
+magnitud del torque de carga haya sido estimada. De manera similar, conocer la
+posición del rotor permite caracterizar la dependencia espacial del
+\textit{cogging torque}, pero no implica necesariamente disponer de una
+estimación de su magnitud durante la operación.
+
+% ------------------------------------------------------------
+% BLOQUE FINAL — TRANSICIÓN HACIA COMPENSACIÓN
+% ------------------------------------------------------------
+%
+% Cerrar estableciendo:
+%
+% 1. Existen diferentes perturbaciones capaces de afectar
+%    el desempeño de una máquina eléctrica.
+%
+% 2. Esta investigación se concentra en dos de naturaleza
+%    diferente:
+%
+%       - cogging/detent torque;
+%       - torque de carga.
+%
+% 3. El cogging constituye una perturbación interna,
+%    periódica y dependiente de la posición.
+%
+% 4. El torque de carga constituye una perturbación externa
+%    que puede variar durante la operación.
+%
+% 5. Ambas pueden producir desviaciones o variaciones en
+%    la velocidad real del rotor.
+%
+% 6. Estas variaciones no deben confundirse con errores
+%    de estimación sensorless.
+%
+% 7. Estimar correctamente theta y omega tampoco implica
+%    necesariamente conocer T_cog o T_L.
+%
+% NO establecer todavía el GAP definitivo.
+%
+% Terminar abriendo la siguiente pregunta:
+%
+% ¿Qué estrategias han sido propuestas para rechazar,
+% estimar o compensar estas perturbaciones?
+%
+% Conduce a:
+%
+% \subsection{Métodos de reducción y compensación de perturbaciones}
+
+Por lo tanto, además de estimar las variables necesarias para realizar el
+control \textit{sensorless}, resulta de interés determinar si las
+perturbaciones que afectan la dinámica mecánica pueden ser rechazadas,
+identificadas o estimadas durante la operación. La literatura ha abordado
+este problema mediante diferentes estrategias, desde técnicas orientadas a
+atenuar directamente sus efectos hasta métodos que incorporan modelos de las
+perturbaciones dentro del proceso de estimación.
+
+En este contexto, resulta necesario analizar las estrategias propuestas para
+el rechazo, estimación y compensación del \textit{cogging torque} y del torque
+de carga, distinguiendo entre aquellas que requieren un conocimiento previo
+de la perturbación y aquellas capaces de obtener información sobre esta
+durante la operación.
+\subsection{Métodos de estimación y compensación de perturbaciones}
+% ------------------------------------------------------------
+% BLOQUE 1 — ESTRATEGIAS DE RECHAZO Y COMPENSACIÓN
+% ------------------------------------------------------------
+%
+% Presentar las principales formas encontradas en la literatura:
+%
+% - control robusto / rechazo de perturbaciones;
+% - feedforward;
+% - LUT;
+% - control resonante / PR;
+% - observadores de perturbación;
+% - observadores de estado extendido.
+%
+% Diferenciar:
+%
+%   compensar una perturbación conocida
+%              !=
+%   estimar la perturbación durante la operación.
+
+
+% ------------------------------------------------------------
+% BLOQUE 2 — COMPENSACIÓN DE COGGING
+% ------------------------------------------------------------
+%
+% Revisar específicamente métodos para cogging:
+%
+% - caracterización offline;
+% - LUT en función de theta;
+% - feedforward;
+% - resonantes;
+% - estimación online;
+%
+% Para cada trabajo preguntar:
+%
+% - ¿T_cog se conoce previamente?
+% - ¿se identifica offline?
+% - ¿se estima online?
+% - ¿usa theta medida o estimada?
+% - ¿es sensorless?
+%
+% Esto empieza a acercarse directamente al GAP.
+
+
+% ------------------------------------------------------------
+% BLOQUE 3 — ESTIMACIÓN Y RECHAZO DEL TORQUE DE CARGA
+% ------------------------------------------------------------
+%
+% Revisar:
+%
+% - DOB;
+% - ESO;
+% - EKF;
+% - observadores aumentados;
+% - estimación de load torque.
+%
+% Diferenciar:
+%
+%   rechazo de T_L
+%       !=
+%   estimación de T_L.
+%
+% Un controlador puede rechazar una perturbación sin necesariamente
+% reconstruir explícitamente su valor.
+
+
+% ------------------------------------------------------------
+% BLOQUE 4 — OBSERVADORES CON ESTADOS EXTENDIDOS
+% ------------------------------------------------------------
+%
+% Introducir aquí el concepto de extender el vector de estados
+% para incorporar perturbaciones desconocidas.
+%
+% Ejemplo conceptual:
+%
+%   x = [estados eléctricos, theta, omega]
+%
+% pasa a:
+%
+%   x_aug = [estados eléctricos, theta, omega, T_L]
+%
+% o:
+%
+%   x_aug = [estados eléctricos, theta, omega,
+%            estados asociados a perturbaciones periódicas]
+%
+% Explicar desde literatura:
+%
+% - qué perturbación agrega cada autor como estado;
+% - qué dinámica supone para ella;
+% - qué mediciones utiliza;
+% - qué observador emplea;
+% - si demuestra/analiza observabilidad;
+% - si solamente demuestra funcionamiento mediante simulación
+%   o experimento.
+%
+% IMPORTANTE:
+%
+% Agregar una perturbación al vector de estados NO garantiza
+% que esta pueda ser estimada.
+
+
+% ------------------------------------------------------------
+% BLOQUE 5 — OBSERVABILIDAD DEL SISTEMA AUMENTADO
+% ------------------------------------------------------------
+%
+% Retomar aquí el concepto de observabilidad presentado
+% anteriormente en la subsección sensorless.
+%
+% Antes se analizó:
+%
+%   ¿pueden reconstruirse theta y omega?
+%
+% Ahora la pregunta cambia:
+%
+%   ¿pueden reconstruirse theta, omega Y las perturbaciones?
+%
+% Revisar literatura sobre:
+%
+% - observabilidad de observadores aumentados;
+% - incorporación de load torque como estado;
+% - incorporación de parámetros/perturbaciones;
+% - pérdida de observabilidad al aumentar el orden;
+% - necesidad de excitación;
+% - condiciones de operación;
+%
+% IMPORTANTE:
+%
+% No asumir que porque theta y omega sean observables,
+% T_L o T_cog también lo sean.
+%
+% Tampoco asumir que una buena simulación del EKF demuestra
+% formalmente observabilidad.
+
+
+% ------------------------------------------------------------
+% BLOQUE 6 — TABLA COMPARATIVA
+% ------------------------------------------------------------
+%
+% Comparar los trabajos según:
+%
+% Referencia
+% Motor
+% Perturbación
+% Estrategia
+% Perturbación estimada online
+% Compensación online
+% Sensorless
+%
+% Esta tabla debe permitir visualizar qué combinaciones ya
+% han sido abordadas y cuáles aparecen menos desarrolladas.
+
+
+% ------------------------------------------------------------
+% BLOQUE FINAL — GAP
+% ------------------------------------------------------------
+%
+% Utilizar la literatura anterior para identificar la brecha.
+%
+% NO partir desde la solución propuesta.
+%
+% Determinar a partir de los papers si existe o no la combinación:
+%
+% stepper
+% + sensorless
+% + baja velocidad
+% + cogging
+% + estimación online
+% + compensación online
+%
+% y cómo se trata simultáneamente el torque de carga.
+% ============================================================
+% \subsection{Brecha de investigación}
+% ============================================================
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparación de la literatura. Fuente: Propia}
+    \label{tab:comparacion_compensacion}
+
+    \renewcommand{\arraystretch}{1.25}
+    \setlength{\tabcolsep}{3pt}
+
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{
+        l
+        l
+        l
+        l
+        c
+        c
+        c
+    }
+        \toprule
+
+        \textbf{Referencia} &
+        \textbf{Motor} &
+        \textbf{Perturbación} &
+        \textbf{Estrategia} &
+        \shortstack{\textbf{Perturbación}\\\textbf{estimada online}} &
+        \shortstack{\textbf{Compensación}\\\textbf{online}} &
+        \textbf{Sensorless} \\
+
+        \midrule
+
+        Arias et al.
+\cite{ariasReducingCoggingTorque2019}
+& Stepper
+& Cogging
+& Control resonante
+& No
+& Sí
+& No \\
+
+Wu et al.
+\cite{wuSpeedControlLowSpeed2025}
+& PMSM
+& Cogging + armónicos de flujo
+& Control resonante
+& No
+& Sí
+& No \\
+
+Sekine et al.
+\cite{sekineSuppressionVelocityPulsations2024}
+& PMSM
+& Torque de carga
+& Control resonante
+& No
+& Sí
+& No \\
+
+Picatoste 
+\cite{picatosteruilopeModellingControlStepper2014}
+& Stepper
+& Cogging
+& Feedforward basado en modelo
+& No
+& Sí
+& Sí \\
+
+Lascu et al.
+\cite{lascuPLLPositionSpeed2020}
+& PMSM
+& Torque de carga
+& Observador extendido
+& Torque de carga
+& Sí
+& Sí \\
+
+Guzinski et al.
+\cite{guzinskiSensorlessLowSpeed2019}
+& PMSM
+& Cogging + armónicos
+& Observador extendido + LUT
+& No
+& Sí
+& Sí \\
+
+De Angelo .
+\cite{deangeloControlParaMaquinas2004}
+& PMSM
+& Armónicos + Load
+& Observador extendido
+& Armónicos$^{*}$
+& Sí
+& Sí \\
+
+
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+
+    \vspace{2mm}
+
+    \begin{minipage}{0.95\textwidth}
+        \footnotesize
+        $^{*}$El método estima componentes armónicos del flujo magnético durante la operación,
+        pero no realiza una estimación directa del \textit{cogging torque}.
+    \end{minipage}
+
+\end{table}
+% ============================================================
+%
+% OBJETIVO:
+% Determinar cómo la literatura elimina/reduce cogging/ripple
+% y encontrar qué información necesita cada estrategia.
+%
+%
+% ------------------------------------------------------------
+% 1. MÉTODOS PASIVOS
+% ------------------------------------------------------------
+%
+% Tratarlos brevemente.
+%
+% - geometría;
+% - skewing;
+% - dientes;
+% - optimización electromagnética.
+%
+% No son el foco de tu tesis.
+%
+%
+% ------------------------------------------------------------
+% 2. MÉTODOS ACTIVOS
+% ------------------------------------------------------------
+%
+% Aquí está el foco.
+%
+% Separarlos en:
+%
+%               ACTIVOS
+%                  |
+%          ----------------
+%          |              |
+%       OFFLINE          ONLINE
+%
+%
+% ------------------------------------------------------------
+% A) OFFLINE
+% ------------------------------------------------------------
+%
+% Buscar:
+%
+% - LUT;
+% - mapas de cogging;
+% - identificación previa;
+% - Fourier identificado previamente;
+% - perfiles de corriente;
+% - feedforward conocido.
+%
+% Pregunta fundamental:
+%
+% ¿Qué necesitan conocer previamente?
+%
+%
+% ------------------------------------------------------------
+% B) ONLINE
+% ------------------------------------------------------------
+%
+% Buscar:
+%
+% - disturbance observers;
+% - estimación de torque;
+% - estimación armónica;
+% - adaptive observers;
+% - resonant control;
+% - iterative/adaptive compensation.
+%
+%
+% Para CADA estrategia de interés registrar:
+%
+% [ ] ¿Stepper o PMSM?
+% [ ] ¿Usa sensor de posición?
+% [ ] ¿Usa sensor de velocidad?
+% [ ] ¿Es sensorless?
+% [ ] ¿Trabaja a baja velocidad?
+% [ ] ¿Conoce previamente frecuencia?
+% [ ] ¿Conoce previamente amplitud?
+% [ ] ¿Conoce previamente fase?
+% [ ] ¿Estima cogging online?
+% [ ] ¿Compensa cogging online?
+% [ ] ¿Utiliza theta real o estimada?
+% [ ] ¿Utiliza Wm real o estimada?
+% [ ] ¿Reduce torque ripple?
+% [ ] ¿Reduce speed ripple?
+%
+%
+% ------------------------------------------------------------
+% PÁRRAFO FINAL
+% ------------------------------------------------------------
+%
+% Este párrafo NO debería afirmar todavía el GAP.
+%
+% Debe resumir los patrones encontrados:
+%
+% - qué hacen bien los métodos existentes;
+% - qué información requieren;
+% - qué ocurre cuando no existe sensor mecánico;
+% - qué ocurre a baja velocidad.
+%
+% Y entonces:
+
+
+% ============================================================
+\subsection{Brecha de investigación}
+% ============================================================
+%
+% ESTA SECCIÓN NO SE ESCRIBE DESDE LA INTUICIÓN.
+%
+% Se escribe utilizando los resultados de las subsecciones
+% anteriores.
+%
+%
+% ------------------------------------------------------------
+% PÁRRAFO 1: QUÉ ESTÁ RESUELTO
+% ------------------------------------------------------------
+%
+% Ejemplo conceptual:
+%
+% La literatura ha demostrado estrategias sensorless...
+% También existen múltiples estrategias para compensar cogging...
+%
+%
+% ------------------------------------------------------------
+% PÁRRAFO 2: QUÉ NO COINCIDE
+% ------------------------------------------------------------
+%
+% Buscar la intersección:
+%
+%                 SENSORLESS
+%                     ∩
+%               BAJA VELOCIDAD
+%                     ∩
+%                   STEPPER
+%                     ∩
+%                  COGGING
+%                     ∩
+%             ESTIMACIÓN ONLINE
+%                     ∩
+%          COMPENSACIÓN DE RIPPLE
+%
+%
+% Esa INTERSECCIÓN es potencialmente tu GAP.
+%
+%
+% ------------------------------------------------------------
+% PÁRRAFO 3: LIMITACIÓN DE LOS MÉTODOS ACTUALES
+% ------------------------------------------------------------
+%
+% Aquí solo colocar limitaciones que hayas demostrado
+% bibliográficamente.
+%
+% Por ejemplo, SI tus papers efectivamente muestran que:
+%
+% - compensan utilizando posición medida;
+% - requieren caracterización offline;
+% - trabajan a velocidades mayores;
+% - estiman rotor pero no perturbación;
+% - estiman perturbación pero no son sensorless;
+% - trabajan en PMSM pero no en stepper;
+%
+% entonces esas características construyen tu brecha.
+%
+%
+% ------------------------------------------------------------
+% PÁRRAFO 4: OPORTUNIDAD DE INVESTIGACIÓN
+% ------------------------------------------------------------
+%
+% RECIÉN AQUÍ puedes llegar a algo del tipo:
+%
+% Existe entonces una oportunidad de estudiar la estimación
+% y compensación online de perturbaciones periódicas en un
+% accionamiento stepper sensorless operando a baja velocidad,
+% utilizando las variables proporcionadas por el propio
+% observador.
+%
+% La redacción definitiva dependerá de lo que efectivamente
+% demuestre la revisión bibliográfica.
 
 
 % ============================================================

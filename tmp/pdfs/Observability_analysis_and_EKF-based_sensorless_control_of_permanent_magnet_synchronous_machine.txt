@@ -1,0 +1,591 @@
+
+PAGE 1
+Observability Analysis and EKF-Based Sensorless Control of
+Permanent Magnet Synchronous Machine
+Xin Wen1, Y an Zhang1, Y ahong Lin2
+1. Logistics Engineering College, Shanghai Maritime University, Shanghai 201306, P . R. China
+E-mail: zhangyan@shmtu.edu.cn
+2. Department of Measurement Control Technology and Instruments, Y antai University, Y antai 264005, P . R. China
+Abstract: The observability analysis is presented and a combining method applying extended Kalman ﬁlter (EKF) and high
+frequency injection (HFI) method is proposed to realize the estimation of rotor speed and position at standstill and in normal
+situation for permanent magnet synchronous machine (PMSM). Considering the observability of start-up situation, a surface-
+mounted permanent magnet synchronous machine (SPMSM) model is developed using vector control method, then the high
+frequency injection methods are carried out to estimate the rotor speed and position accurately at standstill, while the extended
+Kalman ﬁlter algorithm is applied to validate the observability. Simulation results are shown that the proposed method can
+estimate the rotor position and speed accurately.
+Key Words: observability analysis, permanent magnet synchronous machine (PMSM), sensorless control, high frequency injec-
+tion (HFI), extended Kalman ﬁlter (EKF)
+1 Introduction
+Permanent Magnet Synchronous Motor (PMSM) has a
+high torque to inertia ratio, high speed, high efﬁciency as
+well as high reliability and compact size. These qualities
+make PMSM becomes one of the most applicable AC ma-
+chines and PMSM is therefore gaining extensive research at-
+tention in recent years [1, 2]. Since mechanic position sensor
+is usually too expensive, which increases the cost and de-
+crease the stability of the system, mechanic sensorless con-
+trol is becoming a research focus now.
+When it comes to the sensorless techniques, many re-
+search works have been done in speed and position esti-
+mation of PMSM using state observer. Some of them use
+the back electromotive force (EMF) to determine the speed
+and position of the rotor [3], others with the adjunction of a
+Kalman ﬁlter [4] or sliding mode observer [5]. Whereas the
+main problem of the PMSM observer-based sensorless tech-
+niques is the deteriorate performance in low and zero speed
+operation conditions, the usual solution is to inject a super-
+imposed signal to the control values in order to generate in-
+formation without interfering with the normal functioning of
+motor [6, 7]. Those solutions show good performance at low
+speed and standstill but are obviously very dependent on ge-
+ometrical or magnetic saliency of the rotor to allow extrac-
+tion of the position and speed information through ﬁltering.
+Thus they are unusable for surface-mounted PMSM.
+In this paper, a new state observer based on extended
+Kalman ﬁlter and high frequency injection (HFI) method is
+used to observe the rotor position and speed. On the one
+hand, the injected high frequency signal makes sure the ob-
+servability problem at zero speed. On the other hand, ex-
+tended Kalman ﬁlter can solve nonlinear equation directly
+by numeric iteration. The proposed method combining EKF
+and HFI offers an effective mean to ensure the observability
+in unobservable region, thus solving the problems incurred
+in sensorless control of PMSM and observability analysis.
+The simulation results verify the proposed method can reach
+This work is supported by National Natural Science Foundation
+(NNSF) of China under Grant 61503240 and 61603246.
+the satisfying estimation results both in standstill situation
+and in normal situation.
+2 Mathmatical Model
+In the stator reference frame, the PMSM dynamic mathe-
+matical model can be written as [8]:
+dI
+dt = L−1(V−R eqI− ψrC′(θ)ω)
+dω
+dt = p
+J(Tm −Tl)
+dθ
+dt = ω
+(1)
+whereI =[ iα iβ]T andV =[ vα vβ]T stand for currents
+and voltages vectors in the α−βreference frame, ωis the
+electrical speed of the rotor, θis the electrical position, ψr is
+the rotor permanent magnet ﬂux. L is the inductance matrix,
+Req is the equivalent resistance matrix:
+Req = R+ωL′ =
+[Rs 0
+0 Rs
+]
++ω∂L
+∂θ (2)
+where Rs is the resistance of one stator winding. p is the
+number of pole pairs, J is the inertia of the rotor with the
+load, Tl is the resistant torque, and Tm is the motor torque.
+C′(θ) denotes the partial derivative of C(θ) with respect to θ:
+C(θ)=
+[cosθ
+sinθ
+]
+; C′(θ)= ∂C(θ)
+∂θ=
+[−sinθ
+cosθ
+]
+(3)
+For a salient rotor PMSM, L represents the inductance
+matrix and is depend on the electrical position:
+L =
+[L0 +L2cos2θL 2sin2θ
+L2sin2θL 0 −L2cos2θ
+]
+(4)
+whereL0 andL2 represents the average and differential spa-
+tial inductances. Torque producing by the machine Tm is
+given as:
+Tm =3p
+2 [ψr(iβcosθ−iαsinθ)
+−L2((i2
+α−i2
+β)sin2θ−2iαiβcos2θ)]
+(5)
+Proceedings of the 36th Chinese Control Conference
+July 26-28, 2017, Dalian, China
+151Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 2
+For a non-salient rotor PMSM, the equation (4) (5) can be
+simpliﬁed by:
+L2 =0 (6)
+By taking:
+x =[ IT ωθ]T ; y = I ; u = V (7)
+f(x,u)=
+[dIT
+dt
+dω
+dt
+dθ
+dt
+]
+; h(x)= I (8)
+system of the following form (denoted ∑) are discussed:
+∑
+:
+{
+˙x = f(x(t),u(t))
+y = h(x(t)) (9)
+where x ∈X ⊂ Rn is the state vector, u ∈U ⊂ Rm is the
+input vector, y ∈Rp is the output vector, f and h are C∞
+functions. The system of (9) can be applied to the PMSM
+model of (1).
+In this report, a surface-mounted PMSM (SPMSM) is
+studied. The current state functions of which in stator ref-
+erence frame are:
+{
+diα
+dt = −Rs
+L0
+iα+ ψr
+L0
+ωsinθ+ uα
+L0
+diβ
+dt = −Rs
+L0
+iβ−ψr
+L0
+ωcosθ+ uβ
+L0
+(10)
+In order to design SPMSM observer, the discrete extended
+Kalman ﬁlter is applied. When sample period is small
+enough, ωis considered unchangeable, namely ˙ω=0 .
+3 PMSM Observability
+The system which is shown in equation (1) is a 4th order
+system. Its observability matrix should contain the gradient
+of the output and its derivatives up to the 3
+th order. The
+partial observability matrix is [8] :
+Oy1 = ∂(y, ˙y)
+∂x =
+[ I2 O2×1 O2×1
+∂
+∂I(dI
+dt ) ∂
+∂ω(dI
+dt ) ∂
+∂θ(dI
+dt )
+]
+(11)
+where In is then×n identity matrix, and On×m is ann×m
+zero matrix, and:
+∂
+∂I(dI
+dt)= −L−1Req
+∂
+∂ω(dI
+dt)= −L−1(L′I +ψrC′(θ))
+∂
+∂θ(dI
+dt)=( L−1)′LdI
+dt −L−1(L′′I +ψrC(θ))ω
+(12)
+where L′ and L′′ denote the ﬁrst and second partial deriva-
+tives of L with respect to θ:
+L′ = ∂
+∂θL ; L′′ = ∂
+∂θL′ (13)
+The determinant Δy1 of the sub-matrix which is shown in
+equation (11) is given by:
+Δy1 = 1
+LdLq
+[
+(Lδid +ψr)2 +L2
+δi2
+q
+]
+ω
++ Lδ
+LdLq
+[
+Lδ
+did
+dt iq −(Lδid +ψr)diq
+dt
+] (14)
+The observability condition Δy1 ̸=0 can be written as:
+ω̸= (Lδid +ψr)Lδ
+diq
+dt −Lδ
+did
+dt Lδiq
+(Lδid +ψr)2 +L2
+δi2q
+(15)
+and it follows that:
+ω̸= d
+dtarctan
+( Lδiq
+Lδid +ψr
+)
+(16)
+The equation (16) deﬁnes a observability vector, denoted
+by ΨO , that has the following components in the d−q ref-
+erence frame:
+ΨOd = Lδid +ψr
+ΨOq = Lδiq
+(17)
+and hence
+ω̸= d
+dtθO (18)
+whereθO is the phase of the vector ΨO in the rotating refer-
+ence frame.
+For the SPMSM model:
+Ld = Lq = L0 =⇒ Lδ= Ld −Lq =0 (19)
+thus the equation (14) becomes:
+Δy1 = ω
+(ψr
+L0
+)2
+(20)
+and the observability vector is equal to rotor permanent mag-
+net ﬂux vector, which is ﬁxed in the d −q reference frame.
+The ﬁctitious observability vector is shown in Fig. 1. Thus it
+can be obtained that the observability problem arises only at
+standstill situation.
+Fig. 1: Fictitious observability vector for SPMSM
+Fig. 2: Stator, estimated and real rotor reference frames for
+SPMSM
+152Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 3
+When it comes to the case of zero speed, state observer
+algorithms that combine high frequency injection (HFI)
+method were proposed. In [7] a high frequency voltage is
+injected into the motor and causes changes of current sig-
+nal. Rotor position and speed including zero speed can be
+estimated based on natural or artiﬁcial motor salient effect.
+To deal with the observability problem at zero speed, one
+solution combining HFI method with EKF algorithm is pro-
+posed [9]. A high frequency voltage is injected on the direct
+axis in the estimated rotating reference frame (Fig. 2), which
+results in a vibration of the rotor (nonzero speed) only if the
+position is not correctly estimated. If the following HF volt-
+age:
+v
+ˆd = Vhfcos(ωhft) (21)
+is injected in the estimated ˆdˆq rotating reference frame (ob-
+tained by the estimated position ˆθ), the determinant Δy1 be-
+comes [8]:
+Δy1 = −ψ2
+r
+L2
+0
+ω+ ψr
+L2
+0
+Vhfcos(ωhft)sin˜θ (22)
+where ˜θstands for the position estimation error. In the real
+Park reference frame, the injected signal is:
+[vd
+vq
+]
+=
+[Vhfcos(ωhft)cos(˜θ)
+Vhfcos(ωhft)sin(˜θ)
+]
+(23)
+When the position is correctly estimated ( ˜θ=0 ), the
+d-axis injection has no effect on the movement of the ma-
+chine. However, when the position is wrongly estimated, a
+high-frequency voltage component is generated on the real
+q-axis. This voltage produces a component of the magnetic
+ﬁeld which is perpendicular to the rotor and therefore creates
+a torque that itself creates a vibration at the injection fre-
+quency. Thus the local observability is guaranteed at stand-
+still.
+4 EKF - based Observer Design
+The Extended Kalman Filter is a set of mathematical equa-
+tions which produce the optimal estimation of the state sys-
+tem based on least square method. The EKF estimates the
+process by using a feedback control. The EKF provides con-
+siderable good tolerance for the mathematical model errors
+and noises in the measurement inaccuracy [10].
+The state space model of the simpliﬁed PMSM given by
+(9) is a nonlinear system. To apply the EKF algorithm, the
+system needs be discretized and linearized [11].
+Based on equations (7) (8) (9), the state function of this
+nonlinear system is
+˙x = f(x)+ Bu +w (24)
+where
+f(x)=
+⎡
+⎢⎢⎣
+−
+Rs
+L0
+iα+ ψr
+L0
+ωsinθ
+−Rs
+L0
+iβ−ψr
+L0
+ωcosθ
+0
+ω
+⎤
+⎥⎥⎦ (25)
+and
+B =
+⎡
+⎢⎢⎣
+1
+L0
+0
+0 1
+L0
+00
+00
+⎤
+⎥⎥⎦ (26)
+The output function is
+y = h(x)+ v (27)
+Here w and v are random disturbances. w is the process
+noise which stands for the errors of the parameters; v is the
+measurement noise which stands for the errors in the mea-
+surement and sample. The noise covariance matrixes are de-
+ﬁned as follows:
+Q = cov(w)= E{ww
+T}
+R = cov(v)= E{vvT}
+(28)
+whereE{·} is the computation of expectation value.
+From equation (24) (27), the discrete approximated equa-
+tion is given by:
+xk =( I +Tsf(xk−1))xk−1 +TsBuk−1 +wk−1
+yk = h(xk−1)xk−1 +vk−1
+(29)
+After linearization of f(x) and h(x), the Jacobian matrix
+are obtained as follows:
+Fk = df
+dx
+⏐⏐
+⏐
+⏐
+xk=ˆxk
+=
+⎡
+⎢⎢⎣
+−Rs
+L0
+0 ψr
+L0
+sinθ ωψr
+L0
+cosθ
+0 −Rs
+L0
+−ψr
+L0
+cosθ ωψr
+L0
+sinθ
+00 0 0
+00 1 0
+⎤
+⎥⎥⎦
+(30)
+Hk = dh
+dx
+⏐⏐
+⏐
+⏐
+xk=ˆxk
+=
+[1000
+0100
+]
+(31)
+Deﬁne matrix P as the error covariance of observation
+Pk = E{ekeT
+k } =
+n∑
+i=1
+E{[xi −ˆxi][xi −ˆxi]T} (32)
+As the SPMSM model observer, the extended Kalman ﬁl-
+ter can be realized by iteration as follows:
+a) Compute the state ahead and the error covariance ahead.
+ˆxk/k−1 =ˆxk−1 +Ts(f(xk−1)+ Buk−1)
+Pk/k−1 =Φk/k−1Pk−1ΦT
+k/k−1 +Qk−1
+(33)
+whereΦis transfer matrix from xk−1 toxk, which is deﬁned
+as
+Φk/k−1 ≈I +Fk−1Ts (34)
+b) Compute the Kalman gain.
+Kk = Pk/k−1HT
+k (HkPk/k−1HT
+k +R)−1 (35)
+c) Update estimation with measurement and error covari-
+ance matrix.
+ˆxk =ˆxk/k−1 +Kk(yk −Hkˆxk/k−1)
+Pk = Pk/k−1 −KkHkPk/k−1
+(36)
+In the EKF observer design, choosing the proper values
+for the covariance matrices Q and R is of great importance.
+The change of values of covariance matrices affect both dy-
+namic and steady state. By using trial and error methods,
+a suitable set of values of Q and R are selected to insure
+optimal stability and convergence time. In this work, the fol-
+lowing matrices are used:
+Q =
+⎡
+⎢⎢⎣
+0.1 000
+00 .10 0
+0 0 20 0
+000 0 .3
+⎤
+⎥⎥⎦ ; R =
+[0.20
+00 .2
+]
+(37)
+153Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 4
+5 Simulation Results
+The PMSM model is constructed to verify the using con-
+ventional observer combining with EKF. The simulation is
+implemented using MA TLAB/Simulink. The parameter of
+the motor model is given in Table 1. Based on optimal con-
+trol theory, the desired control gains are determined .
+Table 1: PMSM parameters
+V ariable Physical Meaning V alue Unit
+Rs Armature Resistance 2.125 Ω
+L0 Armature Inductance 11.6e −3 H
+ψr Rotor Magnetic Flux 0.387 V/rad/s
+J Moment of Inertia 0.03 Kg.m 2
+B Damping Coefﬁcient 0.121 N.m/rad/s
+p Poles Number 6
+The block diagram used in the simulation is as shown
+in Fig. 3. It is mainly composed of space vector pulse
+width modulation (SVPWM) block, calculation block, PI
+controller block, injected voltage block and EKF observer
+block.
+Fig. 3: Block diagram of PMSM with HFI and EKF
+The EKF algorithm is implemented using S-Function
+block. The inputs of S-Function are reference voltages vα
+and vβ under stator reference frame, and actual currents iα
+and iβ taken directly from the machine terminals. The out-
+puts of S-Function are estimated speed and position of the
+rotor ˆωand ˆθ, which are fed to injected voltage block in or-
+der to calculate the estimation error, meanwhile they are fed
+to scopes and are compared with real speed and position.
+The PMSM system is controlled using PI controllers with
+the reference currents:
+i
+#
+d =0 A ; i#
+q =5 A (38)
+Meanwhilevd andvq are obtained by PI controller, which
+are fed to SVPWM and calculation block, then control sig-
+nals are obtained and are fed to inverter in order to realize
+the PMSM control. By applying the control method i
+d =0 ,
+the control of SVPWM, rotor speed and current are based on
+an estimator that is operated by PI controller. The structure
+of control system is shown as follows in Fig. 4, where L
+q is
+the inductance of q-axis and ωe is electrical speed.
+The following HF voltage is injected in the esti-
+mated ˆdˆq rotating reference frame during the time period
+Fig. 4: Topology of PI controller for d-axis current
+[0.04s,0.07s]:
+vˆd =5 cos(2π.800t) (39)
+The Rotor observation results without HFI are shown in
+Fig. 5 – Fig. 8. The simulation results verify that the es-
+timated rotor speed obtained by EKF is rather accurate with
+acceptable error and the estimated rotor position has obvious
+error at low speed.
+Fig. 5: Rotor real and estimated speed without HFI
+Fig. 6: Rotor speed estimation error without HFI
+Fig. 7: Rotor real and estimated position without HFI
+154Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 5
+Fig. 8: Rotor position estimation error without HFI
+The Rotor speed observation results with HFI are shown
+in Fig. 9 – Fig. 12. It is obvious that after injecting HF volt-
+age signal, the estimations of rotor position and speed when
+the SPMSM starts are more accurate and estimation errors
+are less both at standstill situation and in normal operating
+situation.
+Fig. 9: Rotor real and estimated speed with HFI
+Fig. 10: Rotor speed estimation error with HFI
+Fig. 11: Rotor real and estimated position with HFI
+Fig. 12: Rotor position estimation error with HFI
+6 Conclusion
+Using the presented approach, which applies sensorless
+control and observability analysis of permanent magnet syn-
+chronous machine based on extended Kalman ﬁlter and high
+frequency injection, it is possible to estimate the rotor speed
+and rotor position while the initial position and mechanic pa-
+rameters are not needed. Furthermore, by injecting HF volt-
+age, the estimation of extended Kalman ﬁlter is more accu-
+rate when SPMSM starts up. Though the problem is that the
+covariance matrixes of noises can only be determined by ex-
+periment since the noises and disturbances are not known in
+practice. The simulation result veriﬁes the performance and
+the accuracy of the represented approach in dynamic state
+and zero speed.
+References
+[1] S. Srikanth, B. Ranganaik and M. Srinivas Rao, Space vec-
+tor PWM techniques and high temperature super conducting
+PMSM machines with multilevel Inverter, IEEE-International
+Conference On Advances In Engineering, Science And Man-
+agement (ICAESM -2012), Nagapattinam, Tamil Nadu , 2012:
+522–527.
+[2] S. K. Kommuri, M. Defoort, H. R. Karimi and K. C. V elu-
+volu, A Robust Observer-Based Sensor Fault-Tolerant Control
+for PMSM in Electric V ehicles, in IEEE Transactions on In-
+dustrial Electronics, 63(12): 7671–7681, 2016.
+[3] S. Bolognani, S. Calligaro and R. Petrella, Design Issues and
+Estimation Errors Analysis of Back-EMF-Based Position and
+Speed Observer for SPM Synchronous Motors, in IEEE Jour-
+nal of Emerging and Selected Topics in Power Electronics ,
+2(2): 159–170, 2014.
+[4] N. K. Quang, N. T. Hieu and Q. P . Ha, FPGA-Based Sen-
+sorless PMSM Speed Control Using Reduced-Order Extended
+Kalman Filters, in IEEE Transactions on Industrial Electron-
+ics, 61(12): 6574–6582, 2014.
+155Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 6
+[5] H. Lee and J. Lee, Design of Iterative Sliding Mode Observer
+for Sensorless PMSM Control, in IEEE Transactions on Con-
+trol Systems Technology, 21(4): 1394–1399, 2013.
+[6] FENG Yingben ,CHEN Hui, Sensorless drive of surface-
+mounted PMSM for EPS based on highfrequency signal injec-
+tion, Journal of Jilin University (Engineering and Technology
+Edition), 41(2):65–69, 2011.
+[7] LI Y uan-yuan, HUANG Shou-dao, XU Qiong, et al, Sensor-
+less control of permanent magnet synchronous motor based on
+high frequency voltage signal injection, Transactions of China
+Electrotechnical Society, 28(1):326–330, 2013.
+[8] M. Koteich, A. Maloum, G. Duc and G. Sandou, Permanent
+magnet synchronous drives observability analysis for motion-
+sensorless control, 2015 IEEE Symposium on Sensorless Con-
+trol for Electrical Drives (SLED), Sydney, NSW , 2015: 1–8.
+[9] F. Abry, A. Zgorski, X. Lin-Shi and J. M. Retif, Sensorless
+position control for SPMSM at zero speed and acceleration,
+Proceedings of the 2011 14th European Conference on Power
+Electronics and Applications, Birmingham , 2011: 1–9.
+[10] R. E. Kalman, A New Approach to Linear Filtering and
+Prediction Problems, J.basic Eng.trans.asme , 82D(1):35–45,
+1960.
+[11] M. Gowda, W. H. Ali, P . Coﬁe, et al. Design and Digital Im-
+plementation of Controller for PMSM Using Extended Kalman
+Filter, Circuits & Systems, 04(8):489–497, 2013.
+156Authorized licensed use limited to: Universidad de Talca. Downloaded on April 06,2026 at 16:48:58 UTC from IEEE Xplore.  Restrictions apply. 

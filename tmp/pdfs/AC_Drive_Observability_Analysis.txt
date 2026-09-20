@@ -1,0 +1,2273 @@
+
+PAGE 1
+IEEE TRANSACTIONS ON INDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013 3047
+AC Drive Observability Analysis
+Pavel V aclavek,Senior Member , IEEE,P e t rB l a h a ,a n dI v oH e r m a n
+Abstract—AC induction motors and permanent magnet syn-
+chronous drives became very popular for motion control appli-
+cations due to their simple and reliable construction. Sensorless
+drive control is required in many applications to reduce drive
+production costs. While many approaches to magnetic ﬂux, rotor
+speed, or other quantities needed to control electrical machine
+were proposed, conditions under which these quantities can be
+estimated are not often sufﬁciently investigated. In this paper,
+induction machine and permanent-magnet-synchronous-machine
+drive state observability analysis is presented, together with con-
+ditions allowing reliable rotor speed and position estimation. A
+method based on the nonlinear dynamical system state observ-
+ability theory is proposed, resulting in a uniﬁed approach to the
+ac drive observability analysis.
+Index Terms —Induction machine, nonlinear system, observ-
+ability, synchronous machine.
+I. I NTRODUCTION
+I
+NDUCTION motors and permanent magnet synchronous
+machines (PMSMs) are becoming more and more popular
+due to their reliable construction. If it is intended to use these
+drives in a low-cost application (e.g., mass-produced washing
+machines), it is necessary to optimize production costs, while
+many applications require precise speed and position control.
+Unfortunately, the position or speed sensor is a quite expensive
+device compared to other parts of the drive. That is why it is
+necessary to develop a reliable control system which estimates
+the rotor position and speed from electrical quantities instead
+of using a speed sensor. The other reason for the development
+of sensorless control techniques is their ability to act as a
+diagnostic tool in safety-critical applications [1], [2].
+The idea of using a state observer for the evaluation of
+the signals needed for ac drive control is known [3]. In most
+cases, such applications exploit the Kalman ﬁlter algorithm to
+estimate the values of states that cannot be measured directly
+[4]–[6]. The Kalman ﬁlter provides a uniﬁed method for the
+state observer design, and that is why it is relatively easy
+to use. Another possibility is to ﬁnd a state observer ﬁtted
+Manuscript received December 30, 2011; revised April 2, 2012 and May 19,
+2012; accepted May 21, 2012. Date of publication June 8, 2012; date of current
+version April 11, 2013. This work was realized in CEITEC - Central European
+Institute of Technology with research infrastructure supported by the project
+CZ.1.05/1.1.00/02.0068 ﬁnanced from European Regional Development Fund.
+This work was supported by the Czech Science Foundation under the project
+GA P103/10/0647 “Intelligent Electrical Drives Predictive and Robust Control
+Algorithms,” and by the Freescale Semiconductor Czech Republic.
+P . V aclavek is with the CEITEC - Central European Institute of Technol-
+ogy, Brno University of Technology, 612 00 Brno, Czech Republic (e-mail:
+pavel.vaclavek@ceitec.vutbr.cz).
+P . Blaha and I. Herman are with the Center for Applied Cybernetics, Faculty
+of Electrical Engineering and Communication, Brno University of Technol-
+ogy, 612 00 Brno, Czech Republic (e-mail: blahap@feec.vutbr.cz; hermani@
+feec.vutbr.cz).
+Digital Object Identiﬁer 10.1109/TIE.2012.2203775
+exactly for the drive [7]. It is possible to use a simple structure
+similar to Luenberger’s observer with many advantages—low
+computational demands and results similar to the Kalman ﬁlter
+algorithm [8]. In the case of computational power limitation
+back electromagnetic force (back-emf) sensing techniques [9],
+sliding mode [10] or model reference adaptive system structures
+[11] can be used, in contrast to some authors who also propose
+computationally extensive state estimation schemes based on
+artiﬁcial intelligence, e.g., neural networks [12].
+If a model-based speed and position estimation approach
+is used [13], it is necessary to choose the proper ac drive
+model structure. During this task, it is necessary to consider
+model computational demands as implementation on low-cost
+processors with low computational power should be supposed.
+The other thing to be taken into account is the model state
+observability. Authors of many papers deal with ac drive sen-
+sorless control poor performance in the low-speed region and
+simultaneous speed or position estimation together with the ma-
+chine parameters identiﬁcation [14]. Unfortunately, the usual
+way of analyzing these problems is based only on experimental
+results or observer stability analysis [15], [16], while the nature
+of problems in sensorless control schemes remains hidden.
+The most straightforward approach to the observability anal-
+ysis is based on the idea that estimated quantity is algebraically
+evaluated from the machine model equations [17]. If the quan-
+tity (e.g., rotor speed) can be unambiguously computed using
+the model equation, it can be considered to be observable. The
+main disadvantage of this method is that the results obtained
+cannot be easily generalized to similar problems, e.g., to other
+types of machines.
+Some of the values to be estimated (e.g., rotor speed) are
+usually considered to be slowly varying or nearly constant. In
+the case of the ac induction machine, this assumption allows
+the machine to be modeled as a linear parameter varying
+system. The problem of the rotor speed estimation can be then
+transferred to the problem of slowly varying parameter identiﬁ-
+cation. Based on this idea, some authors propose observability
+condition derivation as a persistent excitation condition [18],
+[19]. While persistent excitation seems to be a natural condition
+to obtain speed estimate, its use as an observability condition
+has signiﬁcant drawbacks. The ﬁrst problem is that there are
+successful observer designs even when the persistent excitation
+condition is not satisﬁed [20], [21]. There is no constructive
+procedure for determining which inputs are persistently excit-
+ing, and that is why some authors propose the use of nonlinear
+observability theory instead of persistent excitation condition
+even in the problem of model parameter identiﬁcation [22].
+Another possible approach to the ac drive observability anal-
+ysis is based on the idea that the machine nonlinear model
+can be linearized around some state vector value. Relatively
+0278-0046/$31.00 © 2012 IEEE
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 2
+3048 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+simple linear system observability theory can be then applied.
+This approach can be considered, namely, for the machine
+observability analysis in a particular state [23] or the evaluation
+of the possibility of machine parameter estimation [24].
+The better way to understand sensorless control behavior is
+based on the nonlinear dynamical system theory. The question
+of global observability is very important. While global observ-
+ability, preferably independent of system trajectory, would be
+useful for practical applications, it has been shown that it is
+very difﬁcult to construct a global observer and that it is not
+possible to design an observer with guaranteed convergence for
+every trajectory [25].
+The local observability concept proposed by Hermann and
+Krener [26] can be used, as global observers for ac machines
+are practically impossible to design as was mentioned earlier.
+Based on this concept, several papers were published provid-
+ing particular results for surface PMSM (SPMSM) while the
+conclusions for an interior PMSM (IPMSM) are rather unclear
+because of the derived condition complexity [27], [28]. Particu-
+lar results were also obtained for the ac induction machine, but
+only for selected machine states [29].
+The main goal of this paper is to present a uniﬁed approach to
+ac machine observability based on the weak local observability
+concept. It will be shown that both state estimation and machine
+parameters identiﬁcation possibility can be evaluated by the
+same tools. The proposed method can be extended to other
+types of machines or parameters to be estimated. In this paper,
+a careful induction machine and PMSM observability analy-
+sis will be performed leading to the conditions under which
+reliable rotor speed (for ac induction machine) and position
+(for PMSM drive) estimation can be guaranteed. Conditions
+of simultaneous ac induction machine rotor speed and rotor
+resistance, which are important for speed estimate accuracy,
+will be given.
+II. M
+ACHINE MODEL
+A. AC Induction Machine Model
+1) Classical Approach: The classical structure used to
+model the ac induction machine is the so-called T-model [30]
+written in the stationary reference frame. The model consists of
+two equations for stator and rotor magnetic ﬂux space vectors
+Ψ
+s =Ψsα +jΨsβ and Ψr =Ψrα +jΨrβ
+dΨs
+dt = us −Rsis (1)
+dΨr
+dt =jωeΨr −Rr ir (2)
+and two equations describing the relation between current and
+magnetic ﬂux space vectors
+Ψs =Lsis +Lmir (3)
+Ψr =Lmis +Lr ir (4)
+where us = usα +jusβ is the stator voltage space vector, is =
+isα +jisβ is the stator current space vector, ir = irα +jirβ is
+the rotor current space vector, Lm stands for the magnetizing
+Fig. 1. T-model bond graph.
+inductance, Ls = Lm +Lsσ is the stator winding inductance,
+Lr = Lm +Lrσ is the rotor inductance, Lsσ,Lrσ are the leak-
+age inductances, and ωe is the rotor electrical angular velocity.
+T-model I/O behavior analysis leads to the conclusion that
+there is a redundant parameter. Parameter redundancy can be
+easily proved by the corresponding bond-graph construction as
+shown in Fig. 1. The so-called causality conﬂict (it is not possi-
+ble to construct a proper bond graph with integral causality) is
+observed during bond-graph construction, proving a redundant
+energy storage component to be present in the model [31].
+It is not a good idea to use a model with some redundant
+parameters not only because of higher computational demands.
+The main problem with the use of such a model is the fact that
+its parameters cannot be identiﬁed from the I/O data collected.
+The solution is based on using another ac induction machine
+model structure—the so-called Γ-model [32]. In the Γ-model,
+only two inductances are present, instead of the three induc-
+tances in the T-model. The Γ-model can be described by [33]
+dΨ
+s
+dt = us −Rsis (5)
+dΨR
+dt =jωeΨR −RRiR (6)
+Ψs =LM(is + iR) (7)
+ΨR = Ψs +LLiR. (8)
+Γ-model quantities can be calculated from T-model quantities
+using
+γ= Ls
+Lm
+(9)
+ΨR =γΨr (10)
+iR = 1
+γir (11)
+LM =γLm = Ls (12)
+LL =γLsσ+γ2Lrσ (13)
+RR =γ2Rr (14)
+while stator quantities us, is, Ψs,Rs remain unchanged.
+2) Simpliﬁed Model: The Γ-model provides solution to
+the unwanted parameter dependence in the ac induction ma-
+chine model. However, is it the simplest model from the
+computational point of view? During ac induction machine
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 3
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3049
+sensorless control research [7], an even simpler model has been
+designed.
+From (1)–(4), it can be easily obtained
+dis
+dt = Lr
+LsLr −L2m
+[
+us + Lm
+Lr
+( Rr
+Lr
+−jωe
+)
+Ψr
+−
+(
+Rs + L2
+mRr
+L2r
+)
+is
+]
+(15)
+dΨr
+dt = −
+( Rr
+Lr
+−jωe
+)
+Ψr + RrLm
+Lr
+is. (16)
+Using the substitution
+is = Lr
+LsLr −L2m
+i′
+s (17)
+Ψr = Lr
+Lm
+Ψ′
+r (18)
+we will then get
+di′
+s
+dt = us +
+( Rr
+Lr
+−jωe
+)
+Ψ′
+r −RsL2
+r +L2
+mRr
+LsL2r −L2mLr
+i′
+s (19)
+dΨ′
+r
+dt = −
+( Rr
+Lr
+−jωe
+)
+Ψ′
+r + RrL2
+m
+LsL2r −L2mLr
+i′
+s (20)
+where i′
+s and Ψ′
+r are the modiﬁed stator current and rotor
+magnetic ﬂux space vectors. Now, assume
+ξ1 = RsL2
+r +L2
+mRr
+LsL2r −L2mLr
+(21)
+ξ2 = Rr
+Lr
+(22)
+ξ3 = RrL2
+m
+LsL2r −L2mLr
+. (23)
+New parameters ξ1,ξ2,ξ3 deﬁned by (21)–(23) allow us to
+rewrite (17) and (18) as
+di′
+s
+dt = us −ξ1i′
+s +(ξ2 −jωe)Ψ′
+r (24)
+dΨ′
+r
+dt = −(ξ2 −jωe)Ψ′
+r +ξ3i′
+s. (25)
+The proposed model cannot be easily represented by an equiv-
+alent electrical circuit. It can be seen from the model given by
+(24) and (25) that ac induction machine dynamical properties
+are given only by three parameters ξ
+1,ξ2,ξ3.I ti st r u et h a t
+conversions (17) and (18) are also necessary to make compu-
+tations using the proposed machine model. These equations
+can be interpreted as some kind of evaluated data scaling.
+In many applications, control algorithms are implemented on
+chips equipped with ﬁxed-point or fractional arithmetics only.
+In such a case, data scaling techniques have to be used re-
+gardless of the algorithm implemented. Data scales must be
+modiﬁed with respect to (17) and (18), but only the computation
+of (24) and (25) has to be performed in real time.
+B. PMSM Model
+The mathematical model of a PMSM drive is usually deﬁned
+in the rotating reference frame d−q by two-phase voltage
+equations [34]
+[u
+d
+uq
+]
+=
+[Ld
+did
+dt
+Lq
+diq
+dt
+]
++
+[ R −ωeLq
+ωeLd R
+][id
+iq
+]
++
+[
+0
+KEωe
+]
+(26)
+where
+ud,uq stator voltage components in a rotating frame;
+id,iq stator current components in a stationary frame;
+R stator resistance;
+Ld,Lq stator inductance components;
+KE EMF constant;
+ωe rotor angular speed (electrical speed).
+The machine model can be transformed using inverse Park’s
+transformation
+uα=ud cosθe −uq sinθe
+uβ=ud sinθe +uq cosθe (27)
+iα=id cosθe −iq sinθe
+iβ=id sinθe +iq cosθe (28)
+to state equations in stationary reference frame α−β
+[diα
+dt
+diβ
+dt
+]
+= A
+[uα
+uβ
+]
+−RA
+[iα
+iβ
+]
+−ωeB
+[iα
+iβ
+]
+−C
+[0
+1
+]
+KEωe
+(29)
+where matrices A, B, and C are
+A = Ld −Lq
+2LdLq
+[
+−cos2θe −sin2θe
+−sin2θe cos2θe
+]
++ Ld +Lq
+2LdLq
+[
+10
+01
+]
+(30)
+B = L2
+d −L2
+q
+2LdLq
+[
+−sin2θe cos2θe
+cos2θe sin2θe
+]
++ (Ld −Lq)2
+2LdLq
+[
+0 −1
+10
+]
+(31)
+C =
+[
+cosθe −sinθe
+sinθe cosθe
+][ 1
+Ld
+0
+0 1
+Lq
+]
+(32)
+and where
+uα,uβ stator voltage components in a stationary frame;
+iα,iβ stator current components in a stationary frame;
+θe rotor angular position (electrical angle).
+Models (26) and (29) describe an IPMSM with salient rotor
+type, where, in general
+Ld ̸= Lq. (33)
+If an SPMSM with nonsalient rotor type is assumed, then
+Ld = Lq. (34)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 4
+3050 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+III. M ODEL OBSERV ABILITY
+In this part, the observability of states of the proposed
+ac induction machine model structure (24) and (25) will be
+analyzed. It can be assumed that stator voltage us and modiﬁed
+stator current i′
+s can be measured. It is necessary to decide if it is
+possible to compute an estimate of modiﬁed rotor magnetic ﬂux
+Ψ′
+r and rotor speed ωe only from measured stator quantities. In
+general, there is no information on the mechanical parameters
+of the load. It can be assumed that the rotor speed is only slowly
+varying, and that is why
+dω
+e
+dt =0 . (35)
+Similarly, the observability of the PMSM model (29) will
+be studied assuming that no mechanical machine parameters
+are known. Machine speed is assumed to be slowly varying as
+deﬁned by (35), and rotor position is given by
+dθ
+e
+dt = ωe. (36)
+A. Observability Theory
+The following analysis will be based on nonlinear system
+local weak observability concept [26].
+Deﬁnition 1—State X-Indistinguishability: Assume a non-
+linear dynamical system Σ
+Σ: dx
+dt = f(x, u)
+y = h(x) (37)
+where x ∈Ω⊂Rn is the state vector, u ∈U ⊂Rm is the
+vector of input values, y ∈Rr is the output vector, and f and
+h are nonlinear functions
+f :Ω× U ↦→ Rn (38)
+h :Ω ↦→ Rr. (39)
+Let x0, x1 ∈x ⊂Ω be states of the system Σ (37) and
+Θx0((u(τ) and ⟨t0,t1⟩)) be a state trajectory corresponding to
+the control u(τ) at time interval τ∈⟨t0,t1⟩ and initial state
+x(t0)= x0. States x0, x1 are indistinguishable on the set X
+(X-indistinguishable) if and only if
+∀(u(τ),⟨t0,t1⟩) ∈U × RΘx0 ((u(τ),⟨t0,t1⟩)) ⊂X
+×R ⇒ Σx0 ((u(τ),⟨t0,t1⟩)) = Σx1 ((u(τ),⟨t0,t1⟩)). (40)
+Then, it is possible to deﬁne the indistinguishability relation on
+the set X ⊂Ω as
+IX : X ↦→ X
+IX(x0)= {x|x ∈X ∧∀(u(τ),⟨t0,t1⟩) ∈U
+× RΘx ((u(τ),⟨t0,t1⟩)) ⊂X
+× R ⇒ Σx0 ((u(τ),⟨t0,t1⟩)) = Σx1
+×((u(τ),⟨t0,t1⟩))}. (41)
+Deﬁnition 2—State Weak Local Observability: The state of
+the system (37) is said to be weakly locally observable at the
+point x0 if and only if
+∃X ∈O∀X′ ∈O, X′ ⊂X, x0 ∈X′ IX′(x0)= {x0}
+(42)
+whereO is the domain of all open sets. The system (37) is said
+to be weakly locally observable if and only if its state is weakly
+locally observable at every point of the state space Ω
+∀x0 ∈Ω∃X ∈O∀X′ ∈O, X′ ⊂X,
+x0 ∈X′IX′(x0)= {x0}. (43)
+The main advantage of this concept is that a relatively simple
+algebraic criterion for its evaluation exists [26], [35] while it
+is sufﬁcient to deﬁne the ability of the system state change
+tracking.
+Theorem 1—Observability Theorem: Assume a nonlinear
+dynamical system (37) and a point from its state space x
+0 ∈Ω.
+Let
+O = ∂L
+∂x
+⏐⏐
+⏐
+⏐
+x=x0
+(44)
+where
+L =
+⎡
+⎢⎢⎣
+L0
+f h
+Lf h
+..
+.
+L
+n−1
+f h
+⎤
+⎥⎥⎦ (45)
+is the observability criterion matrix and Lk
+f h is the kth-order
+Lie derivative of the function h with respect to the vector ﬁeld
+f . If the matrix O has full rank
+rank{O} = n (46)
+then the state of the system Σis locally weakly observable at
+point x0.
+Remark 1: The Lie derivative of the function h with respect
+to the vector ﬁeld f is given by
+Lf h =(∇h)f = ∂h
+∂x f =
+n∑
+i=1
+∂h
+∂xi
+fi (47)
+L0
+f h = h Lk
+f h = LfLk−1
+f h. (48)
+B. Induction Machine Observability
+1) Rotor Speed Observability: Now, the observability
+theorem will be applied to the system given by (24)–(35). The
+equations can be rewritten into the components
+di
+′
+sα
+dt =usα −ξ1i′
+sα +ξ2Ψ′
+rα +ωeΨ′
+rβ (49)
+di′
+sβ
+dt =usβ −ξ1i′
+sβ +ξ2Ψ′
+rβ −ωeΨ′
+rα (50)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 5
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3051
+dΨ′
+rα
+dt = −ξ2Ψ′
+rα −ωeΨ′
+rβ +ξ3i′
+sα (51)
+dΨ′
+rβ
+dt = −ξ2Ψ′
+rβ +ωeΨ′
+rα +ξ3i′
+sβ (52)
+dωe
+dt =0. (53)
+The (49)–(53) can be ﬁtted to the structure (37) assuming
+x =
+⎡
+⎢⎢
+⎢⎢⎣
+i
+′
+sα
+i′
+sβ
+Ψ′
+rα
+Ψ′
+rβ
+ωe
+⎤
+⎥⎥
+⎥⎥⎦
+(54)
+u =
+[
+u
+sα
+usβ
+]
+(55)
+y =
+[i′
+sα
+i′
+sβ
+]
+(56)
+f(x, u)=
+⎡
+⎢⎢⎢⎢⎣
+usα −ξ1i′
+sα +ξ2Ψ′
+rα +ωeΨ′
+rβ
+usβ −ξ1i′
+sβ +ξ2Ψ′
+rβ −ωeΨ′
+rα
+−ξ2Ψ′
+rα −ωeΨ′
+rβ +ξ3i′
+sα
+−ξ2Ψ′
+rβ +ωeΨ′
+rα +ξ3i′
+sβ
+0
+⎤
+⎥⎥⎥⎥⎦
+(57)
+h(x)=
+[i′
+sα
+i′
+sβ
+]
+(58)
+and the state space dimension n =5 .
+In our case, the result of the Lie derivative will be a vector
+with two components
+Lk
+f h =
+[Lk
+fh1
+Lk
+fh2
+]
+. (59)
+Because of the computational complexity, only the ﬁrst two
+derivatives are denoted below
+L0
+f h = h =
+[i′
+sα
+i′sβ
+]
+(60)
+Lf h = ∂h
+∂x f =
+[usα −ξ1i′
+sα +ξ2Ψ′
+rα +ξ2ωeΨ′
+rβ
+usβ −ξ1i′sβ +ξ2Ψ′rβ −ξ2ωeΨ′rα
+]
+. (61)
+As the system order is n =5 , it is necessary to evaluate Lie
+derivativesLk
+f h up to the order k =4 . The resulting criterion
+matrix has dimensions 10 × 5, and it is a Jacobian
+O =
+⎡
+⎢⎢
+⎢⎢⎢
+⎢
+⎢
+⎢⎢⎢
+⎢
+⎢
+⎢
+⎢⎢⎢⎣
+∂L0
+fh1
+∂i′sα
+∂L0
+fh1
+∂i′sβ
+∂L0
+fh1
+∂Ψ′rα
+∂L0
+fh1
+∂Ψ′rβ
+∂L0
+fh1
+∂ωe
+∂L0
+fh2
+∂i′sα
+∂L0
+fh2
+∂i′sβ
+∂L0
+fh2
+∂Ψ′rα
+∂L0
+fh2
+∂Ψ′rβ
+∂L0
+fh2
+∂ωe
+∂Lfh1
+∂i′sα
+∂Lfh1
+∂i′sβ
+∂Lfh1
+∂Ψ′rα
+∂Lfh1
+∂Ψ′rβ
+∂Lfh1
+∂ωe
+∂Lfh2
+∂i′sα
+∂Lfh2
+∂i′sβ
+∂Lfh2
+∂Ψ′rα
+∂Lfh2
+∂Ψ′rβ
+∂Lfh2
+∂ωe
+... ... ... ... ...
+∂L4
+fh1
+∂i′sα
+∂L4
+fh1
+∂i′sβ
+∂L4
+fh1
+∂Ψ′rα
+∂L4
+fh1
+∂Ψ′rβ
+∂L4
+fh1
+∂ωe
+∂L4
+fh2
+∂i′sα
+∂L4
+fh2
+∂i′sβ
+∂L4
+fh2
+∂Ψ′rα
+∂L4
+fh2
+∂Ψ′rβ
+∂L4
+fh2
+∂ωe
+⎤
+⎥⎥
+⎥⎥⎥
+⎥
+⎥
+⎥⎥⎥
+⎥
+⎥
+⎥
+⎥⎥⎥⎦
+. (62)
+According to the observability theorem mentioned earlier,
+the matrix O has to be a full-rank matrix to guarantee that the
+system will be weakly locally observable
+rank{O} =5 . (63)
+Condition (63) can be tested by searching for a regular matrix
+constructed from any ﬁve rows of the matrix O. It is not an easy
+task, but after some experiments, two interesting selections can
+be found. The ﬁrst one contains the ﬁrst ﬁve rows of O
+O
+1 =
+⎡
+⎢⎢
+⎢
+⎢
+⎢
+⎢⎢⎢
+⎢
+⎢
+⎢⎢⎢⎣
+∂L0
+fh1
+∂i′sα
+∂L0
+fh1
+∂i′sβ
+∂L0
+fh1
+∂Ψ′rα
+∂L0
+fh1
+∂Ψ′rβ
+∂L0
+fh1
+∂ωe
+∂L0
+fh2
+∂i′sα
+∂L0
+fh2
+∂i′sβ
+∂L0
+fh2
+∂Ψ′rα
+∂L0
+fh2
+∂Ψ′rβ
+∂L0
+fh2
+∂ωe
+∂Lfh1
+∂i′sα
+∂Lfh1
+∂i′sβ
+∂Lfh1
+∂Ψ′rα
+∂Lfh1
+∂Ψ′rβ
+∂Lfh1
+∂ωe
+∂Lfh2
+∂i′sα
+∂Lfh2
+∂i′sβ
+∂Lfh2
+∂Ψ′rα
+∂Lfh2
+∂Ψ′rβ
+∂Lfh2
+∂ωe
+∂L2
+fh1
+∂i′sα
+∂L2
+fh1
+∂i′sβ
+∂L2
+fh1
+∂Ψ′rα
+∂L2
+fh1
+∂Ψ′rβ
+∂L2
+fh1
+∂ωe
+⎤
+⎥⎥
+⎥
+⎥
+⎥
+⎥⎥⎥
+⎥
+⎥
+⎥⎥⎥⎦
+. (64)
+The determinant of the matrix O
+1 can be computed as
+D1 =d e t{O1} =
+(
+ξ2
+2 +ω2
+e
+)dΨ′
+rβ
+dt . (65)
+The explicit form of the matrix O1 as well as the determinant
+D1 calculation can be found in Appendix. The matrix O1 is
+regular if it has a nonzero determinant D1 ̸=0 .A si ti sp o s s i b l e
+to assume ξ2 ̸=0 , it is clear from (65) that
+D1 ̸=0 ⇔
+dΨ′
+rβ
+dt ̸=0 . (66)
+Another possible selection is similar to the O1 matrix except
+the last row
+O2 =
+⎡
+⎢⎢
+⎢
+⎢
+⎢
+⎢⎢⎢
+⎢
+⎢
+⎢⎢⎢⎣
+∂L0
+fh1
+∂i′sα
+∂L0
+fh1
+∂i′sβ
+∂L0
+fh1
+∂Ψ′rα
+∂L0
+fh1
+∂Ψ′rβ
+∂L0
+fh1
+∂ωe
+∂L0
+fh2
+∂i′sα
+∂L0
+fh2
+∂i′sβ
+∂L0
+fh2
+∂Ψ′rα
+∂L0
+fh2
+∂Ψ′rβ
+∂L0
+fh2
+∂ωe
+∂Lfh1
+∂i′sα
+∂Lfh1
+∂i′sβ
+∂Lfh1
+∂Ψ′rα
+∂Lfh1
+∂Ψ′rβ
+∂Lfh1
+∂ωe
+∂Lfh2
+∂i′sα
+∂Lfh2
+∂i′sβ
+∂Lfh2
+∂Ψ′rα
+∂Lfh2
+∂Ψ′rβ
+∂Lfh2
+∂ωe
+∂L2
+fh2
+∂i′sα
+∂L2
+fh2
+∂i′sβ
+∂L2
+fh2
+∂Ψ′rα
+∂L2
+fh2
+∂Ψ′rβ
+∂L2
+fh2
+∂ωe
+⎤
+⎥⎥
+⎥
+⎥
+⎥
+⎥⎥⎥
+⎥
+⎥
+⎥⎥⎥⎦
+. (67)
+The determinant of this matrix is
+D
+2 =d e t{O2} = −
+(
+ξ2
+2 +ω2
+e
+)dΨ′
+rα
+dt . (68)
+Again, the matrix O2 is regular if its determinant is nonzero.
+Equation (68) leads to conclusion
+D2 ̸=0 ⇔ dΨ′
+rα
+dt ̸=0 . (69)
+The regularity of at least one of the matrices O1, O2 is a
+sufﬁcient condition for O to be a full-rank matrix. Thus
+D1 ̸=0 ∨D2 ̸=0 ⇒ rank{O} =5 (70)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 6
+3052 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+and considering (66) and (69)
+dΨ′
+rα
+dt ̸=0 ∨
+dΨ′
+rβ
+dt ̸=0 ⇒ rank{O} =5 . (71)
+Condition (71) can be rewritten as
+dΨ′
+r
+dt ̸=0 ⇒ rank{O} =5 (72)
+where Ψ′
+r =Ψ′
+rα +jΨ′
+rβ. According to the observability
+theorem, it is possible to say that, if the modiﬁed rotor ﬂux
+space vector Ψ
+′
+r is not constant, the state of the system de-
+scribed by (24)–(35) is weakly locally observable.
+Note that, if the rotor ﬂux space vector is constant, (24) and
+(25) can be reduced to
+di′
+s
+dt = us −(ξ1 −ξ3)i′
+s. (73)
+As (73) does not contain rotor speed ωe, the rotor speed will
+have no impact on machine I/O behavior, and thus, it will be
+unobservable. That is why the condition
+dΨ′
+r
+dt ̸=0 (74)
+is not only sufﬁcient but also a necessary condition for ac
+induction machine state observability.
+Remark 2: Condition (74) is not equivalent to
+dus
+dt ̸=0 . (75)
+It can be easily shown that, if
+d2ωe
+dt2 ̸=0 (76)
+rotor ﬂux space vector can be nonconstant even if stator voltage
+is constant and vice versa. Some authors present conclusions
+[36] that (76) is a sufﬁcient observability condition even in
+the case of constant rotor magnetic ﬂux. This is true only if the
+rotor and load inertia is constant and completely known and the
+load torque is constant. In real applications, the load inertia is
+not usually known, and in some cases, it can even vary during
+the drive operation. That is why it is not correct to consider (76)
+to be an observability condition in practical applications.
+2) Rotor Resistance Observability: In most applications,
+machine inductances can be considered to be known as there
+are methods for their reliable ofﬂine estimation [37] including
+saturation effects. Algorithms for the stator resistance com-
+putation are also available [38], [39] even when a sensorless
+control algorithm is used. On the other hand, rotor resistance
+estimation is very difﬁcult, and its accuracy has an important
+impact on speed estimation performance. That is why rotor
+resistance observability will be analyzed.
+If the machine inductances and the stator resistance are
+known and constant, machine parameters ξ
+1,ξ3 can be
+written as
+ξ1 =k1 +k2ξ2 (77)
+ξ3 =k2ξ2 (78)
+where k1 = RsL2
+r/(LsL2
+r −L2
+mLr) and k2 = L2
+m/(LsLr −
+L2
+m) are known constants. The only unknown parameter de-
+pending on rotor resistance is ξ2. The parameter ξ2 will be
+assumed to be a new state variable to be observed. Equations
+(54) and (57) can be substituted by
+x =
+⎡
+⎢⎢⎢
+⎢
+⎢
+⎢⎣
+i
+′
+sα
+i′
+sβ
+Ψ′
+rα
+Ψ′
+rβ
+ωe
+ξ2
+⎤
+⎥⎥⎥
+⎥
+⎥
+⎥⎦
+(79)
+f(x, u)=
+⎡
+⎢⎢
+⎢
+⎢
+⎢⎢⎣
+u
+sα −(k1 +k2ξ2)i′
+sα +ξ2Ψ′
+rα +ωeΨ′
+rβ
+usβ −(k1 +k2ξ2)i′
+sβ +ξ2Ψ′
+rβ −ωeΨ′
+rα
+−ξ2Ψ′
+rα −ωeΨ′
+rβ +k2ξ2i′
+sα
+−ξ2Ψ′
+rβ +ωeΨ′
+rα +k2ξ2i′
+sβ
+0
+0
+⎤
+⎥⎥
+⎥
+⎥
+⎥⎥⎦
+. (80)
+The observability of the system consisting of (79), (55), (56),
+and (80) can be studied by the same method as that used in
+the previous section. The state vector dimension in this case is
+n =6 . That is why it is necessary to compute Lie derivatives
+up to the ﬁfth-order to construct the matrix O. This matrix has
+dimensions of 12 × 6. It is necessary to prove that the matrix O
+is full rank. The ﬁrst six rows of the matrix O have been used
+to form the submatrix O
+3. Its determinant is
+D3 =d e tO3 =
+(
+ω2
+e +ξ2
+2
+)
+×
+[ ⎛
+⎝
+[dΨ′
+rα
+dt
+]2
++
+[
+dΨ′
+rβ
+dt
+]2⎞
+⎠
+−ξ3
+ξ2
+(
+di′
+sα
+dt
+dΨ′
+rα
+dt +
+di′
+sβ
+dt
+dΨ′
+rβ
+dt
+)]
+. (81)
+It is possible to evaluate di′
+sα/dt,di′
+s
+β/dt by the differentiation
+of (51) and (52). Then
+D3 = −ω2
+e +ξ2
+2
+ξ2
+(
+dΨ′
+rα
+dt
+d2Ψ′
+rα
+d2t +
+dΨ′
+rβ
+dt
+d2Ψ′
+rβ
+d2t
++dωe
+dt
+[
+dΨ′
+rα
+dt Ψ′
+rβ −
+dΨ′
+rβ
+dt Ψ′
+rα
+])
+. (82)
+If the rotor ﬂux is assumed to be a vector Ψ′
+r =Ψ′
+rα +jΨ′
+rβ =
+(Ψ′
+rα,Ψ′
+rβ), (82) can be rewritten as the vector form
+D3 = −ω2
+e +ξ2
+2
+ξ2
+( dΨr
+dt · d2Ψr
+d2t + dωe
+dt
+dΨr
+dt × Ψr
+)
+. (83)
+It is clear that the matrix O3 will be regular and the state of the
+system is observable if
+dΨr
+dt · d2Ψr
+d2t + dωe
+dt
+dΨr
+dt × Ψr ̸=0 . (84)
+During rotor speed observability analysis, it has been as-
+sumed that the rotor speed ωe is constant. This assumption is
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 7
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3053
+necessary; otherwise, the speed estimation task has to be ex-
+panded to the load inertia and torque estimation problem which
+does not lead to any simpler observability conditions. That is
+why the observability condition for simultaneous rotor speed
+and resistance estimation is
+dΨr
+dt · d2Ψr
+d2t ̸=0 . (85)
+From (85), it can be seen that the observability condition will
+be fulﬁlled if the speed and acceleration vectors of the rotor
+ﬂux space vector end point are not perpendicular. It leads to the
+following two cases:
+1) rotor ﬂux magnitude is held constant, and magnetic ﬁeld
+speed accelerates while rotor speed is constant—there
+have to be changes in load torque while preserving rotor
+speed;
+2) rotor ﬂux magnitude must vary.
+Unfortunately, both situations are very difﬁcult to achieve in
+practical applications. The load torque is a property of the load
+attached to the machine and usually cannot be controlled. Rotor
+ﬂux magnitude changes seem to be possible, but this approach
+leads to troubles with stator voltage limitations due to relatively
+slow rotor magnetic ﬂux magnitude dynamics.
+The theoretical possibility of simultaneous rotor speed and
+rotor resistance estimation can be concluded from the afore-
+mentioned results. The practical possibility is highly dependent
+on rotor ﬂux dynamics and stator voltage limitation. If stator
+voltage limitation disallows rapid changes of the rotor mag-
+netic ﬂux magnitude, the model-independent speed estimation
+technique should be used to be able to estimate rotor resistance
+simultaneously [40].
+The rotor speed and rotor resistance observability condition
+has been derived under the condition that all other electri-
+cal parameters—stator resistance and inductances—are known.
+Machine inductances can be usually identiﬁed ofﬂine, including
+their dynamical changes depending on the nonlinear magneti-
+zation characteristics [41]. That is why the machine inductances
+can be considered to be known. While the stator resistance iden-
+tiﬁcation is a more challenging task, there are methods of online
+stator resistance measurement independent of the knowledge
+of rotor speed or rotor resistance [38], [42], [43]. The uniﬁed
+approach proposed in this paper can be theoretically extended
+to the problem of derivation of conditions of simultaneous
+electrical and even mechanical parameter estimation (e.g., load
+torque or inertia), but in such a case, the complexity of the
+solution increases greatly.
+C. PMSM Observability
+During the observability analysis, the following assumptions
+will be made:
+1) electrical parameters of the machine are known and
+constant;
+2) load torque is unknown;
+3) rotor and load inertia is unknown;
+4) rotor speed is constant or slowly varying.
+According to these assumptions, the machine model has to be
+extended (29) with two equations
+dθ
+e
+dt =ωe
+dωe
+dt =0. (86)
+The observability theorem will be applied to the system given
+by (29) and (86). The equations can be ﬁtted to the structure
+(37) assuming
+x =
+⎡
+⎢⎣
+iα
+iβ
+θe
+ωe
+⎤
+⎥⎦ (87)
+u =
+[
+uα
+uβ
+]
+(88)
+y =
+[
+iα
+iβ
+]
+(89)
+f(x, u)=
+⎡
+⎢⎢⎣
+diα
+dt
+diβ
+dt
+ωe
+0
+⎤
+⎥⎥⎦ (90)
+h(x)=
+[
+iα
+iβ
+]
+(91)
+and the state space dimension n =4 .
+In our case, the result of the Lie derivative will be a vector
+with two components
+Lk
+f h =
+[Lk
+fh1
+Lk
+f
+h2
+]
+. (92)
+Because of the computational complexity, only the ﬁrst two
+derivatives are denoted below
+L0
+f h = h =
+[iα
+iβ
+]
+(93)
+Lf h = ∂h
+∂x f =
+[diα
+dt
+diβ
+dt
+]
+. (94)
+As the system order is n =4 , it is necessary to evaluate Lie
+derivatives Lk
+f h up to order k =3 . The resulting criterion
+matrix has dimensions of 8 × 4, and it is the Jacobian
+O =
+⎡
+⎢⎢
+⎢
+⎢
+⎢
+⎢⎢⎢
+⎢
+⎢
+⎢⎢⎢
+⎢
+⎢
+⎢
+⎢⎢⎣
+∂L0
+fh1
+∂iα
+∂L0
+fh1
+∂iβ
+∂L0
+fh1
+∂θe
+∂L0
+fh1
+∂ωe
+∂L0
+fh2
+∂iα
+∂L0
+fh2
+∂iβ
+∂L0
+fh2
+∂θe
+∂L0
+fh2
+∂ωe
+∂Lfh1
+∂iα
+∂Lfh1
+∂iβ
+∂Lfh1
+∂θe
+∂Lfh1
+∂ωe
+∂Lfh2
+∂iα
+∂Lfh2
+∂iβ
+∂Lfh2
+∂θe
+∂Lfh2
+∂ωe
+∂L2
+fh1
+∂iα
+∂L2
+fh1
+∂iβ
+∂L2
+fh1
+∂θe
+∂L2
+fh1
+∂ωe
+∂L2
+fh2
+∂iα
+∂L2
+fh2
+∂iβ
+∂L2
+fh2
+∂θe
+∂L2
+fh2
+∂ωe
+∂L3
+fh1
+∂iα
+∂L3
+fh1
+∂iβ
+∂L3
+fh1
+∂θe
+∂L3
+fh1
+∂ωe
+∂L3
+fh2
+∂iα
+∂L3
+fh2
+∂iβ
+∂L3
+fh2
+∂θe
+∂L3
+fh2
+∂ωe
+⎤
+⎥⎥
+⎥
+⎥
+⎥
+⎥⎥⎥
+⎥
+⎥
+⎥⎥⎥
+⎥
+⎥
+⎥
+⎥⎥⎦
+. (95)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 8
+3054 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+According to the observability theorem mentioned earlier,
+the matrix O has to be a full-rank matrix to guarantee that the
+system will be weakly locally observable
+rank{O} =4 . (96)
+Condition (96) can be tested by searching for a regular matrix
+constructed from any four rows of the matrix O. There are 70
+possible submatrices, and it is necessary to prove that at least
+one is regular. It is not an easy task, but after some experiments,
+it is possible to ﬁnd out that interesting results can be obtained
+using the ﬁrst four rows of the matrix O.N o w ,i tw i l lb ep r o v e d
+that the matrix
+O
+s =
+⎡
+⎢⎢
+⎢⎢⎢⎣
+∂L0
+fh1
+∂iα
+∂L0
+fh1
+∂iβ
+∂L0
+fh1
+∂θe
+∂L0
+fh1
+∂ωe
+∂L0
+fh2
+∂iα
+∂L0
+fh2
+∂iβ
+∂L0
+fh2
+∂θe
+∂L0
+fh2
+∂ωe
+∂Lfh1
+∂iα
+∂Lfh1
+∂iβ
+∂Lfh1
+∂θe
+∂Lfh1
+∂ωe
+∂Lfh2
+∂iα
+∂Lfh2
+∂iβ
+∂Lfh2
+∂θe
+∂Lfh2
+∂ωe
+⎤
+⎥⎥
+⎥⎥⎥⎦
+(97)
+is regular, which is equivalent to the condition
+D =d e t{O
+s} ̸=0 . (98)
+The determinant in (98) can be evaluated using symbolic math
+software and written as a rather complicated expression (not
+published in this paper because of its large size), which cannot
+be used directly for a clear physical interpretation. Fortunately,
+the expression is simpliﬁed signiﬁcantly after the application of
+the Park’s transform
+u
+d =uαcosθe +uβsinθe
+uq = −uαsinθe +uβcosθe (99)
+id =iαcosθe +iβsinθe
+iq = −iαsinθe +iβcosθe (100)
+when (98) can be expressed as
+−ΔL
+( diq
+dt (ΔLid +Ke)−ΔLiq
+did
+dt
+)
++ ωe
+(
+(ΔL)2 (
+i2
+d +i2
+q
+)
++Ke(Ke +2ΔLid)
+)
+̸=0 (101)
+where
+ΔL = Ld −Lq. (102)
+In the case of SPMSM, the inductances Ld and Lq are nearly
+equivalent ΔL =0 , and the condition (101) reduces to well-
+known SPMSM observability condition
+ωe ̸=0 . (103)
+This condition clearly demonstrates that model-based sensor-
+less control techniques fail at speeds near to zero in the case of
+SPMSM.
+Observability behavior is much more interesting in the case
+of IPMSM whenΔL ̸=0 . Two situations should be considered.
+1) Zero Rotor Speed (or Near to Zero Speed): If the rotor
+speed is zero (or very low) ωe ≈0, the observability condition
+(101) reduces to
+( diq
+dt (ΔLid +Ke)−ΔLiq
+did
+dt
+)
+̸=0 (104)
+diq
+dt (ΔLid +Ke) ̸=ΔLiq
+did
+dt . (105)
+This condition can be satisﬁed only if the stator current is
+nonzero and time varying. Assuming nonzero stator current, the
+observability condition can be rewritten as
+1
+id + Ke
+ΔL
+did
+t ̸= 1
+iq
+diq
+t . (106)
+It is possible to compute the time integral
+∫ 1
+id + Ke
+ΔL
+did
+dt dt ̸=
+∫ 1
+iq
+diq
+t dt (107)
+∫ 1
+id + Ke
+ΔL
+did ̸=
+∫ 1
+iq
+diq (108)
+ln
+( ⏐⏐⏐⏐id + Ke
+ΔL
+⏐⏐⏐⏐
+)
++C1 ̸=l n(|iq|)+ C2 (109)
+where C1 and C2 are constants given by the initial conditions.
+Let constant C be deﬁned as
+ln|C| = C1 −C2 (110)
+then
+ln
+( ⏐⏐⏐⏐id + Ke
+ΔL
+⏐⏐⏐⏐
+)
++ln |C| ̸=l n(|iq|) (111)
+and thus
+⏐⏐⏐⏐id + Ke
+ΔL
+⏐⏐⏐⏐|C| ̸= |iq|. (112)
+It is not necessary to determine the value of the constant C.
+The condition (112) provides an easy interpretation of IPMSM
+observability in the zero or low-speed region. The rotor position
+will be observable if stator current components in rotating
+reference frame i
+d,iq are changing and not kept to be linearly
+dependent. Stator current space vector should change not only
+its magnitude but also direction in the rotating reference frame.
+2) Nonzero Speed: In this case, the observability condition
+(101) can be rewritten as
+ωe ̸=
+diq
+dt
+(
+id + Ke
+ΔL
+)
+−iq
+did
+dt(
+id + Ke
+ΔL
+)2
++i2q
+. (113)
+It is clear that this condition is satisﬁed in steady state when
+(did/dt)=( diq/dt)=0 . In transient, the condition is not
+satisﬁed at discrete points
+ωe =
+diq
+t
+(
+id + Ke
+ΔL
+)
+−iq
+did
+t(
+id + Ke
+ΔL
+)2
++i2q
+. (114)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 9
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3055
+Fig. 2. Induction machine experimental system.
+System observability is reestablished immediately as soon as
+the system goes through these points during transient. It is also
+necessary to remember that, to prove rotor position observabil-
+ity, it is sufﬁcient that any of the subdeterminants of the matrix
+(95) is nonzero. Assuming rows 1, 2, 5, and 6 of (95), it is
+possible to obtain the determinant
+D
+′ =d e t{O1256}. (115)
+After substitution of (114) into (115), we get a nonzero expres-
+sion (evaluated using symbolic math software and not published
+because of its large size). That is why, at every time instant, the
+nonzero subdeterminant of the matrix (95) exists, proving rotor
+position observability when ωe ̸=0 .
+It is necessary to remark that both ac induction machine
+(ACIM) and PMSM observability conditions are sufﬁcient but
+not necessary conditions. This means that the drive state may
+be observable even if these conditions are not fulﬁlled. If these
+conditions are fulﬁlled, state observability is guaranteed.
+IV . E
+XPERIMENTAL VERIFICA TION
+The theoretical results obtained in this paper are proved by
+the behavior of real sensorless control applications.
+A. Induction Machine Sensorless Control
+1) Experiment Setup: Observability conditions were veri-
+ﬁed on the real ac induction machine using our experimental
+system shown in Fig. 2. A small 250-W induction machine with
+two pole pairs was used with approximate parameter values
+R
+s =3 2Ω,Rr =2 2Ω,Ls =0 .85 H,Lr =0 .85 H, andLm =
+0.7 H. The load torque was produced by dc permanent magnet
+motor mechanically connected to the induction machine. The
+observer [7] was implemented on the Freescale 56F805 hybrid
+controller evaluation board together with the complete control
+system based on the rotor ﬂux-oriented vector control algo-
+rithm. The Freescale 56F805 hybrid controller chip is equipped
+with peripherals needed to control electrical drives, and also,
+the evaluation board is suitable for motor control application
+testing. The Freescale three-phase ac high-voltage brushless
+dc power stage has been used to supply control signals to the
+machine.
+2) Nonzero Rotor Magnetic Flux Frequency: The possibil-
+ity of ac induction machine rotor speed estimation when rotor
+speed and rotor magnetic ﬂux frequency are not zero is well
+known. The machine was controlled using the observed rotor
+magnetic ﬂux and rotor speed values. This experiment has been
+Fig. 3. Comparison of (solid) ac induction machine real rotor speed and
+(dashed) estimated value.
+conducted just for completeness. The ability to track rotor speed
+changes, including rotation direction reversal, is demonstrated
+in Fig. 3.
+3) Zero Rotor Magnetic Flux Frequency: It is known and
+also conﬁrmed by the condition (74) that rotor speed cannot be
+estimated under pure dc magnetization, e.g., when
+Ψ
+r =
+[Ψrα
+Ψrβ
+]
+=
+[Ψr0
+0
+]
+. (116)
+On the other hand, observability condition (74) admits speed
+estimation under dc magnetization with a superimposed ac
+signal, e.g.,
+Ψr =
+[Ψrα
+Ψrβ
+]
+=
+[Ψr0 +Ψrc sin(ωct)
+0
+]
+. (117)
+The experiment was conducted using the same observer as in
+the previous one. The machine was running at constant speed
+ω= 100rad· s−1 controlled using coupled dc drive. Rotor ﬂux
+was estimated using a ﬂux model and measured rotor speed to
+be able to control the rotor ﬂux independently of the observer
+behavior. Initially, dc magnetization Ψ
+r0 =0 .45 Wb was ap-
+plied. At time t =0 .5 s, rotor magnetic ﬂux was controlled
+to be
+Ψr =
+[Ψrα
+Ψrβ
+]
+=
+[0.45+0 .35(100t)
+0
+]
+Wb. (118)
+The observer behavior can be seen in Fig. 4. Rotor speed
+is not correctly computed, and also, rotor ﬂux estimate drifts
+away during pure dc magnetization because of the lack of
+observability. At time t =0 .5 s, rotor ﬂux magnitude variation
+starts, while its angular rotational speed is zero. It can be seen
+that the observer is able to track the rotor speed as well as the
+rotor magnetic ﬂux under this condition. While the dynamics
+of the observer used is rather poor and probably practically
+unusable in this case, the experiment proved the theoretically
+obtained observability condition.
+4) Rotor Resistance Estimation: Condition (85) admits the
+simultaneous estimation of the rotor speed and rotor resistance
+even in the case of constant rotor speed. In this experiment,
+the machine was controlled to the rotor mechanical speed of
+30 rad · s
+−1. The machine was controlled based on the mea-
+sured speed and independent ﬂux model. Rotor speed and rotor
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 10
+3056 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+Fig. 4. Speed and ﬂux estimation at zero rotor ﬂux angular frequency.
+Fig. 5. Rotor speed and rotor resistance estimation.
+resistance were estimated using the same observer as in the
+previous section. Rotor magnetic ﬂux magnitude was controlled
+to vary from 0.6 to 0.8 Wb with a frequency of 100 Hz to
+Fig. 6. Comparison of (solid) PMSM real mechanical rotor speed and
+(dashed) estimated value.
+Fig. 7. Comparison of (solid) PMSM real electrical rotor position and
+(dashed) estimated value.
+achieve machine observability. The nominal value of the ξ2
+parameter is ξ2 = Rr/Lr =2 2/0.85 ≈26 s−1. The observer
+was intentionally initialized using the wrong value ξ2 =1 4,
+which is related to Rr =1 2Ω. ξ2 and ξ3 parameters were
+initialized using the same Rr value. It can be seen in Fig. 5
+that, at the beginning, the wrong observer parameters resulted
+in speed estimation error. The observer parameters are auto-
+matically tuned, which is demonstrated by the adaptation of the
+ξ
+2 parameter to a value of approximately 28. As the parameter
+ξ2 is tuned, the observer can also compute the correct rotor
+speed. The obtained ξ2 value corresponds with rotor resistance
+Rr =2 8×0.85 ≈24Ω. The observer dynamical performance
+is very slow but sufﬁcient to demonstrate simultaneous rotor
+speed and rotor resistance observability.
+B. PMSM Sensorless Control
+1) Experiment Setup: Observability conditions were veri-
+ﬁed on the real PMSM. A small PMSM from TGDrives TGT2
+series with three pole pairs was used with approximate parame-
+ter values of R
+s =0 .28Ω,Ld =0 .17 mH,Lq =0 .24 mH, and
+KE =0 .012 Wb. The observer based on extended Kalman ﬁl-
+ter [44] as well as vector control was implemented on National
+Instruments cRIO-9082 system.
+2) Nonzero Rotor Speed: The possibility of PMSM rotor
+position estimation at nonzero speed is well known. This ex-
+periment was conducted just for completeness. Rotor speed
+tracking is shown in Fig. 6 while rotor position tracking is
+shown in Fig. 7. The observer used in the experiment uses
+independent adaptation of speed and rotor position allowing
+the reduction of measurement noise impact on the estimated
+position value.
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 11
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3057
+Fig. 8. Comparison of (solid) PMSM real electrical rotor position and
+(dashed) estimated value at zero speed.
+3) Zero Rotor Speed: Model-based rotor position estimation
+at zero speed is possible only for IPMSM. The same Extended
+Kalman Filter (EKF) based observer was used as in the previous
+experiment. The rotor position was driven externally. At time
+t =0 .5 s voltage u
+sα = U sin(2πft), usβ =0 was applied
+with amplitude U =0 .5 V and frequency f = 500Hz. In this
+case, the produced stator current components satisfy condition
+(112), and the machine state is observable. The initial value of
+the rotor position was θe(0) = 0.5 rad, while the initial value in
+the observer was set to 0 rad. It can be seen in Fig. 8 that the ro-
+tor position is correctly identiﬁed as soon as the excitation sig-
+nal is injected. It is possible to track rotor position at zero speed
+or very slow speed. Rapid change of the rotor position was ap-
+plied at timet =7 s. The observer lost the position value, which
+is closely related to the fact that only local observability can be
+achieved.
+V. C
+ONCLUSION
+According to the results of the induction machine observ-
+ability analysis presented in this paper, speed and rotor ﬂux
+estimation is proven to be possible using only stator elec-
+trical quantities measurement. It has been also proven that
+the model-based estimation is possible only when nonconstant
+rotor magnetic ﬂux condition is fulﬁlled. Sensorless control of
+an induction machine in a low-speed region is known to be a
+very difﬁcult task. It is possible to see from condition (74) that
+the problem is not caused by low or even zero rotor speed but by
+very low or zero magnetic ﬁeld frequency. While observability
+is generally lost at zero magnetic ﬁeld frequency, difﬁculties in
+sensorless operation arise even at low magnetic ﬁeld frequency
+because the speed information contained in stator voltage and
+current measurement is inﬂuenced by noise and nonmodeled
+nonlinearities. Careful measures to achieve stable observer
+behavior in low-speed operation need to be applied [13], [45].
+Machine state observability can be also improved using ﬁeld-
+weakening increasing magnetic ﬁeld frequency even at low
+rotor speed or by additional stator voltage change injection
+allowing rotor magnetic ﬂux changes [46], [47].
+It has been shown that rotor-speed- and rotor-resistance-
+dependent parameters can be simultaneously estimated only if
+the rotor ﬂux magnitude or load torque is not constant.
+There are other estimation methods which do not rely on the
+induction machine model and thus do not suffer from observ-
+ability problems—the so-called rotor slot harmonics analysis
+[40], [48], [49]. Unfortunately, this method does not provide
+good performance at low speed due to its low resolution. The
+only possibility seems to be the injection of an additional
+signal into the stator voltage, which can provide rotor ﬂux
+variation even at zero magnetic ﬁeld frequency reestablishing
+state variable observability [50].
+The results of the PMSM state observability proved that
+rotor position and speed can be computed from stator electrical
+quantity measurement. It has been shown that, in the case of a
+surface permanent magnet machine, the observability condition
+is given by (103). The possibility of rotor speed and position
+estimation is guaranteed for nonzero rotor speed only. This
+property of SPMSM is known to cause troubles in sensorless
+control in the low-speed region and estimation of the initial
+rotor position. On the other hand, the observability condition
+(101) valid for IPMSM drives promises the possibility of
+rotor position estimation even at zero rotor speed. The state
+observability can be achieved by applying changes to stator
+current allowing relatively easy initial rotor position estimation.
+Many control schemes based on this idea have been already
+developed [51], [52]. This IPMSM property is connected to
+magnetic saliency which can be inﬂuenced by the proper rotor
+construction [53] to achieve reliable sensorless operation. This
+is very important as it is possible to design an IPMSM drive
+sensorless control without performing an initial rotor alignment
+procedure.
+The research effort of the authors is currently aimed at
+the further generalization of the aforementioned commented
+results, namely, proving conditions of concurrent rotor position,
+load torque, and load inertia estimation for PMSM drives.
+Requirements for the performance of concurrent mechanical
+quantities and electrical drive parameter estimation are also
+under investigation.
+A
+PPENDIX
+OBSERV ABILITY MAT R I X
+In the ﬁrst step, Lie derivatives (119) shown at the bottom of
+the page need to be computed to be able to enumerate criterion
+matrix (64). Criterion matrix O
+1 is then computed as a Jacobian
+L1 =
+⎡
+⎢⎢
+⎢
+⎢⎣
+L
+0
+fh1
+L0
+f
+h2
+Lfh1
+Lfh2
+L2
+f
+h1
+⎤
+⎥⎥
+⎥
+⎥⎦
+=
+⎡
+⎢⎢
+⎢
+⎢⎣
+i
+′
+sα
+i′
+s
+β
+usα −ξ1i′
+sα +ξ2Ψ′
+rα +ωeΨ′
+rβ
+usβ −ξ1i′
+sβ +ξ2Ψ′
+rβ −ωeΨ′
+rα
+−ξ1usα +i′
+sα
+(
+ξ2
+1 +ξ2ξ3
+)
++ξ3i′
+sβωe −Ψ′
+rα
+(
+ξ2
+2 +ξ1ξ2 −ω2
+e
+)
+−Ψ′
+rβωe(ξ1 +2ξ2)
+⎤
+⎥⎥
+⎥
+⎥⎦
+(119)
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 12
+3058 IEEE TRANSACTIONS ON I NDUSTRIAL ELECTRONICS, VOL. 60, NO. 8, A UGUST 2013
+O1 = ∂L1
+∂x =
+⎡
+⎢⎢⎢
+⎢⎣
+10 0 0 0
+01 0 0 0
+−ξ
+1 0 ξ2 ωe Ψ′
+rβ
+0 −ξ1 −ωe ξ2 −Ψ′
+rα
+ξ2
+1 +ξ2ξ3 ξ3ωe ω2
+e −ξ2
+2 −ξ1ξ2 −ωe(ξ1 +2ξ2)2 ωeΨ′
+rα +ξ3i′
+sβ −Ψ′
+rβ(ξ1 +2ξ2)
+⎤
+⎥⎥⎥
+⎥⎦
+(120)
+of matrix L1 given by (119), resulting in (120), shown on top
+of the page. Now, it is necessary to compute determinant
+D1 =d e t{O1} =
+(
+ω2
+e +ξ2
+2
+)(
+−ξ2Ψ′
+rβ +ωeΨ′
+rα +ξ3i′
+sβ
+)
+.
+(121)
+(121) can be rewritten as
+D1 =
+(
+ω2
+e +ξ2
+2
+)dΨ′
+rβ
+dt (122)
+considering (52).
+REFERENCES
+[1] J. Guzinski, M. Diguet, Z. Krzeminski, A. Lewicki, and H. Abu-Rub,
+“Application of speed and load torque observers in high-speed train
+drive for diagnostic purposes,” IEEE Trans. Ind. Electron., vol. 56, no. 1,
+pp. 248–256, Jan. 2009.
+[2] J. Guzinski, H. Abu-Rub, M. Diguet, Z. Krzeminski, and A. Lewicki,
+“Speed and load torque observer application in high-speed train elec-
+tric drive,” IEEE Trans. Ind. Electron. , vol. 57, no. 2, pp. 565–574,
+Feb. 2010.
+[3] J. Holtz, “Sensorless speed and position control of induction motors,” in
+Proc. 27th IEEE IECON , Denver, CO, 2001, pp. 1200–1205.
+[4] M. Barut, S. Bogosyan, and M. Gokasan, “Speed sensorless direct
+torque control of IMs with rotor resistance estimation,” Energy Convers.
+Manage., vol. 46, no. 3, pp. 335–349, Feb. 2005.
+[5] S. Jafarzadeh, C. Lascu, and S. Fadali, “State estimation of induction
+motor drives using the unscented Kalman ﬁlter,” IEEE Trans. Ind. Elec-
+tron., vol. 59, no. 11, pp. 4207–4216, 2012.
+[6] G. G. Rigatos, “A derivative-free Kalman ﬁltering approach to state
+estimation-based control of nonlinear systems,” IEEE Trans. Ind.
+Electron., vol. 59, no. 10, pp. 3987–3997, Oct. 2012.
+[7] P . V aclavek and P . Blaha, “Lyapunov function based ﬂux and speed ob-
+server for ac induction motor sensorless control and parameters estima-
+tion,” IEEE Trans. Ind. Electron., vol. 53, no. 1, pp. 138–145, Feb. 2006.
+[8] G. Welch and G. Bishop, “An introduction to the Kalman ﬁlter,” in
+SIGGRAPH Course Syllabus . Chapel Hill, NC: Univ. North Carolina,
+2001, p. 82.
+[9] F. Genduso, R. Miceli, C. Rando, and G. R. Galluzzo, “Back EMF
+sensorless-control algorithm for high-dynamic performance PMSM,”
+IEEE Trans. Ind. Electron., vol. 57, no. 6, pp. 2092–2100, Jun. 2010.
+[10] K. Hongryel, S. Jubum, and L. Jangmyung, “A high-speed sliding-mode
+observer for the sensorless speed control of a PMSM,” IEEE Trans. Ind.
+Electron., vol. 58, no. 9, pp. 4069–4077, Sep. 2011.
+[11] T. Orlowska-Kowalska and M. Dybkowski, “Stator-current-based MRAS
+estimator for a wide range speed-sensorless induction-motor drive,” IEEE
+Trans. Ind. Electron., vol. 57, no. 4, pp. 1296–1308, Apr. 2010.
+[12] S. Gadoue, D. Giaouris, and J. Finch, “Sensorless control of induction
+motor drives at very low and zero speeds using neural network ﬂux
+observers,” IEEE Trans. Ind. Electron. , vol. 56, no. 8, pp. 3029–3039,
+Aug. 2009.
+[13] J. Holtz, “Sensorless control of induction motor drives,” Proc. IEEE ,
+vol. 90, no. 8, pp. 1359–1394, Aug. 2002.
+[14] K. Akatsu and A. Kawamura, “Sensorless very low-speed and zero-speed
+estimations with online rotor resistance estimation of induction motor
+without signal injection,” IEEE Trans. Ind. Appl., vol. 36, no. 3, pp. 764–
+771, May/Jun. 2000.
+[15] M. S. Zaky, “Stability analysis of speed and stator resistance estimators
+for sensorless induction motor drives,” IEEE Trans. Ind. Electron., vol. 59,
+no. 2, pp. 858–870, Feb. 2012.
+[16] G. Foo and M. Rahman, “Sensorless direct torque and ﬂux-controlled
+IPM synchronous motor drive at very low speed without signal injection,”
+IEEE Trans. Ind. Electron., vol. 57, no. 1, pp. 395–403, Jan. 2010.
+[17] J. Chiasson, M. Bodson, and L. Tolbert, “Observability of speed in an
+induction motor from stator currents and voltages,” in Proc. 44th IEEE
+Conf. Decis. Control, 2005, no. 5, pp. 3438–3443.
+[18] G. Kenné, T. Ahmed-Ali, F. Lamnabhi-Lagarrigue, and A. Arzandé,
+“Nonlinear systems time-varying parameter estimation: Application to
+induction motors,” Elect. Power Syst. Res., vol. 78, no. 11, pp. 1881–1888,
+Nov. 2008.
+[19] A. Pavlov and A. Zaremba, “Adaptive observers for sensorless con-
+trol of an induction motor,” in Proc. IEEE Amer . Control Conf.
+(Cat. No.01CH37148), 2001, vol. 2, pp. 1557–1562.
+[20] C.-S. Chiu, K.-Y . Lian, C.-Y . Hung, and P . Liu, “Adaptive speed control
+for induction motors based on a semi-current-fed model,” Int. J. Control,
+vol. 81, no. 2, pp. 307–316, Feb. 2008.
+[21] H. Shim, Y . Son, and J. Back, “Enlarging the class of linear systems
+admitting adaptive observers without persistent excitation,” in Proc. Eur .
+Control Conf., 2003, pp. 262–269.
+[22] D. Del V ecchio and R. Murray, “Observability and local observer con-
+struction for unknown parameters in linearly and nonlinearly parameter-
+ized systems,” in Proc. IEEE Amer . Control Conf. , 2003, vol. 6, no. 1,
+pp. 4748–4753.
+[23] D. Basic, F. Malrait, and P . Rouchon, “Euler–Lagrange models with
+complex currents of three-phase electrical machines and observabil-
+ity issues,” IEEE Trans. Autom. Control , vol. 55, no. 1, pp. 212–217,
+Jan. 2010.
+[24] E. Laroche, E. Sedda, and C. Durieu, “Methodological insights for online
+estimation of induction motor parameters,” IEEE Trans. Control Systems
+Technology, vol. 16, no. 5, pp. 1021–1028, Sep. 2008.
+[25] S. Ibarra-rojas, J. Moreno, and G. Espinosa-pa, “Global observability
+analysis of sensorless induction motors,” Automatica, vol. 40, no. 6,
+pp. 1079–1085, 2004.
+[26] R. Hermann and A. Krener, “Nonlinear controllability and observability,”
+IEEE Trans. Autom. Control, vol. AC-22, no. 5, pp. 728–740, Oct. 1977.
+[27] M. Ezzat, J. de Leon, N. Gonzalez, and A. Glumineau, “Sensorless
+speed control of permanent magnet synchronous motor by using sliding
+mode observer,” in Proc. 11th IEEE Int. Workshop VSS , Jun. 2010,
+pp. 227–232.
+[28] D. Zaltni, M. N. Abdelkrim, M. Ghanes, and J. P . Barbot, “Observability
+analysis of PMSM,” in Proc. 3rd Int. Conf. SCS , Nov. 2009, pp. 1–6.
+[29] M. Ghanes, J. De Leon, and A. Glumineau, “Observability study and
+observer-based interconnected form for sensorless induction motor,” in
+Proc. 45th IEEE Conf. Decis. Control , 2006, pp. 1240–1245.
+[30] K. P . Kovács and I. Rácz, Transiente V orgänge in Wechselstrommaschi-
+nen, vol. I–II. Budapest, Hungary: V erlag der Ungarischen Akademie
+der Wissenschaften, 1959.
+[31] J. F. Broenik, “Introduction to physical systems modelling with bond
+graphs,” in SiE Whitebook on Simulation Methodologies . Enschede-
+Noord, The Netherlands: Univ. Twente, 1999.
+[32] G. Slemon, “Modelling of induction machines for electric drives,” IEEE
+Trans. Ind. Appl., vol. 25, no. 6, pp. 1126–1131, Nov. 1989.
+[33] B. Peterson, “Oscillations in inverter fed induction motor drives,” M.S.
+thesis, Lund Inst. Technol., Lund, Sweden, 1991.
+[34] Z. Chen, M. Tomita, S. Doki, and S. Okuma, “An extended electromotive
+force model for sensorless control of interior permanent-magnet syn-
+chronous motors,” IEEE Trans. Ind. Electron., vol. 50, no. 2, pp. 288–295,
+Apr. 2003.
+[35] J. Hedrick and A. Girard, Control of Nonlinear Dynamic Systems: Theory
+and Applications. Berkeley, CA: Univ. California, 2005.
+[36] C. Canudas De Wit, A. Y oussef, J. Barbot, P . Martin, and F. Malrait,
+“Observability conditions of induction motors at low frequencies,” in
+Proc. 39th IEEE Conf. Decis. Control , 2000, vol. 3, pp. 2044–2049.
+[37] P . V as, Parameter Estimation, Condition Monitoring, and Diagnosis of
+Electrical Drives. Oxford, U.K.: Clarendon, 1993.
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+PAGE 13
+V ACLA VEKet al.: AC DRIVE OBSERV ABILITY ANALYSIS 3059
+[38] P . Blaha and P . V aclavek, “The algorithm for online stator resistance
+identiﬁcation of an ac induction motor,” in Proc. 10th IEEE Int. Conf.
+Intell. Eng. Syst., 2006, pp. 86–91.
+[39] M. S. Zaky, “Stability analysis of speed and stator resistance estimators
+for sensorless induction motor drives,” IEEE Trans. Ind. Electron., vol. 59,
+no. 2, pp. 858–870, Feb. 2012.
+[40] P . V aclavek and P . Blaha, “AC induction machine speed observer with
+rotor resistance adaptation,” in Proc. 16th IF AC World Congr . ,P r a h a ,
+Czech Republic, 2005.
+[41] A. Ganji, P . Guillaume, R. Pintelon, and P . Lataire, “Induction motor
+dynamic and static inductance identiﬁcation using a broadband excitation
+technique,” IEEE Trans. Energy Convers. , vol. 13, no. 1, pp. 15–20,
+Mar. 1998.
+[42] S.-B. Lee and T. Habetler, “An online stator winding resistance esti-
+mation technique for temperature monitoring of line-connected induc-
+tion machines,” IEEE Trans. Ind. Appl. , vol. 39, no. 3, pp. 685–694,
+May 2003.
+[43] S. Mir, M. Elbuluk, and D. Zinger, “Pi and fuzzy estimators for tuning
+the stator resistance in direct torque control of induction machines,” IEEE
+Trans. Power Electron., vol. 13, no. 2, pp. 279–287, Mar. 1998.
+[44] L. V esely and D. Zamecnik, “Extending mathematical model of perma-
+nent magnet synchronous motors in alpha-beta coordinate system for
+EKF,” in Proc. 12th IEEE CINTI , Nov. 2011, pp. 457–460.
+[45] J. Holtz, “Drift- and parameter-compensated ﬂux estimator for persistent
+zero-stator-frequency operation of sensorless-controlled induction mo-
+tors,” IEEE Trans. Ind. Appl., vol. 39, no. 4, pp. 1052–1060, Jul. 2003.
+[46] D. Basic, F. Malrait, and P . Rouchon, “Current controller for low-
+frequency signal injection and rotor ﬂux position tracking at low speeds,”
+IEEE Trans. Ind. Electron., vol. 58, no. 9, pp. 4010–4022, Sep. 2011.
+[47] Z. Q. Zhu and L. M. Gong, “Investigation of effectiveness of sensor-
+less operation in carrier-signal-injection-based sensorless-control meth-
+ods,” IEEE Trans. Ind. Electron. , vol. 58, no. 8, pp. 3431–3439,
+Aug. 2011.
+[48] S. Nandi, S. Ahmed, and H. Toliyat, “Detection of rotor slot and other
+eccentricity related harmonics in a three phase induction motor with dif-
+ferent rotor cages,” IEEE Trans. Energy Convers., vol. 16, no. 3, pp. 253–
+260, Sep. 2001.
+[49] P . V aclavek and P . Blaha, “Hybrid speed estimation scheme for ac in-
+duction machine sensorless control,” in Proc. IEEE Conf. Control Appl. ,
+Toronto, ON, Canada, 2005, vol. 1, pp. 1455–1460.
+[50] L. Harnefors and H.-P . Nee, “A general algorithm for speed and position
+estimation of ac motors,” IEEE Trans. Ind. Electron. , vol. 47, no. 1,
+pp. 77–83, Feb. 2000.
+[51] D. Basic, F. Malrait, and P . Rouchon, “Current controller for low-
+frequency signal injection and rotor ﬂux position tracking at low speeds,”
+IEEE Trans. Ind. Electron., vol. 58, no. 9, pp. 4010–4022, Sep. 2011.
+[52] G. Foo and M. Rahman, “Sensorless sliding-mode MTPA control of an
+IPM synchronous motor drive using a sliding-mode observer and HF
+signal injection,” IEEE Trans. Ind. Electron. , vol. 57, no. 4, pp. 1270–
+1278, Apr. 2010.
+[53] R. Wrobel, A. S. Budden, D. Salt, D. Holliday, P . H. Mellor, A. Dinu,
+P . Sangha, and M. Holme, “Rotor design for sensorless position estimation
+in permanent-magnet machines,” IEEE Trans. Ind. Electron. , vol. 58,
+no. 9, pp. 3815–3824, Sep. 2011.
+Pavel Vaclavek (M’04–SM’12) received the M.Sc.
+degrees in cybernetics and industrial management
+and the Ph.D. degree in cybernetics from the Brno
+University of Technology, Brno, Czech Republic, in
+1993, 1998, and 2001, respectively.
+He is currently a Research Group Leader with the
+Central European Institute of Technology, Brno Uni-
+versity of Technology. His research interests include
+speed sensorless control of induction machines,
+system modeling, and parameter estimation.
+Petr Blaha received the M.Sc. and Ph.D. degrees
+in cybernetics from the Brno University of Tech-
+nology, Brno, Czech Republic, in 1996 and 2001,
+respectively.
+He is currently a Senior Researcher with the
+Central European Institute of Technology, Brno Uni-
+versity of Technology. His research interests include
+speed sensorless control of induction machines,
+parameter estimation, and polynomial methods in
+control systems.
+Ivo Herman received the Bc. degree in automation
+and measurement from the Brno University of Tech-
+nology, Brno, Czech Republic, in 2010.
+He is a Student in master specialization cyber-
+netics, control, and measurement at the Faculty of
+Electrical Engineering and Communication, Brno
+University of Technology. He works as a Junior
+Researcher at the Center for Applied Cybernetics,
+Faculty of Electrical Engineering and Communica-
+tion, Brno University of Technology.
+Authorized licensed use limited to: Universidad de Talca. Downloaded on November 25,2025 at 21:10:59 UTC from IEEE Xplore.  Restrictions apply. 
