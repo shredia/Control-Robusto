@@ -561,7 +561,7 @@ dIb_dtheta_e = ...
 %
 % d(eps_norm)/d(theta_estimado) ~= -1
 %
-dEps_dtheta_e = 0;%%-1
+dEps_dtheta_e = -1;%%-1
 
 
 Ck = [ ...

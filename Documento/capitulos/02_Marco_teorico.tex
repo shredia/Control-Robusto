@@ -1,17 +1,119 @@
+% ============================================================
+% CAPÍTULO 2 — MARCO TEÓRICO
+% ============================================================
+
 \chapter{Marco teórico}
-En esta sección se presenta una revisión de los conceptos fundamentales relacionados con el control de motores paso a paso, así como una descripción de las principales técnicas de control robusto que se han desarrollado para sistemas con perturbaciones no medibles. Se abordarán también los desafíos específicos que plantea el control de un clinostato accionado por motores paso a paso, y se discutirán las estrategias más adecuadas para mitigar los efectos de las perturbaciones mecánicas variables.
 
-\section{Motor Stepper}
-Desde el punto de vista del control, los motores paso a paso pueden operar mediante secuencias discretas de excitación (control por pasos) o mediante excitaciones sinusoidales de corriente (microstepping), lo que permite reducir vibraciones mecánicas y rizado de torque. En este último caso, el comportamiento del motor se aproxima al de un motor síncrono de imanes permanentes, habilitando el uso de técnicas de control avanzadas basadas en la regulación de corrientes.
+En este capítulo se presentan los fundamentos teóricos necesarios para el 
+modelado, control y estimación de estados de un motor paso a paso operando 
+en régimen \textit{sensorless} a baja velocidad. En primer lugar, se describen 
+las características del motor y su representación electromecánica. 
+Posteriormente, se introducen las transformaciones utilizadas para expresar 
+el modelo en un sistema de referencia rotante y los fundamentos del control 
+orientado al campo. Finalmente, se desarrollan los conceptos relacionados 
+con la estimación de estados, la observabilidad a baja velocidad y la 
+incorporación de perturbaciones mediante estados aumentados, los cuales 
+constituyen la base teórica de la estrategia estudiada en este trabajo.
 
-Una de las principales características de los motores paso a paso es su capacidad para generar un torque elevado a bajas velocidades, lo que los hace atractivos para aplicaciones de posicionamiento y movimiento lento. No obstante, su operación a lazo abierto los hace sensibles a perturbaciones mecánicas y variaciones de carga, pudiendo presentarse errores de posición y velocidad cuando las condiciones de operación se apartan de las nominales.
 
-Estas características motivan el estudio de estrategias de control que permitan mejorar el desempeño dinámico del motor, particularmente en aplicaciones donde se requiere un movimiento continuo y estable bajo perturbaciones variables, como en el caso de los clinostatos.
+% ============================================================
+% 2.1 MOTOR PASO A PASO
+% ============================================================
+
+\section{Motor paso a paso}
+
+% ------------------------------------------------------------
+% OBJETIVO DE ESTA SECCIÓN
+% ------------------------------------------------------------
+% Explicar únicamente las características del motor necesarias
+% para entender el resto de la tesis.
+%
+% Debe quedar claro:
+% - qué es un motor paso a paso;
+% - por qué puede operar en lazo abierto;
+% - diferencia básica entre pasos y microstepping;
+% - por qué un stepper híbrido puede modelarse de forma similar
+%   a una PMSM;
+% - elevado número de pares de polos;
+% - presencia de saliencia.
+%
+% NO profundizar todavía en:
+% - FOC;
+% - HFI;
+% - EKF;
+% - observabilidad.
+%
+% Esos conceptos aparecen posteriormente.
+% ------------------------------------------------------------
+
+Desde el punto de vista del control, los motores paso a paso pueden operar 
+mediante secuencias discretas de excitación, correspondientes al control 
+convencional por pasos, o mediante referencias continuas de corriente, como 
+ocurre en el microstepping. En este último caso, las corrientes de las fases 
+pueden ser reguladas mediante referencias sinusoidales y cosenoidales, 
+permitiendo generar posiciones intermedias entre los pasos naturales del motor 
+y reducir determinadas oscilaciones asociadas al accionamiento.
+
+Los motores paso a paso híbridos presentan características electromagnéticas 
+que permiten describir su comportamiento mediante formulaciones similares a 
+las utilizadas en máquinas síncronas de imanes permanentes. Esta relación 
+resulta particularmente útil desde el punto de vista del control, debido a que 
+permite aplicar estrategias de control vectorial y estimación de estados 
+desarrolladas para este tipo de máquinas.
+
+Una de las principales características de los motores paso a paso es su 
+capacidad para generar un torque elevado a bajas velocidades, lo que los hace 
+atractivos para aplicaciones de posicionamiento y movimiento lento. No 
+obstante, su operación convencional en lazo abierto los hace sensibles a 
+perturbaciones mecánicas y variaciones de carga, pudiendo presentarse errores 
+de posición y velocidad cuando las condiciones de operación se apartan de las 
+nominales.
+
+% TODO:
+% Agregar aquí un párrafo corto sobre el motor híbrido:
+% - rotor dentado;
+% - imanes permanentes;
+% - estator dentado;
+% - elevado número de pares de polos.
+%
+% Sería útil incorporar una figura transversal del motor.
+%
+% Terminar esta sección introduciendo que estas características
+% justifican utilizar un modelo electromecánico similar al de
+% una PMSM saliente.
+
+
+% ============================================================
+% 2.2 MODELADO ELECTROMECÁNICO
+% ============================================================
 
 \section{Modelado electromecánico del motor}
-Para el diseño de estrategias de control robusto, es fundamental contar con un modelo preciso del sistema. El modelo electromecánico de un motor paso a paso puede describirse mediante un conjunto de ecuaciones diferenciales que relacionan las variables eléctricas (corrientes y voltajes) con las variables mecánicas (posición, velocidad y torque). En particular, el torque generado por el motor depende de la corriente en las bobinas y de la posición angular del rotor, lo que introduce una no linealidad en el sistema. Además, la presencia de perturbaciones mecánicas variables, como las que se presentan en el clinostato debido a la geometría del sistema de poleas, añade complejidad al modelado y al diseño de controladores robustos.
 
-Una aproximación común para el modelado de motores paso a paso es utilizar un modelo de segundo orden que capture la dinámica del sistema, incluyendo la inercia del rotor, la fricción y las perturbaciones externas. Este modelo puede ser utilizado para analizar la estabilidad del sistema y diseñar controladores que sean capaces de mantener un desempeño adecuado incluso en presencia de perturbaciones no medibles.
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Construir el modelo físico sobre el cual posteriormente se
+% desarrollarán:
+% - FOC;
+% - EKF;
+% - observabilidad;
+% - estados aumentados.
+%
+% IMPORTANTE:
+% Tu modelo final considera saliencia (Ld != Lq).
+% Por lo tanto, conviene presentar primero el modelo general
+% y posteriormente llegar al modelo dq utilizado.
+%
+% Esta sección NO debe hablar todavía de cómo se estima.
+% Aquí sólo se define la planta.
+% ------------------------------------------------------------
+
+El modelo electromecánico de un motor paso a paso puede describirse mediante 
+un conjunto de ecuaciones diferenciales que relacionan las variables 
+eléctricas, correspondientes principalmente a las corrientes y tensiones de 
+fase, con las variables mecánicas de posición, velocidad y torque.
+
+Una representación inicial del sistema puede expresarse mediante:
 
 \begin{equation}
 \label{eq:modelo_motor}
@@ -19,140 +121,1249 @@ Una aproximación común para el modelado de motores paso a paso es utilizar un 
 \begin{aligned}
     L \frac{d i_{a}}{dt} &= V_{a} - R i_{a} - e_{a}(\theta_{e}) \\
     L \frac{d i_{b}}{dt} &= V_{b} - R i_{b} - e_{b}(\theta_{e}) \\
-    J \frac{d \omega_{m}}{dt} &= \tau_{em} - B \omega_{m} - \tau_{dm} - \tau_{load} \\
+    J \frac{d \omega_{m}}{dt} &= 
+    \tau_{em} - B \omega_{m} - \tau_{dm} - \tau_{load} \\
     \frac{d \theta_{m}}{dt} &= \omega_{m} \\
-    \theta_{e} &= \theta_{m} \cdot N_{r}
+    \theta_{e} &= P\theta_{m}
 \end{aligned}
 \right.
 \end{equation}
 
-\section{Transformada de Park y Clarke}
-La transformada de Clarke es una transformada que permite, mediante una multiplicación de matrices, transformar toda la información que hay en un sistema trifásico en un sistema bifásico. Esta transformada es bastante útil, puesto que reduce la cantidad de información redundante, y adicionalmente, la salida de esta transformada es una salida ortogonal ( es decir, son dos señales separadas en 90 grados). Debido a que nuestro motor stepper es bifásico, ya desfasado 90 grados, esta transformada se descarta como una opción para el control, pero es importante conocerla, puesto que es la base de la transformada de Park, que sí se utiliza en el control de motores paso a paso.
+donde $V_a$ y $V_b$ corresponden a las tensiones aplicadas a las fases,
+$i_a$ e $i_b$ a sus respectivas corrientes, $R$ y $L$ representan los
+parámetros eléctricos de los devanados, $J$ corresponde a la inercia del
+rotor, $B$ al coeficiente de fricción viscosa y $P$ al número de pares de
+polos.
 
-La transformada de park tiene como objetivo transformar un sistema de referencia estacionario, a un sistema de referencia rotatorio.Esto es útil, puesto que en un sistema electrico alterno, existe información redundante en una gráfica sinoidal, dónde los valores más importantes serían la frecuencia y la amplitud, pero no el valor instantáneo. Al transformar a un sistema de referencia rotatorio, se obtiene una recta si la amplitud se mantiene constante, lo que facilita el análisis y el control del sistema. Además, esta transformada permite separar la información de torque y flujo en dos componentes ortogonales, lo que es fundamental para el diseño de controladores basados en la regulación de corrientes.
+% ------------------------------------------------------------
+% IMPORTANTE
+% ------------------------------------------------------------
+% Esta ecuación supone inicialmente una inductancia simplificada.
+% Más adelante se introduce el modelo saliente.
+%
+% No presentar este modelo como "el modelo definitivo".
+% Decir explícitamente que corresponde a una representación
+% inicial/simplificada.
+% ------------------------------------------------------------
 
-\begin{equation}
-    \begin{bmatrix}
-        i_d \\
-        i_q
-    \end{bmatrix} = 
-    \begin{bmatrix}
-        \cos(\theta) & \sin(\theta) \\
-        -\sin(\theta) & \cos(\theta)
-    \end{bmatrix}
-    \begin{bmatrix}
-        i_{\alpha} \\
-        i_{\beta}
-    \end{bmatrix}
-\end{equation}
 
-Otra de las ventajas que se tiene al utilizar esta transformada, es el ahorro computacional, puesto que se calcula solo una vez las funciones de seno y coseno, y luego se utilizan para calcular las señales de control, lo que es especialmente relevante en sistemas embebidos con recursos limitados.
+% ============================================================
+% 2.2.1 SALIENCIA
+% ============================================================
 
-\section{FOC en motores steppers}
-Field orient control (FOC) es una técnica de control vectorial que se utiliza para controlar motores eléctricos, incluyendo motores paso a paso. Esta técnica se basa en la idea de controlar el flujo magnético y el torque del motor de manera independiente, lo que permite obtener un desempeño dinámico superior y una mayor eficiencia energética. En el caso de los motores paso a paso, el FOC se implementa utilizando la transformada de Park para separar las corrientes en componentes de flujo y torque, lo que facilita el diseño de controladores que puedan mantener un desempeño adecuado incluso en presencia de perturbaciones mecánicas variables.
+\subsection{Saliencia magnética}
 
-Puesto que nuestro motor tiene solamente 2 fases desfasados en 90 grados,uno puede aplicar de forma inmediata la transformada de Park, y obtener una señal de control para cada fase, lo que simplifica la implementación del FOC. 
-Al aplicar la transformada de Park a las ecuaciones (\ref{eq:modelo_motor}), se obtiene un modelo en el dominio de Park que puede ser utilizado para diseñar controladores basados en la regulación de corrientes. 
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Esta sección estaba después de HFI.
+% Conviene moverla aquí porque:
+%
+%   geometría -> saliencia -> L(theta) -> modelo dq -> HFI
+%
+% Primero se explica la propiedad física.
+% Después se utiliza esa propiedad para HFI.
+%
+% CORREGIR:
+% No afirmar "todos los motores presentan saliencia".
+% Mejor hablar de máquinas isotrópicas y anisotrópicas.
+%
+% Tampoco afirmar sin referencia que "un stepper tiene más
+% saliencia porque tiene más polos". Número de polos y saliencia
+% no son exactamente la misma propiedad.
+% ------------------------------------------------------------
 
-\begin{equation}
-    \begin{bmatrix}
-        \dot{I}_d \\
-        \dot{I}_q \\
-        \dot{\omega_{m}} \\
-        \dot{\theta_{m}}
-    \end{bmatrix} = 
-    \begin{bmatrix}
-        (V_{d} - R I_{d})\frac{1}{L} + \omega_{m} L N_{r} I_{q} \\
-        (V_{q} - R I_{q} + K_{e}\omega_{m} )\frac{1}{L} - \omega_{m} L N_{r} I_{d} \\
-        (K_{e} I_{q} - \tau_{load} - B\omega_{m} - \tau_{dtm} )\frac{1}{J} \\
-        \omega_{m}
-    \end{bmatrix}
-\end{equation}
+La saliencia magnética corresponde a la dependencia de las propiedades 
+magnéticas de la máquina respecto de la orientación del rotor. En una máquina 
+anisotrópica, la reluctancia magnética observada en diferentes direcciones no 
+es equivalente, lo que puede representarse mediante inductancias diferentes 
+en los ejes directo y de cuadratura.
 
-\section{Filtro de Kalman Extendido}
-
-Dado que una de las principales restricciones del sistema es la imposibilidad de medir directamente la velocidad mecánica, resulta necesario recurrir a técnicas de estimación basadas en observadores de estado. Un observador de estados es una herramienta de control que permite reconstruir variables internas del sistema que no son directamente medibles, a partir de un conjunto limitado de mediciones disponibles y de un modelo matemático que describe la dinámica del sistema.
-
-Dentro de este enfoque, los filtros de Kalman corresponden a una clase de observadores de estado de naturaleza probabilística, los cuales permiten estimar los estados del sistema combinando la información proveniente de las mediciones disponibles, las entradas aplicadas y la predicción del modelo, considerando explícitamente la presencia de ruido y perturbaciones.
-
-Para que un observador de estados sea capaz de reconstruir adecuadamente todas las variables de interés, el sistema debe cumplir ciertas condiciones estructurales, entre ellas la observabilidad. Esta propiedad puede analizarse a través del modelo del sistema y depende del punto de operación considerado, lo que resulta particularmente relevante en sistemas no lineales o con parámetros variables, como los sistemas de accionamiento eléctrico.
-
-Para el caso específico de un motor paso a paso, la observabilidad considerando solo la lectura de variables como las corrientes y el voltaje aplicado, puede verse comprometida en ciertas regiones de operación, especialmente a bajas velocidades o en presencia de perturbaciones mecánicas variables. Esto se debe a que la dinámica del sistema puede volverse menos sensible a las variaciones de los estados internos, lo que dificulta la capacidad del observador para distinguir entre diferentes configuraciones del sistema. En estas condiciones, el diseño de un filtro de Kalman extendido (EKF) puede resultar insuficiente para garantizar una estimación precisa de la velocidad, lo que a su vez afecta el desempeño del controlador basado en esta estimación. Por esta razón, es necesario considerar estrategias adicionales que permitan mejorar la observabilidad del sistema, como la inyección de señales de alta frecuencia.
-
-\section{High Frecuency Injection}
-Este método utiliza la inyección de señales de alta frecuencia para mejorar la observabilidad del sistema, especialmente en regiones donde el modelo linealizado no es observable. La idea es introducir una señal de excitación adicional que permita generar una respuesta del sistema que sea sensible a las variaciones de los estados internos, lo que facilita la estimación de variables como la velocidad mecánica.Esta técnica no reconoce especificamente la posición del ángulo eléctrico, si no más bien, identifica el error entre la posición estimada y la posición real, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. 
-
-Lo que se implementa, es simplementa un voltaje de alta frecuencia en el eje del flujo, lo que genera una corriente de alta frecuencia que puede ser analizada para extraer información sobre la posición del rotor y la velocidad. Si se supone un angulo diferente al real, esto se verá reflejado en la corriente del eje del torque, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. Esta técnica es especialmente útil en aplicaciones donde se requiere un control preciso a bajas velocidades, como en el caso de los clinostatos, donde las perturbaciones mecánicas variables pueden afectar significativamente el desempeño del sistema.
-
-\begin{equation}
-    \begin{bmatrix}
-        V_d \\
-        V_q
-    \end{bmatrix} = 
-    \begin{bmatrix}
-         V_{dHF} \\
-        0
-    \end{bmatrix}
-\end{equation}
-
-Ya que se implementa una señal de bajo voltaje y de alta frecuencia, la respuesta será netamente una corriente de alta frecuencia,ya que el sistema mecánico no tendrá el tiempo suficiente para responder a la entrada ,lo que no afecta el desempeño del sistema, pero en caso de que el angulo estimado sea diferente al real, se verá reflejado en la corriente del eje del torque, lo que permite corregir la estimación de la velocidad y mejorar el desempeño del controlador. Pero esta tecnica solo es posible para motores con saliencia, es decir, motores que presentan una diferencia entre la inductancia en el eje del flujo y el eje del torque, lo que permite generar una respuesta de alta frecuencia que sea sensible a las variaciones de la posición del rotor. En el caso de los motores paso a paso, esta condición se cumple debido a su construcción interna, lo que hace que esta técnica sea especialmente adecuada para mejorar la observabilidad y el desempeño del sistema de control en aplicaciones como los clinostatos.
-
-\section{Saliencia}
-La saliencia es una propiedad de los motores eléctricos que se refiere a la diferencia entre la inductancia en el eje del flujo y el eje del torque. Esta diferencia permite generar una respuesta de alta frecuencia que sea sensible a las variaciones de la posición del rotor, lo que es fundamental para la implementación de técnicas como la inyección de señales de alta frecuencia para mejorar la observabilidad del sistema. Estos valores de inductancia van cambiando según la posición del rotor, debido a la geometría interna del motor, producto de la diferencia de resistencia que se genera entre el aire y el hierro, lo que hace que la inductancia varíe en función de la posición angular del rotor. 
-Los motores paso a paso presentan una saliencia significativamente mayor que los motores PMSM, debido a que presentan una construcción interna de más dientes ó número de polos. Un PMSM típico puede presentar entre 4 a 6 pares de polos, mientras que un motor paso a paso puede presentar entre 50 a 100 pares de polos, lo que genera una diferencia significativa en la inductancia entre el eje del flujo y el eje del torque, lo que hace que esta técnica sea especialmente adecuada para mejorar la observabilidad y el desempeño del sistema de control en aplicaciones como los clinostatos. 
-
-Todos los motores presentan saliencia, pero en algunos casos esta puede ser tan baja que no se puede aprovechar para mejorar la observabilidad del sistema, lo que limita la efectividad de técnicas como la inyección de señales de alta frecuencia. Por lo mismo, sus ecuaciones se simplifican para efectos prácticos. En nuestro caso, aun que podría simplificarse el modelo asumiendo que la inductancia es constante, se decidió mantener el modelo completo para poder aprovechar la saliencia del motor y mejorar la observabilidad del sistema, lo que es especialmente relevante en aplicaciones como los clinostatos, donde las perturbaciones mecánicas variables pueden afectar significativamente el desempeño del sistema de control.
-
-Una de las ventajas de la transformada de Park, es que como la saliencia varia en función del flujo, se puede interpretar como una inductancia constante en el plano de Park, lo que simplifica el análisis y el costo computacional.
+En un sistema bifásico, esta dependencia puede expresarse mediante 
+inductancias variables con la posición eléctrica del rotor:
 
 \begin{equation}
 \label{eq:dinamica_electrica}
 \begin{aligned}
     \begin{bmatrix} 
-        \dot{I}_a \\ \dot{I}_b 
-    \end{bmatrix} &= \frac{1}{\Delta_L}
+        \dot{I}_a \\ 
+        \dot{I}_b 
+    \end{bmatrix}
+    &=
+    \frac{1}{\Delta_L}
     \begin{bmatrix} 
         L_b & -L_{ab} \\ 
         -L_{ab} & L_a 
     \end{bmatrix}
     \begin{bmatrix} 
-        V_{a} - R I_a - e_a - \left( I_a \dot{L}_a + I_b \dot{L}_{ab} \right) \\ 
-        V_{b} - R I_b - e_b - \left( I_b \dot{L}_b + I_a \dot{L}_{ab} \right)
-    \end{bmatrix} \\
-    \text{donde:} \\
-    e_a &= -K_e \omega_m \sin(\theta_e) \\
-    e_b &= K_e \omega_m \cos(\theta_e) \\
-    L_a &= L_0 + L_2 \cos(2\theta_e) \\
-    L_b &= L_0 - L_2 \cos(2\theta_e) \\
-    L_{ab} &= L_2 \sin(2\theta_e) \\
+        V_{a} - R I_a - e_a -
+        \left(I_a \dot{L}_a + I_b \dot{L}_{ab}\right) \\ 
+        V_{b} - R I_b - e_b -
+        \left(I_b \dot{L}_b + I_a \dot{L}_{ab}\right)
+    \end{bmatrix},
 \end{aligned}
 \end{equation}
 
+donde
+
 \begin{equation}
-\label{eq:mecanica_completa}
-\left\{
 \begin{aligned}
-    T_e &= K_e (I_b \cos\theta_e - I_a \sin\theta_e) + P L_2 \left[ 2 I_a I_b \cos(2\theta_e) - (I_a^2 - I_b^2) \sin(2\theta_e) \right] \\
-    \dot{\omega}_m &= \frac{1}{J} \left( T_e - T_l - B \omega_m - T_{dm} \sin(4\theta_e) \right) \\
-    \dot{\theta}_m &= \omega_m \\
-    \theta_e &= P \cdot \theta_m
+    e_a &= -K_e \omega_m \sin(\theta_e),\\
+    e_b &= K_e \omega_m \cos(\theta_e),\\
+    L_a &= L_0 + L_2\cos(2\theta_e),\\
+    L_b &= L_0 - L_2\cos(2\theta_e),\\
+    L_{ab} &= L_2\sin(2\theta_e).
+    \Delta_L = L_aL_b-L_{ab}^{2}.
 \end{aligned}
-\right.
 \end{equation}
 
-Al aplicar la transformada de Park a las ecuaciones (\ref{eq:dinamica_electrica}) y (\ref{eq:mecanica_completa}), se obtiene un modelo mucho más simple, dónde las inductancias que varían en función del ángulo eléctrico, se interpretan como inductancias constantes en el plano de Park, lo que simplifica el análisis y el costo computacional.
+Para la parametrización considerada, este determinante puede
+expresarse como $\Delta_L=L_dL_q$. El desarrollo de esta relación
+se presenta en el Anexo~\ref{anexo:determinante_inductancias}.
+
+La dependencia de las inductancias respecto de la posición constituye una 
+fuente adicional de información acerca de la orientación del rotor. Esta 
+propiedad resulta particularmente relevante para las estrategias de 
+estimación \textit{sensorless} basadas en saliencia, desarrolladas en 
+secciones posteriores.
+
+% TODO:
+% Definir:
+%
+% L0 = (Ld + Lq)/2
+% L2 = (Ld - Lq)/2
+%
+% y explicar físicamente qué significa Ld != Lq.
+%
+% Esta conexión será MUY importante para HFI.
+
+
+% ============================================================
+% 2.2.2 TRANSFORMACIÓN DE PARK
+% ============================================================
+
+\subsection{Transformación de Park}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Explicar por qué pasamos de a-b / alpha-beta a d-q.
+%
+% Tu motor ya es bifásico y ortogonal.
+% Por eso Clarke NO es necesaria para la implementación.
+%
+% Puedes mencionar Clarke en un párrafo, pero no merece ser
+% una sección completa para esta tesis.
+%
+% CORREGIR:
+% No decir que Park se utiliza porque "el valor instantáneo
+% no es importante". Sí es importante.
+%
+% La razón correcta es que una componente sinusoidal síncrona
+% con el rotor se transforma en una componente aproximadamente
+% continua en dq.
+% ------------------------------------------------------------
+
+En accionamientos trifásicos, la transformación de Clarke permite representar 
+las variables de fase mediante dos componentes ortogonales estacionarias 
+$\alpha$ y $\beta$. En el motor paso a paso bifásico considerado en este 
+trabajo, las dos fases se encuentran eléctricamente desfasadas en $90^\circ$, 
+por lo que pueden interpretarse directamente como un sistema ortogonal.
+
+La transformación de Park permite posteriormente expresar estas variables en 
+un sistema de referencia rotante sincronizado con la posición eléctrica del 
+rotor. Para las corrientes, esta transformación puede escribirse como
 
 \begin{equation}
-    \label{eq: dq}
-    \begin{aligned}
-            \begin{bmatrix} 
-            \dot{I}_d \\ \dot{I}_q \\ \dot{\omega}_m \\ \dot{\theta}_m 
-    \end{bmatrix} 
-    \end{aligned}   = \begin{bmatrix} 
-        (V_{d} - R I_{d}+ P\omega_{m} L_q I_{q} )\frac{1}{L_d} \\
-        (V_{q} - R I_{q}  - P\omega_{m} L_d I_{d} - K_{e}\omega_{m} )\frac{1}{L_q}  \\
-        (K_{e} I_{q}- P(L_{d} - L_{q})I_{d}I_{q} - T_l - B\omega_{m} - T_{dm} \sin(4\theta_e) )\frac{1}{J} \\
-        \omega_{m}
-    \end{bmatrix}
+\label{eq:park}
+\begin{bmatrix}
+    i_d \\
+    i_q
+\end{bmatrix}
+=
+\begin{bmatrix}
+    \cos(\theta_e) & \sin(\theta_e) \\
+    -\sin(\theta_e) & \cos(\theta_e)
+\end{bmatrix}
+\begin{bmatrix}
+    i_{\alpha} \\
+    i_{\beta}
+\end{bmatrix}.
 \end{equation}
-%%\footnotetext{Nota: Los parámetros del EKF fueron sintonizados mediante el método de prueba y error.}
+
+La utilización de un sistema de referencia sincronizado con el rotor permite 
+representar como aproximadamente constantes aquellas componentes eléctricas 
+que, en el sistema estacionario, presentan una variación sinusoidal síncrona. 
+Esto simplifica tanto el análisis de la máquina como la regulación de sus 
+corrientes.
+
+% TODO:
+% Agregar transformación inversa si después la utilizas en metodología.
+%
+% También puedes agregar una figura:
+%
+% alpha-beta estacionario
+%           ↓ theta_e
+%          d-q rotante
+%
+% Esto ayuda muchísimo visualmente.
+
+
+% ============================================================
+% 2.2.3 MODELO EN COORDENADAS DQ
+% ============================================================
+
+\subsection{Modelo en coordenadas \texorpdfstring{$dq$}{dq}}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% ESTE debe transformarse en el modelo principal de la tesis.
+%
+% Desde aquí deberían salir posteriormente:
+% - controlador;
+% - EKF;
+% - Jacobianos;
+% - modelo aumentado.
+%
+% Evitar tener tres modelos diferentes sin explicar la relación.
+% ------------------------------------------------------------
+
+Al aplicar la transformación de Park al modelo electromagnético, las 
+inductancias asociadas a las direcciones principales del rotor pueden 
+representarse mediante las inductancias $L_d$ y $L_q$. El modelo dinámico 
+puede expresarse como
+
+\begin{equation}
+\label{eq:modelo_dq}
+\begin{bmatrix} 
+    \dot{I}_d \\ 
+    \dot{I}_q \\ 
+    \dot{\omega}_m \\ 
+    \dot{\theta}_m 
+\end{bmatrix}
+=
+\begin{bmatrix} 
+    \dfrac{V_d-RI_d+P\omega_mL_qI_q}{L_d}\\[8pt]
+    \dfrac{V_q-RI_q-P\omega_mL_dI_d-K_e\omega_m}{L_q}\\[8pt]
+    \dfrac{
+        K_eI_q
+        -P(L_d-L_q)I_dI_q
+        -T_l
+        -B\omega_m
+        -T_{dm}\sin(4\theta_e)
+    }{J}\\[8pt]
+    \omega_m
+\end{bmatrix}.
+\end{equation}
+
+La componente de torque electromagnético puede, por tanto, expresarse como
+
+\begin{equation}
+\label{eq:torque_electromagnetico}
+T_e =
+K_eI_q
+-
+P(L_d-L_q)I_dI_q.
+\end{equation}
+
+% TODO IMPORTANTE:
+% Revisar signos según la convención de Park que utilizas realmente
+% en Simulink.
+%
+% No cambies signos sólo porque otra referencia los escribe distinto:
+% dependen de la definición de Park y de la orientación q.
+%
+% Esta ecuación debe coincidir EXACTAMENTE con tu planta de simulación.
+
+
+% ============================================================
+% 2.3 PERTURBACIONES MECÁNICAS
+% ============================================================
+
+\section{Perturbaciones mecánicas}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA — MUY IMPORTANTE
+% ------------------------------------------------------------
+% Tu tesis ahora trata de representar perturbaciones mediante
+% estados. Por lo tanto, necesitas definir matemáticamente QUÉ
+% estás llamando perturbación antes de hablar del EKF.
+%
+% Separar:
+% 1. carga externa;
+% 2. perturbación periódica/cogging;
+% 3. perturbación total/equivalente.
+% ------------------------------------------------------------
+
+La dinámica mecánica de la máquina puede escribirse de forma general como
+
+\begin{equation}
+\label{eq:dinamica_mecanica_general}
+J\dot{\omega}_m
+=
+T_e
+-
+B\omega_m
+-
+T_d,
+\end{equation}
+
+donde $T_d$ representa el torque perturbador total que actúa sobre la 
+dinámica mecánica. Dependiendo de su origen, esta perturbación puede contener 
+componentes con diferentes características temporales o espaciales.
+
+En el presente trabajo se considera conceptualmente
+
+\begin{equation}
+\label{eq:perturbacion_total}
+T_d =
+T_L + T_p(\theta_m),
+\end{equation}
+
+donde $T_L$ representa una componente asociada al torque de carga, mientras 
+que $T_p(\theta_m)$ representa una componente periódica dependiente de la 
+posición del rotor.
+
+
+% ============================================================
+% 2.3.1 TORQUE DE CARGA
+% ============================================================
+
+\subsection{Torque de carga}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Explicar por qué Tl puede modelarse como:
+%
+%   dot(Tl) = 0
+%
+% cuando cambia lentamente.
+%
+% Esto prepara directamente los estados aumentados.
+% ------------------------------------------------------------
+
+El torque de carga corresponde a una perturbación externa aplicada sobre el 
+eje mecánico de la máquina. Cuando su dinámica es considerablemente más lenta 
+que la dinámica eléctrica del accionamiento, puede aproximarse localmente 
+mediante un valor constante o lentamente variable.
+
+Una representación utilizada habitualmente para incorporarlo posteriormente 
+como estado adicional corresponde a
+
+\begin{equation}
+\label{eq:torque_carga_estado}
+\dot{T}_L = 0.
+\end{equation}
+
+Esta expresión no implica que el torque de carga sea estrictamente constante, 
+sino que establece un modelo nominal de evolución lenta. En un estimador 
+estocástico, sus variaciones pueden ser representadas mediante el ruido de 
+proceso asociado al estado.
+
+
+% ============================================================
+% 2.3.2 PERTURBACIONES PERIÓDICAS
+% ============================================================
+
+\subsection{Perturbaciones periódicas y cogging torque}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Introducir el cogging como perturbación dependiente de posición.
+%
+% Aquí debes conectar con tu modelo actual:
+%
+% Tdm sin(4 theta_e)
+%
+% pero después GENERALIZARLO.
+%
+% No necesitas asumir que TODO el ripple es cogging.
+% ------------------------------------------------------------
+
+A diferencia del torque de carga, determinadas perturbaciones internas de la 
+máquina presentan una dependencia periódica respecto de la posición del rotor. 
+Entre ellas se encuentra el \textit{cogging torque}, originado por la 
+interacción entre la geometría magnética del rotor y del estator.
+
+En el modelo inicialmente considerado, esta perturbación puede representarse 
+mediante una componente sinusoidal de la forma
+
+\begin{equation}
+T_{cog}(\theta_e)
+=
+T_{dm}\sin(4\theta_e).
+\end{equation}
+
+Sin embargo, una perturbación periódica general no se encuentra necesariamente 
+compuesta por una única componente sinusoidal.
+
+
+% ============================================================
+% 2.3.3 REPRESENTACIÓN ARMÓNICA
+% ============================================================
+
+\subsection{Representación armónica de perturbaciones periódicas}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA — CENTRAL PARA TU TESIS
+% ------------------------------------------------------------
+% Aquí introduces Fourier.
+%
+% Esto responde directamente a tu pregunta:
+% "¿cuánto de una perturbación puedo representar con un número
+% limitado de estados?"
+% ------------------------------------------------------------
+
+Una perturbación periódica dependiente de la posición puede representarse, 
+bajo determinadas condiciones, mediante una serie de Fourier. De forma 
+general,
+
+\begin{equation}
+\label{eq:fourier_perturbacion}
+T_p(\theta_m)
+=
+A_0
++
+\sum_{k=1}^{\infty}
+\left[
+A_k\cos(kN_c\theta_m)
++
+B_k\sin(kN_c\theta_m)
+\right],
+\end{equation}
+
+donde $N_c$ representa el número de ciclos espaciales de la perturbación por 
+revolución mecánica, mientras que $A_k$ y $B_k$ representan los coeficientes 
+correspondientes a cada componente armónica.
+
+En una implementación real o numérica no resulta posible incorporar un número 
+infinito de componentes. Por esta razón, puede utilizarse una representación 
+truncada,
+
+\begin{equation}
+\label{eq:fourier_truncada}
+T_p^{(N)}(\theta_m)
+=
+A_0
++
+\sum_{k=1}^{N}
+\left[
+A_k\cos(kN_c\theta_m)
++
+B_k\sin(kN_c\theta_m)
+\right].
+\end{equation}
+
+El número de componentes $N$ determina la capacidad del modelo para representar 
+la forma de la perturbación, pero también aumenta el número de variables 
+desconocidas que deben ser determinadas o estimadas.
+
+% TODO:
+% Aquí posteriormente debes colocar referencias de Fourier +
+% observadores armónicos.
+%
+% Esta ecuación será uno de los puentes principales hacia tu
+% observador aumentado.
+
+
+% ============================================================
+% 2.4 CONTROL ORIENTADO AL CAMPO
+% ============================================================
+
+\section{Control orientado al campo}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Mantener tu FOC, pero hacerlo breve.
+%
+% Tu tesis NO estudia principalmente FOC.
+% FOC es la arquitectura sobre la cual funciona el observador.
+%
+% Explicar:
+% - Id / Iq;
+% - lazos internos de corriente;
+% - lazo externo de velocidad;
+% - necesidad de theta_e.
+% ------------------------------------------------------------
+
+El control orientado al campo, o \textit{Field Oriented Control} (FOC), 
+corresponde a una estrategia de control vectorial que permite regular las 
+componentes de corriente de la máquina en un sistema de referencia sincronizado 
+con el rotor.
+
+En el caso del motor paso a paso bifásico considerado, las corrientes pueden 
+transformarse directamente al sistema $dq$, permitiendo regular de manera 
+independiente las componentes $I_d$ e $I_q$. La componente $I_q$ presenta una 
+relación directa con la generación de torque electromagnético, mientras que 
+$I_d$ se encuentra asociada al eje directo de la máquina.
+
+La implementación del FOC requiere conocer la posición eléctrica $\theta_e$ 
+para realizar correctamente las transformaciones entre los sistemas de 
+referencia. Asimismo, cuando se incorpora un lazo externo de velocidad, se 
+requiere disponer de una estimación o medición de $\omega_m$. En una 
+implementación \textit{sensorless}, ambas variables deben ser reconstruidas 
+sin utilizar sensores mecánicos.
+
+% TODO:
+% Agregar diagrama de bloques:
+%
+% omega_ref -> PI velocidad -> Iq_ref
+%                          |
+% Id_ref ----------------> PI corriente -> inversor -> motor
+%                          ^
+%                      theta_hat
+%
+% Este diagrama será más útil que agregar mucho texto.
+
+
+% ============================================================
+% 2.5 ESTIMACIÓN DE ESTADOS
+% ============================================================
+
+\section{Estimación de estados}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA COMO CONTENEDOR
+% ------------------------------------------------------------
+% Antes tenías directamente "Filtro de Kalman Extendido".
+%
+% Ahora conviene:
+%
+% Estimación de estados
+%   -> modelo no lineal
+%   -> EKF
+%   -> estados aumentados
+%
+% porque tu tesis no es simplemente "usar un EKF".
+% ------------------------------------------------------------
+
+Un observador de estados permite reconstruir variables internas de un sistema 
+que no se encuentran disponibles mediante medición directa, utilizando para 
+ello las entradas conocidas, las mediciones disponibles y un modelo de la 
+dinámica del sistema.
+
+Para un sistema no lineal, puede utilizarse la representación
+
+\begin{equation}
+\label{eq:sistema_no_lineal}
+\begin{aligned}
+\dot{x} &= f(x,u) + w,\\
+y &= h(x,u) + v,
+\end{aligned}
+\end{equation}
+
+donde $x$ corresponde al vector de estados, $u$ al vector de entradas, $y$ a 
+las variables medidas, mientras que $w$ y $v$ representan respectivamente 
+incertidumbres de proceso y medición.
+
+
+% ============================================================
+% 2.5.1 EKF
+% ============================================================
+
+\subsection{Filtro de Kalman Extendido}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Ampliar MUCHO tu sección actual.
+%
+% Explicar:
+% - predicción;
+% - corrección;
+% - F;
+% - H;
+% - Q;
+% - R;
+% - P;
+% - K.
+%
+% No entrar todavía en los valores numéricos de tu EKF.
+% Eso pertenece a Metodología.
+% ------------------------------------------------------------
+
+Dentro de los métodos de estimación de estados, el filtro de Kalman extendido 
+(EKF) permite aplicar el principio del filtro de Kalman a sistemas no lineales 
+mediante la linealización local de sus ecuaciones alrededor del estado 
+estimado.
+
+En tiempo discreto, el sistema puede expresarse como
+
+\begin{equation}
+\begin{aligned}
+x_{k+1} &= f(x_k,u_k)+w_k,\\
+y_k &= h(x_k)+v_k.
+\end{aligned}
+\end{equation}
+
+Durante la etapa de predicción, el estado se propaga utilizando el modelo:
+
+\begin{equation}
+\hat{x}_{k|k-1}
+=
+f(\hat{x}_{k-1|k-1},u_{k-1}),
+\end{equation}
+
+mientras que la matriz de covarianza se actualiza mediante
+
+\begin{equation}
+P_{k|k-1}
+=
+F_kP_{k-1|k-1}F_k^{T}
++
+Q_k,
+\end{equation}
+
+donde
+
+\begin{equation}
+F_k
+=
+\left.
+\frac{\partial f}{\partial x}
+\right|_{\hat{x}_{k-1|k-1}}
+\end{equation}
+
+corresponde al Jacobiano del modelo respecto de los estados.
+
+Durante la etapa de corrección se calcula la ganancia de Kalman,
+
+\begin{equation}
+K_k
+=
+P_{k|k-1}H_k^T
+\left(
+H_kP_{k|k-1}H_k^T+R_k
+\right)^{-1},
+\end{equation}
+
+donde
+
+\begin{equation}
+H_k
+=
+\left.
+\frac{\partial h}{\partial x}
+\right|_{\hat{x}_{k|k-1}}.
+\end{equation}
+
+Finalmente, el estado estimado se corrige mediante
+
+\begin{equation}
+\hat{x}_{k|k}
+=
+\hat{x}_{k|k-1}
++
+K_k
+\left[
+y_k-h(\hat{x}_{k|k-1})
+\right].
+\end{equation}
+
+% TODO:
+% Explicar en texto:
+%
+% P -> incertidumbre del estado estimado
+% Q -> incertidumbre/model mismatch de proceso
+% R -> incertidumbre de medición
+% K -> ponderación modelo/medición
+%
+% MUY IMPORTANTE:
+% Q tendrá después una interpretación importante para Tx, Ak, Bk.
+
+
+% ============================================================
+% 2.5.2 ESTADOS AUMENTADOS
+% ============================================================
+
+\subsection{Observadores de estados aumentados}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA — NÚCLEO DE TU TESIS
+% ------------------------------------------------------------
+% Explicar qué significa agregar una perturbación como estado.
+%
+% Partir simple:
+%
+% x = [Id Iq theta omega]^T
+%
+% luego:
+%
+% xa = [Id Iq theta omega Tx]^T
+%
+% después:
+%
+% xa = [Id Iq theta omega Tx A1 B1 ... AN BN]^T
+% ------------------------------------------------------------
+
+Cuando una perturbación desconocida influye directamente sobre la dinámica 
+del sistema, una alternativa consiste en incorporarla como una variable 
+adicional dentro del vector de estados. De esta manera, su valor puede ser 
+reconstruido conjuntamente con los estados originales utilizando las 
+mediciones disponibles.
+
+Considerando inicialmente el modelo electromecánico, puede definirse un vector 
+de estados básico de la forma
+
+\begin{equation}
+x =
+\begin{bmatrix}
+I_d &
+I_q &
+\theta_m &
+\omega_m
+\end{bmatrix}^{T}.
+\end{equation}
+
+Al incorporar una perturbación equivalente de evolución lenta, el vector puede 
+aumentarse como
+
+\begin{equation}
+x_a =
+\begin{bmatrix}
+I_d &
+I_q &
+\theta_m &
+\omega_m &
+T_x
+\end{bmatrix}^{T},
+\end{equation}
+
+donde $T_x$ representa un estado destinado a absorber parte del torque no 
+descrito explícitamente por el modelo nominal.
+
+Para representar además componentes periódicas, el vector puede extenderse a
+
+\begin{equation}
+\label{eq:vector_estados_aumentado}
+x_a =
+\begin{bmatrix}
+I_d &
+I_q &
+\theta_m &
+\omega_m &
+T_x &
+A_1 &
+B_1 &
+\cdots &
+A_N &
+B_N
+\end{bmatrix}^{T}.
+\end{equation}
+
+% IMPORTANTE:
+% No afirmar todavía que:
+%
+% Tx = torque de carga real
+% Ak = armónico físico real
+%
+% Son ESTADOS DEL MODELO.
+%
+% Precisamente una parte de tu investigación será determinar
+% cuánto representan realmente esas magnitudes físicas.
+
+
+% ============================================================
+% 2.6 OBSERVABILIDAD E IDENTIFICABILIDAD
+% ============================================================
+
+\section{Observabilidad e identificabilidad}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA — MUY IMPORTANTE
+% ------------------------------------------------------------
+% En tu versión anterior observabilidad estaba escondida dentro
+% del EKF.
+%
+% Ahora es uno de tus objetivos específicos.
+% Merece sección propia.
+% ------------------------------------------------------------
+
+La incorporación de una variable dentro del vector de estados no garantiza 
+por sí misma que dicha variable pueda ser reconstruida a partir de las 
+mediciones disponibles. Esta capacidad se encuentra relacionada con la 
+observabilidad del sistema.
+
+De manera general, un sistema es observable si sus estados internos pueden 
+ser determinados a partir del conocimiento de sus entradas y salidas durante 
+un intervalo de tiempo.
+
+
+% ============================================================
+% 2.6.1 OBSERVABILIDAD NO LINEAL
+% ============================================================
+
+\subsection{Observabilidad de sistemas no lineales}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Introducir Lie derivatives.
+%
+% Esto te permitirá justificar después matemáticamente el
+% análisis del sistema aumentado.
+% ------------------------------------------------------------
+
+Para un sistema no lineal autónomo de la forma
+
+\begin{equation}
+\dot{x}=f(x),
+\qquad
+y=h(x),
+\end{equation}
+
+la observabilidad local puede analizarse mediante derivadas de Lie de la 
+función de salida respecto de la dinámica del sistema.
+
+La primera derivada de Lie se define como
+
+\begin{equation}
+L_fh(x)
+=
+\frac{\partial h}{\partial x}f(x),
+\end{equation}
+
+mientras que las derivadas sucesivas pueden obtenerse recursivamente mediante
+
+\begin{equation}
+L_f^{k}h(x)
+=
+\frac{\partial L_f^{k-1}h(x)}{\partial x}f(x).
+\end{equation}
+
+A partir de estas expresiones puede construirse una matriz de observabilidad 
+local de la forma
+
+\begin{equation}
+\mathcal{O}(x)
+=
+\begin{bmatrix}
+dh(x)\\
+dL_fh(x)\\
+dL_f^2h(x)\\
+\vdots
+\end{bmatrix}.
+\end{equation}
+
+Cuando
+
+\begin{equation}
+\operatorname{rank}\left(\mathcal{O}(x)\right)=n,
+\end{equation}
+
+donde $n$ corresponde al número de estados, el sistema satisface localmente 
+la condición de rango de observabilidad en el punto considerado.
+
+% TODO IMPORTANTE:
+% Como tu sistema tiene entradas, probablemente en la versión
+% definitiva convendrá formular esto considerando f(x,u) o el
+% campo vectorial correspondiente.
+%
+% Esta versión sirve para introducir el concepto.
+%
+% Después en Metodología defines EXACTAMENTE qué prueba de
+% observabilidad aplicarás.
+
+
+% ============================================================
+% 2.6.2 OBSERVABILIDAD DEL MODELO AUMENTADO
+% ============================================================
+
+\subsection{Observabilidad del modelo aumentado}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Conectar directamente con tu pregunta de investigación.
+%
+% Más estados != más información.
+%
+% Si agregas A1,B1,A2,B2...
+% debes preguntarte si las mediciones permiten distinguirlos.
+% ------------------------------------------------------------
+
+Al incorporar estados adicionales destinados a representar perturbaciones, 
+la dimensión del sistema aumenta sin que necesariamente aumente el número de 
+variables medidas. En consecuencia, la capacidad del observador para 
+reconstruir estos nuevos estados depende de que su influencia sobre las 
+variables medidas pueda distinguirse de aquella producida por los estados 
+originales.
+
+Por esta razón, aumentar progresivamente el número de componentes armónicas 
+permite obtener un modelo potencialmente más flexible para representar la 
+perturbación, pero también puede producir estados cuya influencia sobre las 
+mediciones resulte difícil de distinguir.
+
+
+% ============================================================
+% 2.6.3 IDENTIFICABILIDAD
+% ============================================================
+
+\subsection{Reconstrucción e identificabilidad de perturbaciones}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% ESTE ES UN PUNTO MUY BUENO DE TU TESIS.
+%
+% Diferenciar:
+%
+% 1. estimar bien omega;
+% 2. estimar bien Tdist total;
+% 3. identificar correctamente cada fuente física.
+%
+% No son lo mismo.
+% ------------------------------------------------------------
+
+La reconstrucción adecuada de los estados mecánicos no implica necesariamente 
+que cada estado adicional utilizado por el observador corresponda de manera 
+única a una magnitud física real.
+
+Por ejemplo, puede ocurrir que la perturbación equivalente reconstruida 
+satisfaga aproximadamente
+
+\begin{equation}
+\hat{T}_d(t)
+\approx
+T_d(t),
+\end{equation}
+
+sin que necesariamente se cumpla individualmente
+
+\begin{equation}
+\hat{T}_L=T_L,
+\qquad
+\hat{A}_k=A_k,
+\qquad
+\hat{B}_k=B_k.
+\end{equation}
+
+Por lo tanto, resulta necesario distinguir entre la capacidad del observador 
+para reconstruir una perturbación equivalente y la capacidad de identificar 
+individualmente las diferentes contribuciones físicas que la componen.
+
+% TODO:
+% Buscar aquí referencia formal sobre:
+% - identifiability;
+% - augmented-state estimation;
+% - unknown-input estimation.
+%
+% Esta sección conecta DIRECTAMENTE con tu objetivo específico 4.
+
+
+% ============================================================
+% 2.7 ESTIMACIÓN SENSORLESS A BAJA VELOCIDAD
+% ============================================================
+
+\section{Estimación \textit{sensorless} a baja velocidad}
+
+% ------------------------------------------------------------
+% OBJETIVO
+% ------------------------------------------------------------
+% Explicar por qué el problema es especialmente difícil a baja
+% velocidad.
+%
+% Ya lo discutiste en estado del arte.
+% Aquí NO debes volver a revisar papers.
+%
+% Aquí se explica físicamente:
+%
+% e ~ omega
+% omega -> 0 => e -> 0
+%
+% y por qué HFI puede agregar información.
+% ------------------------------------------------------------
+
+En estrategias \textit{sensorless} basadas en el modelo electromagnético, 
+parte de la información utilizada para reconstruir la posición y velocidad 
+del rotor proviene de la fuerza contraelectromotriz. De forma simplificada,
+
+\begin{equation}
+e \propto \omega_m.
+\end{equation}
+
+Por lo tanto, al disminuir la velocidad mecánica, también disminuye la 
+magnitud de esta señal, reduciendo la información disponible para distinguir 
+determinados estados mecánicos a partir de las variables eléctricas.
+
+Esta limitación resulta especialmente relevante en el presente trabajo, debido 
+a que se busca reconstruir no sólo la posición y velocidad, sino también 
+estados adicionales asociados a perturbaciones mecánicas.
+
+
+% ============================================================
+% 2.7.1 HIGH FREQUENCY INJECTION
+% ============================================================
+
+\subsection{Inyección de señales de alta frecuencia}
+
+% ------------------------------------------------------------
+% AQUÍ MOVEMOS TU HFI ORIGINAL.
+%
+% Ahora tiene sentido:
+%
+% ya explicaste:
+% - saliencia;
+% - dq;
+% - observabilidad;
+% - problema de baja velocidad.
+%
+% Ahora HFI aparece como solución física para introducir
+% información adicional.
+% ------------------------------------------------------------
+
+La inyección de señales de alta frecuencia, o \textit{High Frequency 
+Injection} (HFI), aprovecha la anisotropía magnética de la máquina para 
+obtener información dependiente de la posición del rotor en regiones donde 
+la fuerza contraelectromotriz resulta insuficiente.
+
+Una posible implementación consiste en introducir una señal de alta frecuencia 
+sobre el eje directo,
+
+\begin{equation}
+\begin{bmatrix}
+V_d\\
+V_q
+\end{bmatrix}
+=
+\begin{bmatrix}
+V_{d,\mathrm{HF}}\\
+0
+\end{bmatrix}.
+\end{equation}
+
+Debido a la diferencia entre $L_d$ y $L_q$, la respuesta de corriente 
+producida por esta excitación depende de la orientación relativa entre el 
+sistema de referencia utilizado para la inyección y los ejes magnéticos reales 
+de la máquina. Esta dependencia permite extraer información relacionada con 
+la posición del rotor.
+
+Cuando la frecuencia de inyección es suficientemente superior a la dinámica 
+mecánica, la respuesta producida se concentra principalmente en las variables 
+eléctricas, permitiendo utilizar la componente de alta frecuencia como una 
+fuente adicional de información para la estimación.
+
+% CORRECCIÓN RESPECTO A TU TEXTO ANTERIOR:
+%
+% No decir:
+% "HFI identifica el error entre posición estimada y real"
+%
+% como definición general.
+%
+% Mejor:
+% "la respuesta HF contiene información dependiente de posición".
+%
+% DESPUÉS, dependiendo del método:
+% - se demodula un error angular;
+% - se utiliza un PLL;
+% - se incorpora al EKF;
+% etc.
+
+
+% ============================================================
+% 2.8 MODELO ARMÓNICO COMO ESTADOS
+% ============================================================
+
+\section{Representación de perturbaciones periódicas mediante estados}
+
+% ------------------------------------------------------------
+% ESTA ES PROBABLEMENTE LA SECCIÓN TEÓRICA MÁS IMPORTANTE
+% PARA TU APORTE.
+%
+% Ya explicaste Fourier en 2.3.
+% Ahora explicas CÓMO convertir un armónico en estados.
+% ------------------------------------------------------------
+
+Una componente periódica puede representarse mediante estados cuya dinámica 
+reproduzca un oscilador armónico. Considerando una componente de frecuencia 
+angular $\omega_h$, pueden definirse dos estados $x_{h,1}$ y $x_{h,2}$ tales 
+que
+
+\begin{equation}
+\begin{aligned}
+\dot{x}_{h,1} &= \omega_h x_{h,2},\\
+\dot{x}_{h,2} &= -\omega_h x_{h,1}.
+\end{aligned}
+\end{equation}
+
+En forma matricial,
+
+\begin{equation}
+\begin{bmatrix}
+\dot{x}_{h,1}\\
+\dot{x}_{h,2}
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & \omega_h\\
+-\omega_h & 0
+\end{bmatrix}
+\begin{bmatrix}
+x_{h,1}\\
+x_{h,2}
+\end{bmatrix}.
+\end{equation}
+
+La combinación de ambos estados permite representar una componente sinusoidal 
+con amplitud y fase determinadas por sus condiciones iniciales o por la 
+corrección realizada por el observador.
+
+% ------------------------------------------------------------
+% MUY IMPORTANTE PARA TU MOTOR:
+% ------------------------------------------------------------
+% Si la perturbación depende de posición, entonces su frecuencia
+% temporal cambia con omega_m.
+%
+% Para un armónico espacial:
+%
+% omega_h = k Nc omega_m
+%
+% Por lo tanto:
+% - a 1 rad/s tiene una frecuencia;
+% - a 10 rad/s tiene otra;
+%
+% Esto es fundamental para tu observador.
+% ------------------------------------------------------------
+
+Para una perturbación periódica dependiente de la posición, la frecuencia 
+temporal de cada componente depende de la velocidad mecánica. Para el armónico 
+$k$,
+
+\begin{equation}
+\omega_{h,k}
+=
+kN_c\omega_m.
+\end{equation}
+
+En consecuencia, la dinámica de los estados armónicos se encuentra acoplada 
+con la velocidad mecánica del rotor, lo que debe ser considerado al incorporar 
+estas componentes dentro de un observador de estados.
+
+
+% ============================================================
+% 2.9 VELOCIDAD MECÁNICA INSTANTÁNEA Y ANCHO DE BANDA
+% ============================================================
+
+\section{Reconstrucción de la velocidad mecánica instantánea}
+
+% ------------------------------------------------------------
+% SECCIÓN NUEVA
+% ------------------------------------------------------------
+% Tu variable PRINCIPAL es omega instantánea.
+%
+% Necesitas explicar por qué:
+%
+% omega_hat puede seguir la media correctamente
+% pero no reproducir el ripple.
+%
+% Eso puede manifestarse como:
+% - atenuación;
+% - desfase.
+%
+% Esto prepara exactamente tus métricas de resultados.
+% ------------------------------------------------------------
+
+La estimación correcta del valor medio de la velocidad no implica 
+necesariamente que el observador reproduzca las variaciones instantáneas 
+presentes en la velocidad real. Cuando una perturbación periódica actúa sobre 
+la dinámica mecánica, puede producir componentes oscilatorias en 
+$\omega_m(t)$ cuya frecuencia depende tanto de la estructura espacial de la 
+perturbación como de la velocidad de operación.
+
+Para una componente sinusoidal de la velocidad real,
+
+\begin{equation}
+\omega_m(t)
+=
+\bar{\omega}_m
++
+A_{\omega}\sin(\omega_h t+\phi),
+\end{equation}
+
+la estimación puede presentar una amplitud diferente y un desfase,
+
+\begin{equation}
+\hat{\omega}_m(t)
+=
+\hat{\bar{\omega}}_m
++
+\hat{A}_{\omega}
+\sin(\omega_h t+\phi+\Delta\phi).
+\end{equation}
+
+La relación
+
+\begin{equation}
+G_{\omega}(\omega_h)
+=
+\frac{\hat{A}_{\omega}}{A_{\omega}}
+\end{equation}
+
+permite cuantificar la atenuación de la componente observada, mientras que 
+$\Delta\phi$ representa el desfase introducido por la dinámica de estimación.
+
+% ------------------------------------------------------------
+% ESTO CONECTA DIRECTAMENTE CON TU TESIS:
+% ------------------------------------------------------------
+%
+% observador nominal:
+%
+% Tdist no modelado
+%       ↓
+% modelo no puede explicar ripple
+%       ↓
+% omega_hat suavizada / atrasada
+%
+% observador aumentado:
+%
+% estados perturbación
+%       ↓
+% modelo puede explicar parte del ripple
+%       ↓
+% ¿mejora amplitud y fase de omega_hat?
+%
+% ESA es esencialmente tu pregunta de investigación.
+% ------------------------------------------------------------
+
+
+% ============================================================
+% 2.10 SÍNTESIS DEL MARCO TEÓRICO
+% ============================================================
+
+\section{Síntesis del marco teórico}
+
+% ------------------------------------------------------------
+% OPCIONAL, PERO YO LA PONDRÍA.
+%
+% 2-3 párrafos máximo.
+%
+% NO volver a hacer estado del arte.
+%
+% Sólo conectar matemáticamente las piezas.
+% ------------------------------------------------------------
+
+A partir de los fundamentos presentados, el problema estudiado puede 
+interpretarse como la estimación de los estados mecánicos de una máquina 
+síncrona saliente sometida a perturbaciones de torque desconocidas. La 
+operación a baja velocidad reduce la información asociada a la fuerza 
+contraelectromotriz, mientras que la saliencia permite incorporar información 
+adicional mediante estrategias de excitación de alta frecuencia.
+
+Por otra parte, la incorporación de estados adicionales permite aumentar la 
+capacidad del modelo para representar perturbaciones no consideradas 
+explícitamente en su formulación nominal. En particular, una perturbación de 
+evolución lenta puede representarse mediante un estado aproximadamente 
+constante, mientras que perturbaciones periódicas pueden representarse mediante 
+un conjunto finito de estados armónicos.
+
+Sin embargo, aumentar la capacidad de representación del modelo no garantiza 
+que todos los estados incorporados puedan ser reconstruidos de manera 
+independiente a partir de las mediciones disponibles. Por esta razón, la 
+observabilidad del sistema aumentado y la correspondencia entre los estados 
+estimados y las perturbaciones físicas constituyen aspectos fundamentales para 
+evaluar si la incorporación de estos estados permite mejorar la reconstrucción 
+de la velocidad mecánica instantánea.

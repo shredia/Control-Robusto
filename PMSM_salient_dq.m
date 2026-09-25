@@ -48,7 +48,7 @@ function Outputs(block)
     % Te = Te_PM + Te_rel
     % Te_PM  = Ke * Iq
     % Te_rel = P*(Ld-Lq)*Id*Iq
-    Te = p.Ke*Iq - p.P*(p.Ld - p.Lq)*Id*Iq;
+    Te = p.Ke*Iq - p.P*(p.Lq - p.Ld)*Id*Iq;
     
     % Ángulo espacial del cogging
 psi = p.Nr*Th_m + p.Phi;

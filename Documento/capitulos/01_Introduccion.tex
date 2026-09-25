@@ -387,35 +387,26 @@ Por este motivo, se han desarrollado estrategias de control en lazo cerrado [...
 
 La aplicación de estrategias de control vectorial ha sido estudiada tanto en motores paso a paso como en otras máquinas síncronas de imanes permanentes. Arias et al. \cite{ariasReducingCoggingTorque2019} implementan FOC en un motor paso a paso mediante una estructura en cascada, compuesta por un lazo de control de torque y lazos internos de regulación de corriente. Por otra parte, Wu et al. \cite{wuSpeedControlLowSpeed2025} proponen una estrategia FOC en la cual la regulación de torque se realiza principalmente mediante la componente \(I_q\), manteniendo la referencia \(I_d\) en cero. Esta configuración simplifica la estrategia de control; sin embargo, en máquinas que presentan saliencia puede no aprovechar completamente la contribución del torque de reluctancia.
 % ------------------------------------------------------------
-% PÁRRAFO 6 — ESTRATEGIAS DE CONTROL DE VELOCIDAD
+% PÁRRAFO 6 — ESTRATEGIAS FRENTE A PERTURBACIONES
 % ------------------------------------------------------------
-%
-% Aquí puedes concentrar los papers que tienes.
-%
-% No organizarlos:
-%
-% Paper A...
-% Paper B...
-% Paper C...
-%
-% Sino por estrategias:
-%
-% - PI/PID
-% - control robusto
-% - control adaptativo
-% - control resonante
-% - feedforward
-% - etc.
-%
-% y comparar qué problema intenta resolver cada familia.
-Sin embargo, la regulación de las corrientes y de la velocidad no necesariamente elimina el efecto de las perturbaciones presentes en el sistema. Por este motivo, se han desarrollado diferentes estrategias orientadas a mejorar su rechazo o compensación. Estas pueden diferenciarse, entre otros aspectos, por la información disponible sobre la perturbación y por la forma en que esta información es incorporada al sistema de control.
 
-Una de las alternativas corresponde a las estrategias de compensación *feedforward*, donde se genera una acción de control a partir del conocimiento o de una estimación de la perturbación. Para ello, esta puede ser representada mediante modelos analíticos, componentes armónicas \cite{deangeloControlParaMaquinas2004}, tablas de búsqueda (*lookup tables*, LUT) \cite{piccoliCoggingTorqueRipple2014a} \cite{wenCurrentSensorlessModel2024} \cite{wuDesignImplementationPositionBased2019} \cite{guzinskiSensorlessLowSpeed2019}, modelos obtenidos mediante técnicas de aprendizaje \cite{mandraPerformanceEnhancedRobustIterative2019}  ó sólamente asumiendo que se conoce el modelo de perturbación \cite{zhangSmoothSensorlessStartup2026} \cite{picatosteruilopeModellingControlStepper2014}.
-Otra alternativa consiste en estimar las perturbaciones durante la operación del sistema. Para ello, diferentes trabajos han utilizado estrategias de estimación online de perturbaciones, incluyendo observadores de perturbaciones (DOB), observadores de estado extendido y estimadores basados en filtros de Kalman. \cite{deangeloControlParaMaquinas2004} \cite{picatosteruilopeModellingControlStepper2014} \cite{yuSimultaneousStateDisturbances2025}.
-
-Por otra parte, cuando las perturbaciones presentan un comportamiento periódico, es posible abordar su rechazo a partir de su contenido frecuencial. Dentro de estas estrategias se encuentran los controladores resonantes, los cuales permiten introducir una elevada acción de control alrededor de frecuencias determinadas \cite{ariasReducingCoggingTorque2019}\cite{wuSpeedControlLowSpeed2025} \cite{sekineSuppressionVelocityPulsations2024} .De esta manera, las estrategias de compensación pueden utilizar información previamente caracterizada de la perturbación (cómo el cogging), estimarla durante la operación del sistema (como la carga) o aprovechar características conocidas de su comportamiento periódico para reducir su efecto sobre las variables controladas (Harmónicos ó cogging en tiempo real).
-
-
+La regulación de las corrientes y de la velocidad no elimina necesariamente
+el efecto de las perturbaciones presentes en el accionamiento. Por este motivo,
+se han desarrollado diferentes estrategias destinadas a mejorar su rechazo o
+compensación. Entre ellas se encuentran métodos \textit{feedforward} basados
+en modelos previamente conocidos de la perturbación
+\cite{deangeloControlParaMaquinas2004,picatosteruilopeModellingControlStepper2014,zhangSmoothSensorlessStartup2026},
+estrategias basadas en tablas de búsqueda (LUT)
+\cite{piccoliCoggingTorqueRipple2014a,wenCurrentSensorlessModel2024,wuDesignImplementationPositionBased2019,guzinskiSensorlessLowSpeed2019},
+métodos de aprendizaje
+\cite{mandraPerformanceEnhancedRobustIterative2019},
+estrategias de estimación de perturbaciones
+\cite{deangeloControlParaMaquinas2004,picatosteruilopeModellingControlStepper2014,yuSimultaneousStateDisturbances2025}
+y controladores orientados al rechazo de componentes periódicas
+\cite{ariasReducingCoggingTorque2019,wuSpeedControlLowSpeed2025,sekineSuppressionVelocityPulsations2024}.
+Estas estrategias muestran que el desempeño del accionamiento puede mejorarse
+incorporando información sobre las perturbaciones o aumentando la capacidad
+del controlador para rechazar sus efectos.
 
 
 
@@ -641,7 +632,7 @@ La obtención de las variables mecánicas a partir del modelo de la máquina pue
 
 Dentro de este último grupo se han desarrollado diferentes estructuras de observación, las cuales difieren tanto en los estados considerados como en el mecanismo utilizado para realizar y corregir su estimación. De manera general, los observadores utilizan el modelo dinámico de la máquina junto con las variables eléctricas disponibles para reconstruir estados que no pueden ser medidos directamente. Los observadores de Luenberger incorporan términos de corrección determinados mediante ganancias de observación, mientras que los observadores de modo deslizante (SMO) emplean una acción correctiva destinada a forzar la convergencia del error de estimación. Por otra parte, el filtro de Kalman extendido (EKF) permite abordar modelos no lineales mediante etapas sucesivas de predicción y actualización, ponderando la corrección de los estados de acuerdo con las incertidumbres consideradas en el modelo y las mediciones \cite{luoOptimizedLuenbergerObserverBased2022}.
 
-Las estructuras utilizadas también difieren en las variables que buscan reconstruir. La posición y velocidad pueden estimarse conjuntamente como estados del sistema o, alternativamente, la velocidad puede obtenerse a partir de la posición estimada. Sin embargo, la utilización de una derivada para este propósito puede amplificar el ruido de alta frecuencia, por lo que se han desarrollado estructuras que permiten estimar ambas variables simultáneamente \cite{wangPositionSensorlessPermanent2020}. Asimismo, algoritmos de seguimiento como el PLL pueden utilizar una señal de error angular para realizar el seguimiento de la posición y obtener información de velocidad, evitando la obtención directa de esta última mediante derivación. Dependiendo de la formulación del observador, también pueden incorporarse estados adicionales asociados a variables eléctricas, mecánicas o perturbaciones.
+Las estructuras utilizadas también difieren en las variables que buscan reconstruir. La posición y velocidad pueden estimarse conjuntamente como estados del sistema o, alternativamente, la velocidad puede obtenerse a partir de la posición estimada. Sin embargo, la utilización de una derivada para este propósito puede amplificar el ruido de alta frecuencia, por lo que se han desarrollado estructuras que permiten estimar ambas variables simultáneamente \cite{wangPositionSensorlessPermanent2020}. Asimismo, algoritmos de seguimiento como el PLL pueden utilizar una señal de error angular para realizar el seguimiento de la posición y obtener información de velocidad, evitando la obtención directa de esta última mediante derivación. 
 % ------------------------------------------------------------
 % PÁRRAFO 6 — LIMITACIONES DE LOS MÉTODOS BASADOS EN MODELO
 % ------------------------------------------------------------
@@ -676,7 +667,12 @@ Las estructuras utilizadas también difieren en las variables que buscan reconst
 
 A pesar de las distintas estructuras disponibles, su desempeño se encuentra condicionado tanto por las características propias del método como por la correspondencia entre el modelo utilizado y el comportamiento real de la máquina. Las variaciones de los parámetros, las dinámicas no modeladas y el ruido presente en las variables medidas pueden introducir errores en la reconstrucción de los estados. Estas condiciones afectan de manera diferente a cada estrategia; por ejemplo, se ha reportado una elevada dependencia paramétrica en métodos adaptativos basados en modelos de referencia (MRAS), mientras que los observadores de flujo pueden presentar problemas asociados a componentes continuas y armónicas. Por su parte, los SMO presentan ventajas en términos de simplicidad y robustez, aunque su acción discontinua puede producir \textit{chattering}, mientras que el EKF permite considerar modelos no lineales y diferentes fuentes de incertidumbre a costa de una mayor complejidad computacional \cite{luoOptimizedLuenbergerObserverBased2022}.
 
-Estas limitaciones no dependen únicamente de la estructura seleccionada. En observadores de lazo cerrado existe además un compromiso entre la corrección de las incertidumbres del modelo y la sensibilidad frente al ruido y los errores de medición \cite{wangPositionSensorlessPermanent2020}. Asimismo, la incorporación de nuevas variables dentro del vector de estados no garantiza que estas puedan reconstruirse a partir de las mediciones disponibles. Para ello, es necesario que la dinámica del sistema permita que los estados considerados produzcan información distinguible en las variables medidas, condición asociada a la observabilidad del sistema \cite{wangPositionSensorlessPermanent2020}. Por lo tanto, la precisión del modelo, la calidad de las mediciones y la información disponible sobre los estados condicionan conjuntamente el desempeño de la estimación.
+Estas limitaciones no dependen únicamente de la estructura seleccionada. En observadores de lazo cerrado existe además un compromiso entre la corrección de las incertidumbres del modelo y la sensibilidad frente al ruido y los errores de medición \cite{wangPositionSensorlessPermanent2020}. Estas limitaciones no dependen únicamente de la estructura seleccionada.
+En observadores de lazo cerrado existe además un compromiso entre la corrección
+de las incertidumbres del modelo y la sensibilidad frente al ruido y los
+errores de medición \cite{wangPositionSensorlessPermanent2020}. Por lo tanto,
+la precisión del modelo, la calidad de las mediciones y las condiciones de
+operación condicionan conjuntamente el desempeño de la estimación.
 % ------------------------------------------------------------
 % PÁRRAFO 7 — MÉTODOS BASADOS EN SALIENCIA
 % ------------------------------------------------------------
@@ -902,7 +898,7 @@ Sin embargo, las limitaciones a baja velocidad dependen del principio de estimac
 
 Una de las dificultades asociadas a la estimación \textit{sensorless} a baja velocidad se encuentra relacionada con la observabilidad del modelo utilizado. Esta propiedad determina si los estados no medidos pueden ser reconstruidos a partir de las entradas y salidas disponibles, y depende tanto de la estructura del modelo como de las condiciones de operación de la máquina. Por este motivo, la disminución de velocidad no conduce necesariamente a una pérdida de observabilidad en todos los sistemas, sino que deben analizarse las condiciones particulares bajo las cuales se realiza la estimación.
 
-Zaltni et al. \cite{zaltniObservabilityAnalysisPMSM2009} analizan esta problemática en máquinas síncronas de imanes permanentes considerando como vector de estados las corrientes del estator, la posición y la velocidad del rotor, mientras que las corrientes constituyen las variables medidas. Para una SPMSM, los autores identifican condiciones de pérdida de observabilidad cuando la máquina se encuentra simultáneamente a velocidad y aceleración nulas. En este caso, la ausencia de movimiento elimina la información de posición asociada a la FEM utilizada por el modelo para reconstruir las variables mecánicas. En cambio, para máquinas con saliencia, la dependencia de las inductancias respecto de la posición introduce una fuente adicional de información que puede ser aprovechada durante la estimación.
+Zaltni et al. \cite{zaltniObservabilityAnalysisPMSM2009} analizan esta problemática en máquinas síncronas de imanes permanentes considerando como vector de estados las corrientes del estator, la posición y la velocidad del rotor, mientras que las corrientes constituyen las variables medidas. Para una SPMSM, los autores identifican condiciones de pérdida de observabilidad cuando la máquina se encuentra simultáneamente a velocidad y aceleración nulas. En este caso, la ausencia de movimiento elimina la información de posición asociada a la FEM utilizada por el modelo para reconstruir las variables mecánicas. En máquinas con saliencia, la dependencia de las inductancias respecto de la posición puede introducir información adicional aprovechable durante la estimación, aunque la observabilidad continúa dependiendo de las condiciones de operación y excitación
 
 Posteriormente, Vaclavek et al. \cite{vaclavekACDriveObservability2013} estudian la observabilidad local de máquinas síncronas considerando igualmente las corrientes del estator como variables medidas y la posición y velocidad del rotor como estados no medidos. Sus resultados muestran nuevamente diferencias entre máquinas salientes y no salientes, destacando que la saliencia puede introducir información dependiente de la posición que no se encuentra disponible en el modelo de una máquina sin saliencia.
 
@@ -1595,467 +1591,647 @@ el rechazo, estimación y compensación del \textit{cogging torque} y del torque
 de carga, distinguiendo entre aquellas que requieren un conocimiento previo
 de la perturbación y aquellas capaces de obtener información sobre esta
 durante la operación.
+
+
+% ============================================================
+% SUBSECCIÓN — MÉTODOS DE ESTIMACIÓN Y COMPENSACIÓN
+% ============================================================
+
 \subsection{Métodos de estimación y compensación de perturbaciones}
-% ------------------------------------------------------------
-% BLOQUE 1 — ESTRATEGIAS DE RECHAZO Y COMPENSACIÓN
-% ------------------------------------------------------------
-%
-% Presentar las principales formas encontradas en la literatura:
-%
-% - control robusto / rechazo de perturbaciones;
-% - feedforward;
-% - LUT;
-% - control resonante / PR;
-% - observadores de perturbación;
-% - observadores de estado extendido.
-%
-% Diferenciar:
-%
-%   compensar una perturbación conocida
-%              !=
-%   estimar la perturbación durante la operación.
 
 
 % ------------------------------------------------------------
-% BLOQUE 2 — COMPENSACIÓN DE COGGING
+% P1 — RECHAZO, COMPENSACIÓN Y ESTIMACIÓN
 % ------------------------------------------------------------
 %
-% Revisar específicamente métodos para cogging:
+% Objetivo:
+% Introducir las distintas formas de abordar una perturbación
+% dentro de un accionamiento eléctrico.
 %
-% - caracterización offline;
-% - LUT en función de theta;
-% - feedforward;
-% - resonantes;
-% - estimación online;
+% Diferenciar explícitamente:
 %
-% Para cada trabajo preguntar:
+%   Rechazo:
+%       reducir el efecto de la perturbación sobre la variable
+%       controlada, sin necesariamente conocerla o estimarla.
 %
-% - ¿T_cog se conoce previamente?
-% - ¿se identifica offline?
-% - ¿se estima online?
-% - ¿usa theta medida o estimada?
-% - ¿es sensorless?
+%   Compensación:
+%       generar una acción de control destinada a contrarrestar
+%       el efecto de una perturbación conocida o estimada.
 %
-% Esto empieza a acercarse directamente al GAP.
+%   Estimación:
+%       reconstruir explícitamente la perturbación o algunos
+%       parámetros que permitan representarla.
+%
+% Idea importante:
+%
+%       rechazo != estimación
+%       compensación != estimación online
+%
+% Esto será importante posteriormente para no clasificar como
+% "estimadores de cogging" trabajos que solamente reducen
+% ripple mediante control.
+%
+% No profundizar todavía en observadores.
+
+Las perturbaciones presentes en un sistema de accionamiento pueden abordarse mediante estrategias orientadas a su rechazo, compensación o estimación. El rechazo de perturbaciones busca reducir su efecto sobre las variables controladas, sin requerir necesariamente información explícita sobre su magnitud o comportamiento. Por otra parte, la compensación consiste en generar una acción de control destinada a contrarrestar el efecto de la perturbación, para lo cual puede utilizarse información conocida previamente o estimada durante la operación. Finalmente, la estimación de perturbaciones busca reconstruir su magnitud, comportamiento o los parámetros que permiten representarla a partir de las mediciones disponibles y del modelo del sistema. Por lo tanto, la reducción del efecto de una perturbación no implica necesariamente su estimación, del mismo modo que una acción de compensación ejecutada durante la operación no supone que la perturbación esté siendo identificada en línea.
+
+% ------------------------------------------------------------
+% P2 — CLASIFICACIÓN GENERAL DE ESTRATEGIAS
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Presentar brevemente las principales familias de métodos
+% encontradas en literatura.
+%
+% Mencionar:
+%
+%   - Feedforward.
+%   - Look-Up Tables (LUT).
+%   - Controladores resonantes / PR.
+%   - Disturbance Observers (DOB).
+%   - Extended State Observers (ESO).
+%   - Observadores de estado con perturbaciones aumentadas.
+%
+% Organizar conceptualmente según conocimiento disponible:
+%
+% perturbación conocida previamente
+%       -> LUT / modelo / feedforward
+%
+% perturbación periódica conocida en frecuencia
+%       -> PR / resonante / rechazo selectivo
+%
+% perturbación desconocida
+%       -> DOB / ESO / observadores de estado
+%
+% No entrar todavía en ecuaciones detalladas.
 
 
+Dependiendo de la información disponible sobre la perturbación y de las características de su comportamiento, pueden emplearse diferentes estrategias para reducir sus efectos. Cuando la perturbación puede ser caracterizada previamente, es posible utilizar métodos de compensación anticipativa, como el feedforward o las tablas de búsqueda (Look-Up Tables, LUT), en los que la acción compensatoria se obtiene a partir de información previamente conocida o identificada. Cuando existe incertidumbre respecto de la perturbación, las estrategias de control robusto buscan mantener el desempeño del sistema frente a un conjunto de variaciones o perturbaciones consideradas en el diseño, sin requerir necesariamente su reconstrucción explícita. Para perturbaciones periódicas, también se emplean estrategias de rechazo selectivo, como los controladores resonantes, orientadas a atenuar componentes asociadas a frecuencias específicas. Finalmente, cuando resulta de interés obtener información explícita sobre una perturbación desconocida o variable durante la operación, pueden utilizarse métodos basados en observadores, entre ellos los observadores de perturbación (Disturbance Observer, DOB), los observadores de estado extendido (Extended State Observer, ESO) y los observadores de estado en los que la perturbación o sus parámetros son incorporados como variables adicionales a estimar.
 % ------------------------------------------------------------
-% BLOQUE 3 — ESTIMACIÓN Y RECHAZO DEL TORQUE DE CARGA
+% P3 — COMPENSACIÓN BASADA EN COGGING CONOCIDO PREVIAMENTE
 % ------------------------------------------------------------
+%
+% El cogging presenta dependencia periódica con theta_m.
+%
+% Revisar estrategias que utilizan información conocida o
+% previamente identificada de T_cog(theta_m).
+%
+% Separar principalmente:
+%
+%   1. Modelo conocido:
+%
+%       T_cog(theta_m)
+%              ->
+%       feedforward
+%              ->
+%       compensación
+%
+%   2. Perfil previamente identificado:
+%
+%       identificación de T_cog(theta_m)
+%              ->
+%       LUT
+%              ->
+%       compensación
+%
+% En ambos casos puede existir compensación durante la
+% operación sin que exista estimación online de T_cog.
 %
 % Revisar:
 %
-% - DOB;
-% - ESO;
-% - EKF;
-% - observadores aumentados;
-% - estimación de load torque.
+%   - cómo se obtiene T_cog;
+%   - si theta_m es medida o estimada;
+%   - dónde se aplica la compensación;
+%   - si los parámetros permanecen fijos durante operación.
+%
+% NO introducir todavía Hu/EHSO.
+% Los modelos armónicos estimados online se discutirán
+% posteriormente.
+
+En el caso particular del cogging torque, su carácter periódico y su dependencia con la posición del rotor permiten representar la perturbación mediante una relación \(T_{cog}(\theta_m)\) \cite{guzinskiSensorlessLowSpeed2019,ariasReducingCoggingTorque2019}. A partir de esta característica se han desarrollado estrategias de compensación que utilizan información conocida o previamente identificada de la perturbación. Algunos enfoques emplean modelos analíticos de \(T_{cog}(\theta_m)\) para generar una acción feedforward sincronizada con la posición del rotor \cite{picatosteruilopeModellingControlStepper2014,zhangSmoothSensorlessStartup2026}, mientras que otros caracterizan previamente su perfil y lo almacenan mediante tablas de búsqueda (LUT) \cite{guzinskiSensorlessLowSpeed2019,wuDesignImplementationPositionBased2019,piccoliCoggingTorqueRipple2014a,petroHFPulseSignal2025}. En estos casos, aunque la acción compensatoria sea aplicada durante el funcionamiento del motor, la información utilizada para representar la perturbación permanece previamente determinada, sin requerir necesariamente su estimación o actualización en línea.
+
+% ------------------------------------------------------------
+% P4 — COMPENSACIÓN BASADA EN INFORMACIÓN PREVIAMENTE IDENTIFICADA
+% ------------------------------------------------------------
+%
+% Objetivo:
+% Analizar estrategias donde el perfil o los parámetros de la
+% perturbación son determinados previamente y posteriormente
+% utilizados para generar una acción de compensación.
+%
+% Pueden utilizar:
+%
+%   - LUT;
+%   - modelos analíticos;
+%   - coeficientes armónicos previamente identificados.
+%
+% IMPORTANTE:
+%
+% La forma de representar T_cog no determina por sí sola
+% si la identificación es online u offline.
 %
 % Diferenciar:
 %
-%   rechazo de T_L
-%       !=
-%   estimación de T_L.
+%   identificación offline + compensación online
 %
-% Un controlador puede rechazar una perturbación sin necesariamente
-% reconstruir explícitamente su valor.
-
-
+% de:
+%
+%   estimación/identificación online + compensación online.
+%
+% Revisar para cada paper:
+%
+%   ¿cuándo obtiene los parámetros?
+%   ¿los mantiene constantes durante la operación?
+%   ¿los actualiza?
+%   ¿utiliza theta medida o estimada?
+%   ¿sobre qué variable aplica la compensación?
+%
+Otra estrategia para reducir los efectos del cogging torque consiste en actuar directamente sobre las componentes periódicas que genera en el accionamiento, sin requerir necesariamente la reconstrucción explícita de la perturbación. Para ello, se han empleado controladores resonantes capaces de aumentar la capacidad de rechazo en frecuencias específicas asociadas a las perturbaciones periódicas presentes en el sistema \cite{ariasReducingCoggingTorque2019,wuSpeedControlLowSpeed2025}. Debido a que el cogging torque presenta una periodicidad asociada a la posición del rotor, la frecuencia temporal de las componentes que genera depende de la velocidad de operación, por lo que la frecuencia de actuación del controlador puede requerir ser ajustada conforme esta varía. De esta manera, es posible atenuar componentes periódicas presentes en las variables controladas sin estimar directamente la magnitud instantánea del cogging torque.
 % ------------------------------------------------------------
-% BLOQUE 4 — OBSERVADORES CON ESTADOS EXTENDIDOS
+% P5 — RECHAZO SELECTIVO DE PERTURBACIONES PERIÓDICAS
 % ------------------------------------------------------------
 %
-% Introducir aquí el concepto de extender el vector de estados
-% para incorporar perturbaciones desconocidas.
+% Objetivo:
+% Introducir PR, resonantes y estrategias dirigidas a
+% componentes armónicas específicas.
+%
+% Una perturbación periódica puede representarse mediante
+% diferentes componentes armónicas.
+%
+% Conceptualmente:
+%
+%       T_p(theta) = sum_h T_h(theta)
+%
+% No es necesario actuar sobre todos los órdenes.
+%
+% Puede seleccionarse un conjunto:
+%
+%       H = {h1, h2, ..., hn}
+%
+% que NO necesariamente debe ser consecutivo.
 %
 % Ejemplo conceptual:
 %
-%   x = [estados eléctricos, theta, omega]
+%       H = {1, 3, 12}
 %
-% pasa a:
+% No utilizar esos órdenes como propios del stepper:
+% son solamente un ejemplo de selección.
 %
-%   x_aug = [estados eléctricos, theta, omega, T_L]
+% Explicar que para una perturbación relacionada con la
+% frecuencia mecánica:
 %
-% o:
+%       omega_h = h * omega_m
 %
-%   x_aug = [estados eléctricos, theta, omega,
-%            estados asociados a perturbaciones periódicas]
+% por lo que la frecuencia temporal cambia con la velocidad.
 %
-% Explicar desde literatura:
-%
-% - qué perturbación agrega cada autor como estado;
-% - qué dinámica supone para ella;
-% - qué mediciones utiliza;
-% - qué observador emplea;
-% - si demuestra/analiza observabilidad;
-% - si solamente demuestra funcionamiento mediante simulación
-%   o experimento.
+% Esto puede dificultar el uso de resonadores de frecuencia
+% fija en accionamientos de velocidad variable.
 %
 % IMPORTANTE:
 %
-% Agregar una perturbación al vector de estados NO garantiza
-% que esta pueda ser estimada.
+% Reducir un armónico de velocidad o torque mediante un PR
+% NO significa haber estimado T_cog.
+%
+% Conectar con resultados propios solamente más adelante.
+% No introducir todavía el GAP.
 
-
-% ------------------------------------------------------------
-% BLOQUE 5 — OBSERVABILIDAD DEL SISTEMA AUMENTADO
-% ------------------------------------------------------------
-%
-% Retomar aquí el concepto de observabilidad presentado
-% anteriormente en la subsección sensorless.
-%
-% Antes se analizó:
-%
-%   ¿pueden reconstruirse theta y omega?
-%
-% Ahora la pregunta cambia:
-%
-%   ¿pueden reconstruirse theta, omega Y las perturbaciones?
-%
-% Revisar literatura sobre:
-%
-% - observabilidad de observadores aumentados;
-% - incorporación de load torque como estado;
-% - incorporación de parámetros/perturbaciones;
-% - pérdida de observabilidad al aumentar el orden;
-% - necesidad de excitación;
-% - condiciones de operación;
-%
-% IMPORTANTE:
-%
-% No asumir que porque theta y omega sean observables,
-% T_L o T_cog también lo sean.
-%
-% Tampoco asumir que una buena simulación del EKF demuestra
-% formalmente observabilidad.
-
+La acción resonante puede incorporarse en diferentes niveles de la estructura de control dependiendo de la variable sobre la cual se manifiesta la perturbación y de la señal utilizada para generar su rechazo. Una alternativa consiste en incorporar términos resonantes en el lazo de velocidad, de manera que las componentes periódicas presentes en el error generen una acción correctiva sobre la referencia de corriente. Sin embargo, en una estructura de control en cascada, la reproducción de esta acción depende posteriormente de la capacidad del lazo interno de corriente para seguir las componentes armónicas requeridas, aspecto considerado por Sekine et al. \cite{sekineSuppressionVelocityPulsations2024} mediante la selección de un ancho de banda elevado para el lazo de corriente.Por este motivo, también se han propuesto estructuras que incorporan
+controladores resonantes tanto en los lazos de velocidad como de corriente,
+buscando mejorar simultáneamente el rechazo de las perturbaciones mecánicas
+y el seguimiento de las componentes periódicas de corriente requeridas para
+su compensación \cite{sangeethaSpeedCurrentHarmonics2025}. Alternativamente, se han desarrollado estrategias que prescinden de esta etapa intermedia y generan directamente una componente armónica de tensión a partir de las oscilaciones detectadas en la velocidad \cite{wangTorqueRippleMinimization2025}. Estas diferentes configuraciones evidencian que el desempeño del rechazo no depende únicamente de identificar la frecuencia de la perturbación, sino también de la capacidad de los lazos internos del accionamiento para reproducir la acción compensatoria en dicha frecuencia.
 
 % ------------------------------------------------------------
-% BLOQUE 6 — TABLA COMPARATIVA
+% P5 —Cierre
 % ------------------------------------------------------------
-%
-% Comparar los trabajos según:
-%
-% Referencia
-% Motor
-% Perturbación
-% Estrategia
-% Perturbación estimada online
-% Compensación online
-% Sensorless
-%
-% Esta tabla debe permitir visualizar qué combinaciones ya
-% han sido abordadas y cuáles aparecen menos desarrolladas.
-
-
-% ------------------------------------------------------------
-% BLOQUE FINAL — GAP
-% ------------------------------------------------------------
-%
-% Utilizar la literatura anterior para identificar la brecha.
-%
-% NO partir desde la solución propuesta.
-%
-% Determinar a partir de los papers si existe o no la combinación:
-%
-% stepper
-% + sensorless
-% + baja velocidad
-% + cogging
-% + estimación online
-% + compensación online
-%
-% y cómo se trata simultáneamente el torque de carga.
+Las estrategias descritas muestran que las perturbaciones periódicas pueden ser atenuadas mediante información previamente caracterizada o mediante acciones de rechazo selectivo en las frecuencias de interés. Sin embargo, estas estrategias no requieren necesariamente reconstruir explícitamente la perturbación que actúa sobre el sistema. Cuando se busca además obtener información sobre perturbaciones desconocidas durante la operación, estas pueden incorporarse dentro del proceso de estimación, ya sea como variables desconocidas o mediante modelos dinámicos que describan su comportamiento. Esta alternativa conduce al uso de observadores con modelos aumentados, cuya capacidad de estimación depende tanto de la representación adoptada para la perturbación como de la información disponible para reconstruir los estados incorporados.
 % ============================================================
-% \subsection{Brecha de investigación}
+% SUBSECCIÓN — OBSERVADORES DE ESTADO AUMENTADO Y OBSERVABILIDAD
 % ============================================================
+
+\subsection{Observadores de estado aumentado y observabilidad}
+
+% ------------------------------------------------------------
+% P1 — CONCEPTO DE ESTADO AUMENTADO
+% ------------------------------------------------------------
+
+En sistemas \textit{sensorless}, el rechazo de una perturbación no constituye el único aspecto relevante, debido a que las variables mecánicas utilizadas por el controlador también deben ser reconstruidas a partir del modelo y de las mediciones disponibles. En este contexto, las perturbaciones de torque no consideradas explícitamente en el modelo pueden introducir discrepancias entre la dinámica real del accionamiento y aquella utilizada por el observador, particularmente en la estimación de los estados mecánicos. Una alternativa consiste en incorporar estas perturbaciones, o los parámetros que permiten representarlas, como estados adicionales del observador, permitiendo que su evolución sea estimada conjuntamente con la velocidad y posición del rotor \cite{janiszewskiExtendedKalmanFilter,horvathPositionSensorlessExtended2024}. Este enfoque ha sido aplicado, por ejemplo, incorporando el torque de carga como una variable adicional del modelo, permitiendo su reconstrucción junto con los estados mecánicos del accionamiento \cite{janiszewskiExtendedKalmanFilter}.
+
+
+% ------------------------------------------------------------
+% P2 — DINÁMICA DE LOS ESTADOS ADICIONALES
+% ------------------------------------------------------------
+
+La incorporación de una perturbación como estado adicional requiere definir una dinámica que describa su evolución. Para variables desconocidas que pueden considerarse constantes o lentamente variables respecto de la dinámica del accionamiento, una aproximación habitual consiste en asumir una derivada nula o incorporar pequeñas variaciones mediante el ruido de proceso del observador. De esta forma, la perturbación puede ser actualizada durante la operación sin requerir que su valor sea conocido previamente. Esta representación ha sido utilizada para incorporar variables como el torque de carga y determinados parámetros del motor dentro del modelo de estimación \cite{janiszewskiExtendedKalmanFilter,horvathPositionSensorlessExtended2024}.
+
+
+% ------------------------------------------------------------
+% P3 — EFECTO DEL MODELADO DEL OBSERVADOR
+% ------------------------------------------------------------
+
+La elección de los estados incorporados al observador modifica tanto las variables que pueden ser reconstruidas como la sensibilidad del estimador frente a incertidumbres del modelo. Horváth et al. \cite{horvathLoadTorquePermanent2023} comparan distintas formulaciones de un UKF para la estimación de estados y parámetros de un PMSM, incluyendo modelos de inercia infinita, modelos electromecánicos completos y modelos aumentados. La Tabla \ref{tab:comparacion_ukf_sensorless} resume los resultados reportados para el caso sin medición de posición.
+
 
 \begin{table}[htbp]
     \centering
-    \caption{Comparación de la literatura. Fuente: Propia}
-    \label{tab:comparacion_compensacion}
+    \caption{Comparación de modelos UKF sin medición de posición.
+    Adaptado de \cite{horvathLoadTorquePermanent2023}.}
+    \label{tab:comparacion_ukf_sensorless}
 
-    \renewcommand{\arraystretch}{1.25}
+    \renewcommand{\arraystretch}{1.35}
+    \setlength{\tabcolsep}{5pt}
+    \small
+
+    \begin{tabularx}{\textwidth}{
+        |>{\raggedright\arraybackslash}p{3.2cm}
+        |>{\centering\arraybackslash}X
+        |>{\centering\arraybackslash}X
+        |>{\centering\arraybackslash}X|
+    }
+        \hline
+
+        \textbf{Variable estimada} &
+        \textbf{Modelo de inercia infinita} &
+        \textbf{Modelo completo} &
+        \textbf{Modelo aumentado} \\
+        \hline
+
+        \textbf{Velocidad del rotor} &
+        Sensible a variaciones del flujo PM &
+        Sensible a variaciones del flujo PM &
+        Insensible a variaciones del flujo PM \\
+        \hline
+
+        \textbf{Posición del rotor} &
+        Sensible a variaciones del flujo PM &
+        Sensible a variaciones del flujo PM &
+        Insensible a variaciones del flujo PM \\
+        \hline
+
+        \textbf{Torque de carga} &
+        No es posible &
+        Sensible a variaciones del flujo PM &
+        Insensible a variaciones del flujo PM \\
+        \hline
+
+        \textbf{Flujo del imán permanente} &
+        No es posible &
+        No es posible &
+        Precisa y rápida ante variaciones del flujo PM \\
+        \hline
+
+    \end{tabularx}
+\end{table}
+
+La Tabla \ref{tab:comparacion_ukf_sensorless} muestra que la incorporación de estados adicionales permite estimar variables que no pueden ser reconstruidas mediante formulaciones más reducidas, como el torque de carga y el flujo del imán permanente. Asimismo, en el estudio considerado, el modelo aumentado presenta una menor sensibilidad frente a variaciones del flujo PM en la estimación de posición, velocidad y torque de carga \cite{horvathLoadTorquePermanent2023}. Estos resultados muestran que la selección de los estados incluidos en el modelo del observador puede influir tanto en las variables que pueden ser reconstruidas como en su sensibilidad frente a incertidumbres paramétricas.
+
+
+% ------------------------------------------------------------
+% P4 — PERTURBACIONES PERIÓDICAS COMO ESTADOS
+% ------------------------------------------------------------
+
+La representación mediante estados adicionales no se limita a perturbaciones constantes o lentamente variables. Cuando la perturbación presenta un comportamiento periódico, pueden incorporarse estados cuya dinámica reproduzca las componentes armónicas de interés. En este sentido, Hu et al. \cite{huSelectivePeriodicDisturbance2022} proponen un observador de estados armónicos extendidos (EHSO), en el cual determinadas componentes armónicas de una perturbación periódica son incorporadas mediante estados adicionales. Para cada componente seleccionada se utiliza un modelo dinámico asociado a su frecuencia característica, permitiendo reconstruir selectivamente diferentes órdenes armónicos durante la operación. De esta manera, la estructura periódica de la perturbación es incorporada explícitamente dentro del modelo utilizado por el observador, en lugar de ser representada únicamente como una perturbación desconocida agregada.
+
+
+% ------------------------------------------------------------
+% P5 — SELECCIÓN DE COMPONENTES ARMÓNICAS
+% ------------------------------------------------------------
+
+La incorporación de estados armónicos no requiere necesariamente representar todos los órdenes presentes en la perturbación. En su implementación experimental, Hu et al. \cite{huSelectivePeriodicDisturbance2022} seleccionan determinados órdenes armónicos de acuerdo con las componentes de interés del sistema estudiado. Por lo tanto, los órdenes incorporados al observador pueden ser seleccionados en función de la estructura de la perturbación y no necesitan ser consecutivos. Esta selección resulta relevante debido a que la incorporación de nuevas componentes aumenta la dimensión del modelo y el número de estados que deben ser reconstruidos. En consecuencia, la elección de los armónicos debe estar relacionada con las componentes predominantes de la perturbación considerada, las cuales pueden ser determinadas a partir del modelo físico, análisis espectral o información experimental del accionamiento.
+
+
+% ------------------------------------------------------------
+% P6 — SEPARACIÓN DE PERTURBACIONES
+% ------------------------------------------------------------
+
+La incorporación de perturbaciones dentro del vector de estados requiere además considerar que estas no presentan necesariamente la misma naturaleza física ni dinámica. El torque de carga corresponde a una perturbación externa que actúa sobre la dinámica mecánica y que puede presentar variaciones lentas o cambios durante la operación. Por otra parte, perturbaciones internas como el \textit{cogging torque} presentan una dependencia con la posición del rotor y, por tanto, una estructura periódica. Aunque ambas actúan sobre la dinámica mecánica y pueden producir variaciones en la velocidad, su representación mediante un único estado de perturbación permitiría, en principio, reconstruir únicamente un efecto equivalente o agregado. La identificación independiente de sus contribuciones requiere incorporar información estructural que permita distinguirlas, por ejemplo, mediante dinámicas diferentes para las componentes lentamente variables y periódicas \cite{janiszewskiExtendedKalmanFilter,huSelectivePeriodicDisturbance2022}.
+
+
+% ------------------------------------------------------------
+% P7 — OBSERVABILIDAD DEL MODELO AUMENTADO
+% ------------------------------------------------------------
+
+La incorporación de un mayor número de estados, sin embargo, plantea la necesidad de determinar si estos pueden ser distinguidos a partir de las entradas y mediciones disponibles del sistema. En consecuencia, la capacidad de representar una perturbación mediante estados adicionales no implica por sí misma que estos puedan ser reconstruidos bajo cualquier condición de operación. Este aspecto adquiere especial relevancia en modelos aumentados, debido a que las variables adicionales deben ser estimadas simultáneamente con los estados eléctricos y mecánicos originales del accionamiento.
+
+
+% ------------------------------------------------------------
+% P8 — CONDICIONES DE OPERACIÓN Y OBSERVABILIDAD
+% ------------------------------------------------------------
+
+La observabilidad de estos modelos puede depender de las condiciones de operación y de la información disponible para el observador. Hu et al. \cite{huSelectivePeriodicDisturbance2022}, al incorporar estados adicionales para representar componentes armónicas de una perturbación periódica, determinan que el sistema propuesto es observable para velocidades distintas de cero, por lo que la estimación de dichas componentes es deshabilitada en las proximidades de velocidad nula. Este resultado muestra que la incorporación de estados armónicos puede introducir condiciones particulares para su reconstrucción, las cuales deben ser consideradas al definir el rango de operación del observador.
+
+
+% ------------------------------------------------------------
+% P9 — BAJA VELOCIDAD, SENSORLESS E INYECCIÓN
+% ------------------------------------------------------------
+
+Esta problemática resulta especialmente relevante en accionamientos \textit{sensorless} operando a baja velocidad, donde disminuye la información proporcionada por métodos de estimación dependientes de la fuerza contraelectromotriz. En estas condiciones, se han desarrollado estrategias destinadas a introducir información adicional mediante propiedades como la anisotropía de la máquina o mediante señales de excitación. En \cite{zgorskiSensorlessPositionControl2013}, por ejemplo, se analiza la observabilidad de un modelo \textit{sensorless} de cinco estados compuesto por las corrientes, posición, velocidad y torque de carga. Los autores muestran que la observabilidad débil local depende de las condiciones dinámicas del sistema y, para el caso en que velocidad y aceleración son simultáneamente nulas, incorporan una señal de inyección que provoca una pequeña excitación del rotor y proporciona información adicional para superar la singularidad de observabilidad.
+
+
+% ------------------------------------------------------------
+% P10 — RELACIÓN ENTRE ESTADOS AUMENTADOS Y SENSORLESS
+% ------------------------------------------------------------
+
+Estos resultados evidencian que la incorporación de estados adicionales debe analizarse conjuntamente con las condiciones de observabilidad del sistema, particularmente cuando se pretende estimar simultáneamente variables mecánicas y perturbaciones en condiciones de baja o nula velocidad. Asimismo, las técnicas de inyección pueden aportar información adicional en regiones de operación donde la dinámica natural del accionamiento resulta insuficiente para la reconstrucción de determinados estados. Sin embargo, que una técnica de inyección permita recuperar información asociada a posición o velocidad no implica necesariamente que todos los estados adicionales de un modelo aumentado sean simultáneamente observables, por lo que esta condición debe evaluarse para la estructura específica considerada.
+
+
+% ------------------------------------------------------------
+% P11 — SENSORLESS + ESTIMACIÓN DE PERTURBACIONES
+% ------------------------------------------------------------
+
+La literatura revisada muestra, por tanto, diferentes aproximaciones al problema de estimación. Por una parte, existen observadores aumentados capaces de incorporar perturbaciones de evolución lenta, como el torque de carga, o parámetros desconocidos del motor. Por otra, se han desarrollado observadores destinados a reconstruir selectivamente perturbaciones periódicas mediante modelos armónicos. Paralelamente, las estrategias \textit{sensorless} orientadas a baja y nula velocidad han recurrido a mecanismos de excitación adicionales para recuperar información sobre los estados mecánicos. No obstante, estas estrategias deben diferenciarse según las variables realmente medidas y estimadas, ya que un observador de perturbaciones que utiliza posición o velocidad obtenida mediante un sensor mecánico no resuelve por sí mismo el problema de estimación \textit{sensorless}.Asimismo, estas estrategias basadas en inyección de alta frecuencia , dónde se extrae información asociada a la saliencia del motor, suele requerir etapas de demodulación y filtrado, cuya dinámica puede introducir retardo y desfase al reconstruir las variables del sistema.Alternativamente, se han propuesto estructuras en las que las componentes fundamental y de alta frecuencia son incorporadas directamente dentro del modelo del observador, permitiendo utilizar ambas fuentes de información sin requerir observadores independientes para distintos regímenes de velocidad.Finalmente, existen estrategias de compensación del cogging basadas tanto en información previamente identificada como en rechazo selectivo durante la operación.
+
+% ------------------------------------------------------------
+% P12 — TABLA COMPARATIVA DEL ESTADO DEL ARTE
+% ------------------------------------------------------------
+
+% Aquí incorporar posteriormente la tabla comparativa.
+%
+% Columnas sugeridas:
+%
+% Referencia
+% Motor
+% Condición/rango de velocidad
+% Perturbación considerada
+% Estrategia
+% Variable de perturbación estimada
+% Posición: medida/estimada
+% Velocidad: medida/estimada
+% Sensorless
+% Validación
+%
+% Incluir, una vez verificadas individualmente las características:
+%
+% - Janiszewski
+% - Horváth
+% - Hu et al.
+% - Zgorski et al.
+% - Wilcken/Grotjahn
+% - otros trabajos relevantes encontrados en la búsqueda específica.
+
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparación de estrategias relevantes para la estimación y compensación de perturbaciones en operación \textit{sensorless} a baja velocidad. Fuente: elaboración propia.}
+    \label{tab:comparacion_estado_arte}
+    
+    \renewcommand{\arraystretch}{1.3}
     \setlength{\tabcolsep}{3pt}
-
+    
     \begin{adjustbox}{max width=\textwidth}
     \begin{tabular}{
         l
-        l
-        l
-        l
         c
         c
+        l
         c
+        l
+        l
     }
         \toprule
-
+        
         \textbf{Referencia} &
-        \textbf{Motor} &
-        \textbf{Perturbación} &
-        \textbf{Estrategia} &
-        \shortstack{\textbf{Perturbación}\\\textbf{estimada online}} &
-        \shortstack{\textbf{Compensación}\\\textbf{online}} &
-        \textbf{Sensorless} \\
-
+        \shortstack{\textbf{Baja}\\\textbf{velocidad}} &
+        \textbf{Sensorless} &
+        \shortstack{\textbf{Perturbación}\\\textbf{abordada}} &
+        \shortstack{\textbf{Estados}\\\textbf{aumentados}} &
+        \shortstack{\textbf{Perturbación}\\\textbf{estimada}} &
+        \shortstack{\textbf{Tratamiento de la}\\\textbf{perturbación}} \\
+        
         \midrule
-
+        
         Arias et al.
-\cite{ariasReducingCoggingTorque2019}
-& Stepper
-& Cogging
-& Control resonante
-& No
-& Sí
-& No \\
-
-Wu et al.
-\cite{wuSpeedControlLowSpeed2025}
-& PMSM
-& Cogging + armónicos de flujo
-& Control resonante
-& No
-& Sí
-& No \\
-
-Sekine et al.
-\cite{sekineSuppressionVelocityPulsations2024}
-& PMSM
-& Torque de carga
-& Control resonante
-& No
-& Sí
-& No \\
-
-Picatoste 
-\cite{picatosteruilopeModellingControlStepper2014}
-& Stepper
-& Cogging
-& Feedforward basado en modelo
-& No
-& Sí
-& Sí \\
-
-Lascu et al.
-\cite{lascuPLLPositionSpeed2020}
-& PMSM
-& Torque de carga
-& Observador extendido
-& Torque de carga
-& Sí
-& Sí \\
-
-Guzinski et al.
-\cite{guzinskiSensorlessLowSpeed2019}
-& PMSM
-& Cogging + armónicos
-& Observador extendido + LUT
-& No
-& Sí
-& Sí \\
-
-De Angelo .
-\cite{deangeloControlParaMaquinas2004}
-& PMSM
-& Armónicos + Load
-& Observador extendido
-& Armónicos$^{*}$
-& Sí
-& Sí \\
-
-
+        \cite{ariasReducingCoggingTorque2019}
+        & Sí
+        & No
+        & Cogging
+        & No
+        & No aplica
+        & Control resonante
+        \\
+        
+        Wu et al.
+        \cite{wuSpeedControlLowSpeed2025}
+        & Sí
+        & No
+        & Cogging y armónicos de flujo
+        & Sí
+        & Perturbación en velocidad
+        & Control resonante
+        \\
+        
+        Sekine et al.
+        \cite{sekineSuppressionVelocityPulsations2024}
+        & No$^{1}$
+        & Sí
+        & Perturbación cíclica de velocidad
+        & No
+        & No aplica
+        & Control resonante
+        \\
+        
+        Picatoste
+        \cite{picatosteruilopeModellingControlStepper2014}
+        & Sí
+        & Sí
+        & Torque de carga y cogging
+        & Sí
+        & Torque de carga
+        & Cogging: \textit{feedforward} ideal$^{2}$
+        \\
+        
+        Lascu et al.
+        \cite{lascuPLLPositionSpeed2020}
+        & Sí
+        & Sí
+        & Variaciones paramétricas
+        & Sí
+        & Flujo PM y resistencia estatórica
+        & Estimación/adaptación de parámetros
+        \\
+        
+        Guzinski et al.
+        \cite{guzinskiSensorlessLowSpeed2019}
+        & Sí
+        & Sí
+        & Perturbaciones a baja velocidad
+        & No
+        & No aplica
+        & Sin compensación explícita
+        \\
+        
+        De Angelo
+        \cite{deangeloControlParaMaquinas2004}
+        & Sí
+        & Sí
+        & FEM no sinusoidal y torque de carga
+        & Sí
+        & Torque de carga
+        & Compensación basada en modelo$^{3}$
+        \\
+        
+        Horváth et al.
+        \cite{horvathLoadTorquePermanent2023}
+        & No
+        & Sí
+        & Variación de flujo PM y torque de carga
+        & Sí
+        & Flujo PM y torque de carga
+        & No especifica compensación
+        \\
+        
+        Hu et al.
+        \cite{huSelectivePeriodicDisturbance2022}
+        & No
+        & No
+        & Perturbaciones periódicas de torque
+        & Sí
+        & Torque de carga y componentes armónicas
+        & \textit{Feedforward} de la perturbación estimada
+        \\
+        
+        Wilcken and Grotjahn
+        \cite{wilckenRotorPositionEstimation2023}
+        & Sí
+        & Sí
+        & Variación de flujo PM y torque de carga
+        & Sí$^{4}$
+        & Flujo PM y torque de carga
+        & \textit{Feedforward} del torque estimado
+        \\
+        
         \bottomrule
     \end{tabular}
     \end{adjustbox}
-
+    
     \vspace{2mm}
-
+    
     \begin{minipage}{0.95\textwidth}
-        \footnotesize
-        $^{*}$El método estima componentes armónicos del flujo magnético durante la operación,
-        pero no realiza una estimación directa del \textit{cogging torque}.
+    \scriptsize
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{1pt}
+        
+        $^{1}$ La estrategia plantea operación a baja velocidad, pero su validación se realiza hasta un mínimo de 0.5 p.u.
+        
+        $^{2}$ Se denomina \textit{feedforward} ideal al caso utilizado como referencia de comparación, en el cual la perturbación se considera conocida, incluyendo su amplitud, fase y evolución temporal. Este caso se distingue de las estrategias de compensación \textit{feedforward} basadas en perturbaciones estimadas en línea.
+        
+        $^{3}$ La distribución de flujo magnético se caracteriza previamente mediante un ensayo de la máquina y se representa mediante una serie de Fourier.
+        
+        $^{4}$ El EKF estima separadamente las componentes de corriente fundamental y de alta frecuencia, evitando los filtros utilizados convencionalmente para extraer la respuesta HFI y su retardo asociado.
+      
     \end{minipage}
-
 \end{table}
-% ============================================================
-%
-% OBJETIVO:
-% Determinar cómo la literatura elimina/reduce cogging/ripple
-% y encontrar qué información necesita cada estrategia.
-%
-%
-% ------------------------------------------------------------
-% 1. MÉTODOS PASIVOS
-% ------------------------------------------------------------
-%
-% Tratarlos brevemente.
-%
-% - geometría;
-% - skewing;
-% - dientes;
-% - optimización electromagnética.
-%
-% No son el foco de tu tesis.
-%
-%
-% ------------------------------------------------------------
-% 2. MÉTODOS ACTIVOS
-% ------------------------------------------------------------
-%
-% Aquí está el foco.
-%
-% Separarlos en:
-%
-%               ACTIVOS
-%                  |
-%          ----------------
-%          |              |
-%       OFFLINE          ONLINE
-%
-%
-% ------------------------------------------------------------
-% A) OFFLINE
-% ------------------------------------------------------------
-%
-% Buscar:
-%
-% - LUT;
-% - mapas de cogging;
-% - identificación previa;
-% - Fourier identificado previamente;
-% - perfiles de corriente;
-% - feedforward conocido.
-%
-% Pregunta fundamental:
-%
-% ¿Qué necesitan conocer previamente?
-%
-%
-% ------------------------------------------------------------
-% B) ONLINE
-% ------------------------------------------------------------
-%
-% Buscar:
-%
-% - disturbance observers;
-% - estimación de torque;
-% - estimación armónica;
-% - adaptive observers;
-% - resonant control;
-% - iterative/adaptive compensation.
-%
-%
-% Para CADA estrategia de interés registrar:
-%
-% [ ] ¿Stepper o PMSM?
-% [ ] ¿Usa sensor de posición?
-% [ ] ¿Usa sensor de velocidad?
-% [ ] ¿Es sensorless?
-% [ ] ¿Trabaja a baja velocidad?
-% [ ] ¿Conoce previamente frecuencia?
-% [ ] ¿Conoce previamente amplitud?
-% [ ] ¿Conoce previamente fase?
-% [ ] ¿Estima cogging online?
-% [ ] ¿Compensa cogging online?
-% [ ] ¿Utiliza theta real o estimada?
-% [ ] ¿Utiliza Wm real o estimada?
-% [ ] ¿Reduce torque ripple?
-% [ ] ¿Reduce speed ripple?
-%
-%
-% ------------------------------------------------------------
-% PÁRRAFO FINAL
-% ------------------------------------------------------------
-%
-% Este párrafo NO debería afirmar todavía el GAP.
-%
-% Debe resumir los patrones encontrados:
-%
-% - qué hacen bien los métodos existentes;
-% - qué información requieren;
-% - qué ocurre cuando no existe sensor mecánico;
-% - qué ocurre a baja velocidad.
-%
-% Y entonces:
 
+La Tabla \ref{tab:comparacion_estado_arte} presenta una comparación de las estrategias revisadas, considerando su aplicación a baja velocidad, la operación \textit{sensorless}, la naturaleza de las perturbaciones abordadas y su incorporación mediante estados aumentados. A partir de esta comparación se observan diferentes enfoques para enfrentar el efecto de las perturbaciones sobre el accionamiento. Algunos trabajos recurren al rechazo mediante controladores resonantes, los cuales concentran su acción sobre componentes frecuenciales específicas. Otros, en cambio, compensan la perturbación a partir de un modelo previamente conocido o caracterizado, requiriendo información acerca de su comportamiento antes de la operación. Finalmente, se identifican estrategias que incorporan perturbaciones o parámetros desconocidos como estados adicionales del observador, permitiendo su estimación durante la operación.
 
-% ============================================================
+Este último enfoque resulta particularmente relevante cuando la perturbación no puede considerarse conocida a priori. Los trabajos revisados muestran que es posible aumentar el modelo del observador para incorporar variables como el torque de carga, el flujo magnético o componentes periódicas de una perturbación. Sin embargo, el aumento del número de estados introduce también la necesidad de determinar si dichas variables pueden ser reconstruidas a partir de las mediciones disponibles y con una dinámica suficiente para representar las variaciones que se desean observar.
+
+Esta dificultad adquiere mayor relevancia en operación \textit{sensorless} a baja velocidad, donde la información disponible para reconstruir los estados mecánicos es limitada. En este régimen, parte de la literatura recurre a mecanismos adicionales de excitación, como la inyección de señales de alta frecuencia, para obtener información de posición a partir de la anisotropía de la máquina. En consecuencia, al incorporar simultáneamente estados destinados a representar perturbaciones, surge la interrogante de si la información disponible permite reconstruir tanto los estados mecánicos como las perturbaciones que actúan sobre ellos.
+
 \subsection{Brecha de investigación}
-% ============================================================
-%
-% ESTA SECCIÓN NO SE ESCRIBE DESDE LA INTUICIÓN.
-%
-% Se escribe utilizando los resultados de las subsecciones
-% anteriores.
-%
-%
-% ------------------------------------------------------------
-% PÁRRAFO 1: QUÉ ESTÁ RESUELTO
-% ------------------------------------------------------------
-%
-% Ejemplo conceptual:
-%
-% La literatura ha demostrado estrategias sensorless...
-% También existen múltiples estrategias para compensar cogging...
-%
-%
-% ------------------------------------------------------------
-% PÁRRAFO 2: QUÉ NO COINCIDE
-% ------------------------------------------------------------
-%
-% Buscar la intersección:
-%
-%                 SENSORLESS
-%                     ∩
-%               BAJA VELOCIDAD
-%                     ∩
-%                   STEPPER
-%                     ∩
-%                  COGGING
-%                     ∩
-%             ESTIMACIÓN ONLINE
-%                     ∩
-%          COMPENSACIÓN DE RIPPLE
-%
-%
-% Esa INTERSECCIÓN es potencialmente tu GAP.
-%
-%
-% ------------------------------------------------------------
-% PÁRRAFO 3: LIMITACIÓN DE LOS MÉTODOS ACTUALES
-% ------------------------------------------------------------
-%
-% Aquí solo colocar limitaciones que hayas demostrado
-% bibliográficamente.
-%
-% Por ejemplo, SI tus papers efectivamente muestran que:
-%
-% - compensan utilizando posición medida;
-% - requieren caracterización offline;
-% - trabajan a velocidades mayores;
-% - estiman rotor pero no perturbación;
-% - estiman perturbación pero no son sensorless;
-% - trabajan en PMSM pero no en stepper;
-%
-% entonces esas características construyen tu brecha.
-%
-%
-% ------------------------------------------------------------
-% PÁRRAFO 4: OPORTUNIDAD DE INVESTIGACIÓN
-% ------------------------------------------------------------
-%
-% RECIÉN AQUÍ puedes llegar a algo del tipo:
-%
-% Existe entonces una oportunidad de estudiar la estimación
-% y compensación online de perturbaciones periódicas en un
-% accionamiento stepper sensorless operando a baja velocidad,
-% utilizando las variables proporcionadas por el propio
-% observador.
-%
-% La redacción definitiva dependerá de lo que efectivamente
-% demuestre la revisión bibliográfica.
 
+% P1 — Intersección de los problemas
+%
+% Partir de la conclusión anterior, no volver a describir la tabla.
+%
+% Analizar la combinación:
+%
+% - operación sensorless;
+% - muy baja velocidad;
+% - motor paso a paso;
+% - perturbaciones periódicas (cogging);
+% - estimación online.
+%
+% Mostrar que estos aspectos sí aparecen individualmente en la literatura,
+% pero su combinación aparece menos desarrollada.
+Al considerar conjuntamente las condiciones analizadas anteriormente, se observa que la estimación de perturbaciones adquiere una dificultad adicional en motores paso a paso operados en régimen \textit{sensorless} a muy baja velocidad. Si bien la literatura revisada presenta, por separado, estrategias para la estimación \textit{sensorless} de los estados mecánicos y métodos capaces de reconstruir perturbaciones mediante estados aumentados, su aplicación conjunta aparece menos desarrollada. En particular, las perturbaciones periódicas asociadas al cogging introducen variaciones sobre la dinámica mecánica que deben ser diferenciadas de los cambios de velocidad producidos por el propio movimiento y por otras perturbaciones externas.
 
+% P2 — Estimación sensorless + perturbaciones
+%
+% Contrastar principalmente:
+%
+% - trabajos sensorless de baja velocidad:
+%   reconstruyen theta/omega mediante HFI, FEM, etc.;
+%
+% - trabajos con estados armónicos:
+%   reconstruyen perturbaciones periódicas, pero no necesariamente
+%   bajo las mismas condiciones sensorless de baja velocidad.
+%
+% Introducir el problema de estimar simultáneamente:
+%
+% theta, omega + perturbación.
+
+Por una parte, los métodos orientados a la operación \textit{sensorless} a baja velocidad recurren a información adicional, como la obtenida mediante inyección de señales de alta frecuencia, para reconstruir posición y velocidad cuando la FEM resulta insuficiente. Por otra, los observadores armónicos permiten representar y estimar en línea componentes periódicas desconocidas. Sin embargo, al integrar ambas aproximaciones, los estados asociados a la perturbación deben ser estimados a partir de las mismas mediciones utilizadas para reconstruir los estados mecánicos, planteando la necesidad de determinar si existe información suficiente para observar simultáneamente ambas dinámicas.
+% P3 — Torque de carga vs. perturbaciones periódicas
+%
+% Distinguir:
+%
+% - torque de carga: componente lenta/no periódica;
+% - cogging: componente periódica dependiente de posición.
+%
+% Analizar si ambas pueden incorporarse simultáneamente al observador.
+%
+% IMPORTANTE:
+% distinguir reconstrucción de perturbación total de
+% identificabilidad individual de cada componente.
+%
+% Una buena reconstrucción de:
+% T_dist = Tx + sum(T_h)
+% no implica necesariamente que Tx, A_n, B_n representen
+% individualmente fenómenos físicos identificables.
+
+Además, la perturbación mecánica total puede estar compuesta por fenómenos de distinta naturaleza. Mientras el torque de carga puede aproximarse mediante una componente de evolución lenta, el cogging presenta una dependencia periódica con la posición del rotor. La incorporación de ambas contribuciones como estados del observador no garantiza, por sí sola, que puedan ser identificadas individualmente. En efecto, un observador podría reconstruir adecuadamente la perturbación equivalente que actúa sobre la dinámica mecánica sin que cada uno de sus estados asociados represente de manera única una fuente física de perturbación. Por ello, resulta necesario distinguir entre la reconstrucción de la perturbación total y la identificabilidad de sus componentes.
+% P4 — Brecha de investigación
+%
+% Sintetizar el problema faltante:
+%
+% reconstrucción simultánea de estados mecánicos y perturbaciones
+% desconocidas en operación sensorless a muy baja velocidad.
+%
+% Incorporar:
+% - observabilidad del sistema aumentado;
+% - identificabilidad de las perturbaciones;
+% - capacidad/ancho de banda para reconstruir velocidad instantánea.
+%
+% NO proponer todavía:
+% "EKF de 7 estados", "EHSO", "PR", etc.
+%
+% La brecha debe definir QUÉ falta estudiar, no CÓMO se resolverá.
+En consecuencia, la brecha identificada se relaciona con la reconstrucción simultánea de los estados mecánicos y de perturbaciones de torque desconocidas durante la operación \textit{sensorless} de un motor paso a paso a muy baja velocidad. En particular, permanece por estudiar bajo qué condiciones un modelo de estados aumentados permite representar componentes de perturbación con diferentes características dinámicas sin comprometer la observabilidad de posición y velocidad, así como la capacidad del observador para reproducir las variaciones instantáneas de velocidad asociadas a dichas perturbaciones. Este problema involucra no solo la precisión de estimación, sino también la observabilidad del sistema aumentado, la identificabilidad de sus componentes y el ancho de banda efectivo de la reconstrucción.
+
+% P5 — Pregunta de investigación (opcional)
+%
+% Derivar la pregunta directamente desde P4.
+%
+% Pregunta principal centrada en estimación/observabilidad.
+% Dejar compensación como consecuencia o pregunta secundaria.
+
+A partir de esta brecha, se plantea la siguiente pregunta de investigación:
+
+\begin{quote}
+\textit{¿En qué medida la incorporación de estados destinados a representar 
+perturbaciones de torque permite mejorar la reconstrucción de la velocidad 
+mecánica instantánea de un motor paso a paso durante su operación 
+\textit{sensorless} a baja velocidad?}
+\end{quote}
+
+A partir de esta pregunta principal se plantean las siguientes preguntas 
+específicas:
+
+\begin{enumerate}
+    \item Considerando perturbaciones periódicas representables mediante una 
+    serie de Fourier, ¿en qué medida una representación de orden finito, 
+    incorporada mediante un número limitado de estados adicionales, permite 
+    mejorar la reconstrucción de la velocidad mecánica instantánea?
+
+    \item ¿En qué medida la incorporación de estos estados adicionales permite 
+    reducir el desfase y la atenuación presentes en la estimación de la 
+    velocidad mecánica instantánea?
+
+    \item ¿En qué medida los estados adicionales utilizados para mejorar la 
+    reconstrucción de la velocidad representan también la perturbación de 
+    torque real y sus componentes periódicas?
+\end{enumerate}
 % ============================================================
 \section{Objetivos}
 % ============================================================
@@ -2073,6 +2249,8 @@ De Angelo .
 % paso a paso que permita estimar y compensar en línea perturbaciones
 % periódicas, con el propósito de reducir el ripple de velocidad
 % durante la operación a baja velocidad."
+
+Desarrollar y evaluar una estrategia de estimación de estados aumentados para mejorar la reconstrucción de la velocidad mecánica instantánea de un motor paso a paso en operación \textit{sensorless} a baja velocidad, mediante la incorporación de estados destinados a representar perturbaciones de torque.
 
 
 % ------------------------------------------------------------
@@ -2103,10 +2281,106 @@ De Angelo .
 % 7. Evaluar la reducción del ripple y el desempeño del sistema
 %    mediante simulaciones y/o validación experimental.
 
+\begin{enumerate}
+    \item Desarrollar un modelo aumentado del motor paso a paso que incorpore estados destinados a representar perturbaciones de torque de distinta naturaleza, incluyendo componentes de evolución lenta y componentes periódicas mediante una representación armónica de orden finito.
+    \item Analizar la observabilidad del modelo aumentado y el efecto de la incorporación progresiva de estados de perturbación sobre la capacidad de reconstruir los estados mecánicos durante la operación \textit{sensorless} a baja velocidad.
+    \item Evaluar el efecto del número de estados armónicos incorporados sobre la reconstrucción de la velocidad mecánica instantánea, considerando su error, atenuación y desfase respecto de la velocidad real.
+    \item Analizar la correspondencia entre las perturbaciones representadas por los estados aumentados y el torque perturbador real, distinguiendo entre la reconstrucción de la perturbación equivalente y la identificación de sus componentes individuales.
+\end{enumerate}
 
 
-% ============================================================
-\section{Contribuciones de esta memoria}
+\subsection{Alcances y limitaciones}
+
+\subsubsection{Alcances}
+
+El presente trabajo considera los siguientes alcances:
+
+\begin{enumerate}
+
+    \item El estudio se centra en la estimación \textit{sensorless} de la
+    velocidad mecánica instantánea de un motor paso a paso operando a baja
+    velocidad.
+
+    \item El motor paso a paso se representa mediante un modelo de máquina
+    síncrona de imanes permanentes con saliencia, considerando el elevado
+    número de pares de polos característico de la máquina estudiada.
+
+    \item El modelo se parametriza parcialmente a partir de mediciones
+    experimentales realizadas sobre un motor paso a paso real, incluyendo
+    parámetros eléctricos asociados a su resistencia, inductancias y
+    saliencia.
+
+    \item La estrategia de estimación se estudia sobre una arquitectura de
+    accionamiento previamente desarrollada, conservando las frecuencias de
+    operación y restricciones dinámicas consideradas en sus lazos de control,
+    particularmente en el lazo de corriente.
+
+    \item Se estudia la incorporación de estados adicionales al observador
+    destinados a representar perturbaciones de torque, considerando tanto
+    componentes de evolución lenta como componentes periódicas mediante una
+    representación armónica de orden finito.
+
+    \item El desempeño del observador se evalúa principalmente a partir de la
+    reconstrucción de la velocidad mecánica instantánea, considerando su error,
+    atenuación y desfase respecto de la velocidad real. De manera adicional,
+    se analiza la correspondencia entre los estados de perturbación y el torque
+    perturbador aplicado al modelo.
+
+    \item La estrategia propuesta se evalúa mediante simulación, utilizando los
+    estados reales disponibles en el modelo de la planta como referencia para
+    cuantificar el desempeño de la estimación.
+
+\end{enumerate}
+
+
+\subsubsection{Limitaciones}
+
+El presente trabajo considera las siguientes limitaciones:
+
+\begin{enumerate}
+
+    \item La validación de la estrategia de estimación se realiza mediante
+    simulación. Si bien el modelo incorpora parámetros obtenidos mediante
+    mediciones sobre un motor real, no se realiza una validación experimental
+    del observador propuesto.
+
+    \item Los resultados se restringen al régimen de baja velocidad y a las
+    condiciones de operación consideradas en los escenarios de simulación,
+    por lo que no se pretende caracterizar el desempeño del observador en todo
+    el rango de operación de la máquina.
+
+    \item La dinámica del accionamiento se encuentra condicionada por las
+    frecuencias de muestreo y el ancho de banda de los lazos de control
+    considerados, particularmente por el lazo de corriente. En consecuencia,
+    la capacidad de estimar una componente de perturbación no implica
+    necesariamente que el accionamiento disponga del ancho de banda suficiente
+    para compensarla.
+
+    \item Las perturbaciones periódicas se representan mediante un número
+    finito de componentes armónicas. Por tanto, no se pretende reconstruir de
+    manera exacta una expansión infinita ni representar cualquier perturbación
+    arbitraria.
+
+    \item La incorporación de estados adicionales no garantiza la
+    identificabilidad individual de las diferentes fuentes físicas de
+    perturbación. Una mejora en la reconstrucción de la velocidad puede
+    producirse aun cuando los estados asociados a la perturbación no
+    reproduzcan de forma exacta cada componente del torque real.
+
+    \item Los resultados quedan sujetos a las hipótesis y simplificaciones
+    utilizadas en el modelo de la máquina, las perturbaciones y el
+    accionamiento. En consecuencia, los fenómenos físicos no incluidos
+    explícitamente en la simulación no pueden ser evaluados a partir de los
+    resultados obtenidos.
+
+    \item La compensación de las perturbaciones no constituye el criterio
+    principal de desempeño del trabajo. La evaluación se centra en la capacidad
+    de reconstruir la velocidad mecánica instantánea, mientras que una eventual
+    utilización de las perturbaciones estimadas para compensación se considera
+    complementaria.
+
+\end{enumerate}
+%%\section{Contribuciones de esta memoria}
 % ============================================================
 
 % Aquí NO repetir simplemente los objetivos.
@@ -2143,7 +2417,7 @@ De Angelo .
 
 
 % ============================================================
-\section{Organización de la memoria}
+%%\section{Organización de la memoria}
 % ============================================================
 
 % Describir brevemente qué contiene cada capítulo.
@@ -2171,155 +2445,3 @@ De Angelo .
 % Conclusiones y líneas de trabajo futuro.
 
 
-
-% ============================================================
-% CAPÍTULO 2: MARCO TEÓRICO
-% ============================================================
-
-\chapter{Marco teórico}
-
-
-% ------------------------------------------------------------
-\section{Motores eléctricos}
-% ------------------------------------------------------------
-
-% AQUÍ sí introducir formalmente los tipos de motores.
-%
-% Hacer una clasificación breve para llegar rápidamente al stepper.
-% No transformar esta sección en una revisión general de todas
-% las máquinas eléctricas.
-
-
-% ------------------------------------------------------------
-\section{Motores paso a paso}
-% ------------------------------------------------------------
-
-% Explicar:
-%   - Principio de funcionamiento.
-%   - Construcción.
-%   - Rotor y estator.
-%   - Número de polos/dientes.
-%   - Paso mecánico.
-%   - Excitación de fases.
-
-
-% ------------------------------------------------------------
-\subsection{Tipos de motores paso a paso}
-% ------------------------------------------------------------
-
-% Aquí colocar:
-%   - Reluctancia variable (VR).
-%   - Imán permanente (PM).
-%   - Híbrido (HB).
-%
-% Explicar diferencias constructivas y justificar cuál se utiliza
-% en esta memoria.
-
-
-% ------------------------------------------------------------
-\section{Modelo matemático del motor paso a paso}
-% ------------------------------------------------------------
-
-% Aquí comienza el desarrollo matemático formal.
-%
-% Incluir según corresponda:
-%   - Modelo eléctrico.
-%   - Modelo mecánico.
-%   - FEM.
-%   - Torque electromagnético.
-%   - Inductancias.
-%   - Saliencia.
-
-
-% ------------------------------------------------------------
-\section{Transformaciones de coordenadas}
-% ------------------------------------------------------------
-
-% Explicar:
-%   - alpha-beta.
-%   - d-q.
-%   - Transformaciones utilizadas.
-%   - Significado físico.
-%   - Relación entre ángulo eléctrico y mecánico.
-
-
-% ------------------------------------------------------------
-\section{Control vectorial del motor paso a paso}
-% ------------------------------------------------------------
-
-% Explicar formalmente:
-%   - Control de Id.
-%   - Control de Iq.
-%   - PI de corriente.
-%   - Control de velocidad.
-%   - Generación de referencias.
-%   - Saturaciones.
-%   - MTPA si finalmente forma parte de la estrategia.
-
-
-% ------------------------------------------------------------
-\section{Control sensorless}
-% ------------------------------------------------------------
-
-% Fundamentos matemáticos necesarios para comprender el estimador.
-%
-% Evitar repetir el estado del arte del Capítulo 1.
-%
-% Capítulo 1:
-%   "qué métodos existen y qué hicieron otros autores".
-%
-% Capítulo 2:
-%   "cómo funcionan matemáticamente los métodos que YO necesito".
-
-
-% ------------------------------------------------------------
-\subsection{Filtro de Kalman extendido}
-% ------------------------------------------------------------
-
-% Desarrollar:
-%   - Modelo de estados.
-%   - Predicción.
-%   - Corrección.
-%   - Matrices Q y R.
-%   - Jacobianos.
-%   - Estados estimados.
-%
-% Luego particularizarlo al modelo del stepper.
-
-
-% ------------------------------------------------------------
-\section{Perturbaciones periódicas}
-% ------------------------------------------------------------
-
-% Fundamentos físicos y matemáticos.
-%
-% Incluir:
-%   - Cogging/detent torque.
-%   - Torque ripple.
-%   - Periodicidad respecto a theta_m.
-%   - Frecuencia de perturbación respecto a Wm.
-%   - Representación mediante series de Fourier.
-%
-% Aquí sí corresponde desarrollar expresiones como:
-%
-%       T_d = T_{dm}\sin(N_r\theta_m + \phi)
-%
-% y posteriormente sus armónicos si son utilizados.
-
-
-% ------------------------------------------------------------
-\section{Compensación de perturbaciones periódicas}
-% ------------------------------------------------------------
-
-% Fundamentos matemáticos necesarios para tu propuesta.
-%
-% Según la versión final:
-%   - Control resonante.
-%   - PR.
-%   - Estimación armónica.
-%   - Compensación feedforward.
-%   - Compensación adaptativa.
-%   - Desfase del sistema.
-%
-% Esta sección debería entregar las herramientas necesarias para
-% entender posteriormente tu metodología propuesta.
