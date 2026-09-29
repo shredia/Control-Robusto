@@ -17,7 +17,7 @@ fprintf('Proyecto inicializado desde:\n%s\n', project_folder);
 % SIMULACIÓN Y REFERENCIAS
 % ========================================================================
 
-Time_simulation = 0.2;
+Time_simulation = 1;
 
 t_ref = [0.0];
 w_ref = [10];
@@ -32,11 +32,11 @@ Wm_ref = setinterpmethod(Wm_ref,'zoh');
 % Torque de carga
 % -------------------------------------------------------------------------
 
-t_load = [0.0 0.5];
-Tl_ref = [0.0 0.0];
+t_load = [0.0 0.1];
+Tl_ref = [0.0 0.2];
 
 Tl = timeseries(Tl_ref, t_load);
-Tl = setinterpmethod(Tl,'linear');
+%%Tl = setinterpmethod(Tl,'linear');
 
 
 % -------------------------------------------------------------------------
@@ -158,7 +158,7 @@ motor_params.Imax = ...
 % -------------------------------------------------------------------------
 
 motor_params.Tdm = ...
-    22/1000;
+    22/1000;%%22
 
 
 motor_params.Thold = ...
@@ -275,9 +275,9 @@ motor_params.max_step_rate = 3000;
 % CONTROL DE VELOCIDAD + MTPA
 % ========================================================================
 
-PI_MTPA_params.fbw_Wm = 5;
+PI_MTPA_params.fbw_Wm = 15;
 
-PI_MTPA_params.shi_w = 2;
+PI_MTPA_params.shi_w = 1;
 
 
 PI_MTPA_params.wn_w = ...
@@ -315,9 +315,13 @@ PI_MTPA_params.Ki_w = ...
     PI_MTPA_params.J / ...
     motor_params.Kt;
 
-
+% % 
+% PI_MTPA_params.Kd_w = ...
+%     PI_MTPA_params.Kp_w/10000;
+% % 
 PI_MTPA_params.Kd_w = ...
-    PI_MTPA_params.Kp_w/10000;
+    0;
+
 
 
 PI_MTPA_params.Tf_w = ...
@@ -493,7 +497,7 @@ EKF_params.HFI_flag = 0;
 EKF_params.Amplitud_HFI = 2;
 
 
-EKF_params.f_h = 2000;
+EKF_params.f_h = 1000;
 
 
 EKF_params.wh = ...
@@ -688,6 +692,138 @@ PI_dq_params.wh = ...
 
 PI_dq_params.HFI_flag = ...
     EKF_params.HFI_flag;
+
+% -------------------------------------------------------------------------
+% Control motor 2
+% -------------------------------------------------------------------------
+PI_dq_params2.Vdc = ...
+    Vdc;
+
+
+% -------------------------------------------------------------------------
+% Ancho de banda
+% -------------------------------------------------------------------------
+
+PI_dq_params2.fbw_d = 500;
+
+PI_dq_params2.fbw_q = 500;
+
+
+PI_dq_params2.wd_d = ...
+    2*pi*PI_dq_params.fbw_d;
+
+
+PI_dq_params2.wd_q = ...
+    2*pi*PI_dq_params.fbw_q;
+
+
+PI_dq_params2.shi_d = 1;
+
+PI_dq_params2.shi_q = 1;
+
+
+% -------------------------------------------------------------------------
+% Control usando inductancia nominal
+% -------------------------------------------------------------------------
+
+PI_dq_params2.Kp_d = ...
+    PI_dq_params2.wd_d * ...
+    motor_params.L;
+
+
+PI_dq_params2.Ki_d = ...
+    PI_dq_params2.wd_d * ...
+    motor_params.R;
+
+
+PI_dq_params2.Kp_q = ...
+    PI_dq_params2.wd_q * ...
+    motor_params.L;
+
+
+PI_dq_params2.Ki_q = ...
+    PI_dq_params2.wd_q * ...
+    motor_params.R;
+
+
+% -------------------------------------------------------------------------
+% Control considerando saliencia
+% -------------------------------------------------------------------------
+
+PI_dq_params2.Kp_q_salient = ...
+    2 * ...
+    PI_dq_params2.shi_q * ...
+    PI_dq_params2.wd_q * ...
+    motor_params.Lq ...
+    - motor_params.R;
+
+
+PI_dq_params2.Ki_q_salient = ...
+    PI_dq_params2.wd_q^2 * ...
+    motor_params.Lq;
+
+
+PI_dq_params2.Kp_d_salient = ...
+    2 * ...
+    PI_dq_params2.shi_d * ...
+    PI_dq_params2.wd_d * ...
+    motor_params.Ld ...
+    - motor_params.R;
+
+
+PI_dq_params2.Ki_d_salient = ...
+    PI_dq_params2.wd_d^2 * ...
+    motor_params.Ld;
+
+
+% -------------------------------------------------------------------------
+% Tiempo de muestreo
+% -------------------------------------------------------------------------
+
+PI_dq_params2.Ts = ...
+    Ts_current;
+
+
+% -------------------------------------------------------------------------
+% Modelo
+% -------------------------------------------------------------------------
+
+PI_dq_params2.Ld = ...
+    motor_params.Ld;
+
+
+PI_dq_params2.Lq = ...
+    motor_params.Lq;
+
+
+PI_dq_params2.Psi = ...
+    motor_params.Psi;
+
+
+PI_dq_params2.P = ...
+    motor_params.P;
+
+
+PI_dq_params2.Imax = ...
+    motor_params.Imax;
+
+
+% -------------------------------------------------------------------------
+% HFI
+% -------------------------------------------------------------------------
+
+PI_dq_params2.Amplitud_HFI = ...
+    EKF_params.Amplitud_HFI;
+
+
+PI_dq_params2.wh = ...
+    EKF_params.wh;
+
+
+PI_dq_params2.HFI_flag = ...
+    0;
+
+
 
 
 %% ========================================================================
@@ -968,7 +1104,7 @@ PR_i.wr_max = ...
 % Guardar dentro de PI_dq
 % -------------------------------------------------------------------------
 
-PI_dq_params.PR_i = ...
+PI_dq_params2.PR_i = ...
     PR_i;
 
 

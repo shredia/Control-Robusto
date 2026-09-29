@@ -402,85 +402,141 @@ Ib_pred = ...
 
 
 % =========================================================================
-% 14. VECTOR DE MEDICIÓN
-% =========================================================================
-%
-% La tercera medición impone:
-%
-% eps_norm -> 0
-%
+% 14-16. VECTOR DE MEDICIÓN, JACOBIANA Y COVARIANZA
 % =========================================================================
 
-y_med = [ ...
-    Ia_raw;
-    Ib_raw;
-    0];
-
-
-y_pred = [ ...
-    Ia_pred;
-    Ib_pred;
-    eps_norm];
-
-
-innov = ...
-    y_med - y_pred;
-
-
-% =========================================================================
-% 15. JACOBIANA DE MEDICIÓN
-% =========================================================================
-
+% Derivadas de las corrientes respecto del ángulo eléctrico
 dIa_dtheta_e = ...
     -Id_p*sp ...
     -Iq_p*cp;
-
 
 dIb_dtheta_e = ...
      Id_p*cp ...
     -Iq_p*sp;
 
 
-% Si:
-%
-% eps_norm ~= theta_real - theta_estimado
-%
-% entonces:
-%
-% d(eps_norm)/d(theta_estimado) ~= -1
-%
-dEps_dtheta_e = -1;%%-1
-
-
-Ck = [ ...
-
-    cp, -sp, 0, dIa_dtheta_e;
-
-    sp,  cp, 0, dIb_dtheta_e;
-
-    0,   0,  0, dEps_dtheta_e];
-
-
-% =========================================================================
-% 16. COVARIANZA DE LAS MEDICIONES
-% =========================================================================
-
+% Ruido de las mediciones de corriente
 sigma_Ia = 0.1;
 sigma_Ib = 0.1;
 
 
 if HFI_flag
+
+    % =====================================================================
+    % CASO CON HFI
+    %
+    % Mediciones:
+    %   Ia
+    %   Ib
+    %   error HFI = 0
+    %
+    % El HFI actúa como una pseudomedición angular.
+    % =====================================================================
+
+    y_med = [ ...
+        Ia_raw;
+        Ib_raw;
+        0];
+
+
+    y_pred = [ ...
+        Ia_pred;
+        Ib_pred;
+        eps_norm];
+
+
+    % -------------------------------------------------------------
+    % Jacobiana de medición
+    % -------------------------------------------------------------
+
+    % Aproximación:
+    %
+    % eps_norm ~= theta_real - theta_estimado
+    %
+    % por tanto:
+    %
+    % d(eps_norm)/d(theta_estimado) ~= -1
+    %
+
+    dEps_dtheta_e = -1;
+
+
+    Ck = [ ...
+
+        cp, -sp, 0, dIa_dtheta_e;
+
+        sp,  cp, 0, dIb_dtheta_e;
+
+        0,   0,  0, dEps_dtheta_e];
+
+
+    % -------------------------------------------------------------
+    % Covarianza de medición
+    % -------------------------------------------------------------
+
     sigma_HFI = 0.25;
+
+    Rk = diag([ ...
+        sigma_Ia^2, ...
+        sigma_Ib^2, ...
+        sigma_HFI^2]);
+
+
 else
-    % HFI prácticamente ignorado
-    sigma_HFI = 0;
+
+    % =====================================================================
+    % CASO SIN HFI
+    %
+    % IMPORTANTE:
+    %
+    % El HFI se elimina COMPLETAMENTE del EKF.
+    %
+    % No se utiliza:
+    %   - eps_norm
+    %   - pseudomedición angular
+    %   - sigma_HFI
+    %
+    % El observador utiliza exclusivamente Ia e Ib.
+    % =====================================================================
+
+    y_med = [ ...
+        Ia_raw;
+        Ib_raw];
+
+
+    y_pred = [ ...
+        Ia_pred;
+        Ib_pred];
+
+
+    % -------------------------------------------------------------
+    % Jacobiana de medición
+    % -------------------------------------------------------------
+
+    Ck = [ ...
+
+        cp, -sp, 0, dIa_dtheta_e;
+
+        sp,  cp, 0, dIb_dtheta_e];
+
+
+    % -------------------------------------------------------------
+    % Covarianza de medición
+    % -------------------------------------------------------------
+
+    Rk = diag([ ...
+        sigma_Ia^2, ...
+        sigma_Ib^2]);
+
 end
 
-Rk = diag([ ...
-    sigma_Ia^2, ...
-    sigma_Ib^2, ...
-    sigma_HFI^2]);
 
+% =========================================================================
+% INNOVACIÓN
+% =========================================================================
+
+innov = ...
+    y_med - y_pred;
 
 % =========================================================================
 % 17. GANANCIA DE KALMAN
