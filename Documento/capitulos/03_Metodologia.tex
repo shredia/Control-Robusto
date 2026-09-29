@@ -242,6 +242,7 @@ $dq$, se utilizaron los valores correspondientes a $L_d$ y $L_q$.
 
 
 % ============================================================
+
 \section{Implementación del modelo de simulación}
 
 
@@ -408,17 +409,12 @@ $I_d$ e $I_q$ a partir de sus respectivas referencias $I_d^{*}$ e
 $I_q^{*}$.
 
 La Figura~\ref{fig:lazo_control_corriente} presenta la estructura
-general del lazo de corriente. Los errores entre las referencias y las
-corrientes realimentadas son procesados mediante controladores
-proporcionales-integrales (PI). Las acciones generadas por estos
-controladores se complementan con términos de desacople derivados del
-modelo eléctrico del motor, obteniéndose finalmente las referencias de
-tensión $V_d^{*}$ y $V_q^{*}$.
-
-
-% ------------------------------------------------------------
-% FIGURA DEL LAZO DE CORRIENTE
-% ------------------------------------------------------------
+general del lazo. Los errores entre las referencias y las corrientes
+realimentadas son procesados mediante controladores
+proporcionales-integrales (PI). A las acciones generadas por estos
+controladores se incorporan términos de desacople derivados del modelo
+eléctrico del motor, obteniéndose las referencias de tensión en los
+ejes $d$ y $q$.
 
 \begin{figure}[htbp]
     \centering
@@ -547,14 +543,14 @@ tensión $V_d^{*}$ y $V_q^{*}$.
 
 
     % ========================================================
-    % TÉRMINOS DE DESACOPLE
+    % DESACOPLE
     % ========================================================
 
     \node [above=0.9cm of decoupd, align=center] (compd)
-        {$-\omega_e L_q I_q$};
+        {$-\omega_e L_q I_q^{*}$};
 
     \node [below=0.9cm of decoupq, align=center] (compq)
-        {$+\omega_e L_d I_d+e_{\mathrm{bemf}}$};
+        {$+\omega_e L_d I_d^{*}+\omega_e\Psi$};
 
     \draw [->]
         (compd) -- (decoupd);
@@ -564,7 +560,7 @@ tensión $V_d^{*}$ y $V_q^{*}$.
 
 
     % ========================================================
-    % SIGNOS
+    % SIGNOS DE REALIMENTACIÓN
     % ========================================================
 
     \node at ($(sumd)+(-0.18,0.20)$) {\scriptsize $+$};
@@ -579,94 +575,14 @@ tensión $V_d^{*}$ y $V_q^{*}$.
 
 
 % ------------------------------------------------------------
-\subsubsection{Desacople de los ejes \texorpdfstring{$d$ y $q$}{d y q}}
-\label{subsubsec:desacople_dq}
+\subsubsection{Errores de corriente}
+\label{subsubsec:errores_corriente}
 % ------------------------------------------------------------
 
-El modelo eléctrico expresado en el marco rotatorio $dq$ presenta
-términos de acoplamiento entre las dinámicas de ambos ejes. Estas
-dinámicas pueden expresarse como
-
-\begin{align}
-L_d\frac{dI_d}{dt}
-&=
-V_d
--
-RI_d
-+
-\omega_e L_q I_q,
-\label{eq:dinamica_Id_control}
-\\
-L_q\frac{dI_q}{dt}
-&=
-V_q
--
-RI_q
--
-\omega_e L_d I_d
--
-e_{\mathrm{bemf}},
-\label{eq:dinamica_Iq_control}
-\end{align}
-
-donde $\omega_e$ corresponde a la velocidad eléctrica del rotor y
-$e_{\mathrm{bemf}}$ representa la componente de fuerza
-contraelectromotriz considerada en el eje $q$.
-
-A partir de este modelo se incorporan términos de compensación para
-reducir la interacción entre las dinámicas de ambos ejes. En la
-implementación discreta, las referencias de tensión se calculan en
-cada instante de muestreo como
-
-\begin{align}
-V_d^{*}[k]
-&=
-u_d[k]
--
-\omega_e[k]L_qI_q[k],
-\label{eq:desacople_d}
-\\
-V_q^{*}[k]
-&=
-u_q[k]
-+
-\omega_e[k]L_dI_d[k]
-+
-e_{\mathrm{bemf}}[k],
-\label{eq:desacople_q}
-\end{align}
-
-donde $u_d[k]$ y $u_q[k]$ corresponden a las acciones generadas por
-los controladores PI de corriente.
-
-La compensación de estos términos permite que las dinámicas vistas
-por los controladores puedan aproximarse, para efectos de diseño,
-mediante
-
-\begin{align}
-G_d(s)
-&=
-\frac{1}{L_ds+R},
-\label{eq:planta_corriente_d}
-\\
-G_q(s)
-&=
-\frac{1}{L_qs+R}.
-\label{eq:planta_corriente_q}
-\end{align}
-
-Estas expresiones se utilizan para el diseño de las ganancias de los
-controladores, mientras que su implementación se realiza directamente
-en tiempo discreto.
-
-
-% ------------------------------------------------------------
-\subsubsection{Implementación de los controladores PI de corriente}
-\label{subsubsec:pi_corriente}
-% ------------------------------------------------------------
-
-Los errores de corriente se calculan en cada instante de muestreo
-mediante
+Las corrientes utilizadas por el controlador se obtienen mediante la
+transformación de Park a partir de las corrientes de fase del modelo.
+A partir de ellas, los errores de seguimiento se calculan en cada
+instante de muestreo como
 
 \begin{align}
 e_d[k]
@@ -680,62 +596,50 @@ I_q^{*}[k]-I_q[k].
 \label{eq:error_corriente_q}
 \end{align}
 
-Los controladores PI se implementan en tiempo discreto. Para cada eje,
-el estado integral se actualiza de acuerdo con
+Estos errores constituyen las entradas de los controladores PI
+correspondientes a los ejes $d$ y $q$.
 
-\begin{equation}
-\xi_i[k]
-=
-\xi_i[k-1]
-+
-K_{i,i}T_{s,i}e_i[k],
-\qquad
-i\in\{d,q\},
-\label{eq:integrador_corriente_discreto}
-\end{equation}
 
-mientras que la acción de control se determina mediante
+% ------------------------------------------------------------
+\subsubsection{Controladores PI de corriente}
+\label{subsubsec:pi_corriente}
+% ------------------------------------------------------------
 
-\begin{equation}
-u_i[k]
-=
-K_{p,i}e_i[k]
-+
-\xi_i[k].
-\label{eq:pi_corriente_discreto}
-\end{equation}
-
-Por lo tanto, para cada eje se tiene
+Los controladores PI de corriente fueron implementados directamente
+en tiempo discreto. Para cada eje, la acción de control antes de
+incorporar los términos adicionales puede expresarse como
 
 \begin{align}
 u_d[k]
 &=
-K_{p,d}e_d[k]
-+
-\xi_d[k],
+K_{p,d}e_d[k]+v_{I,d}[k],
+\label{eq:pi_d_discreto}
 \\
 u_q[k]
 &=
-K_{p,q}e_q[k]
-+
-\xi_q[k].
+K_{p,q}e_q[k]+v_{I,q}[k],
+\label{eq:pi_q_discreto}
 \end{align}
 
-Las acciones $u_d[k]$ y $u_q[k]$ se complementan posteriormente con
-los términos de desacople definidos en las
-Ecuaciones~\eqref{eq:desacople_d} y~\eqref{eq:desacople_q}, generando
-las referencias de tensión $V_d^{*}[k]$ y $V_q^{*}[k]$.
+donde $v_{I,d}$ y $v_{I,q}$ corresponden a los estados integrales de
+los controladores.
 
+Las ganancias fueron determinadas a partir de las dinámicas
+eléctricas desacopladas de los ejes $d$ y $q$. Para efectos de diseño,
+estas dinámicas se aproximan mediante
 
-% ------------------------------------------------------------
-\subsubsection{Diseño de las ganancias de los controladores}
-\label{subsubsec:ganancias_pi_corriente}
-% ------------------------------------------------------------
+\begin{align}
+G_d(s)
+&=
+\frac{1}{L_d s+R},
+\\
+G_q(s)
+&=
+\frac{1}{L_q s+R}.
+\end{align}
 
-Las ganancias de los controladores se determinaron a partir de las
-dinámicas eléctricas desacopladas de los ejes $d$ y $q$. Considerando
-una frecuencia angular de diseño $\omega_{c,i}$, se utilizaron las
-relaciones
+Considerando una frecuencia angular de diseño $\omega_{c,i}$, las
+ganancias utilizadas se obtienen mediante
 
 \begin{align}
 K_{p,d}
@@ -756,7 +660,7 @@ R\omega_{c,q}.
 \end{align}
 
 La frecuencia angular de diseño se relaciona con el ancho de banda
-seleccionado mediante
+seleccionado según
 
 \begin{equation}
 \omega_{c,i}
@@ -764,31 +668,91 @@ seleccionado mediante
 2\pi f_{c,i}.
 \end{equation}
 
-Para ambos ejes se seleccionó un ancho de banda de
+Para ambos ejes se utilizó
 
 \begin{equation}
-f_{c,d}
-=
-f_{c,q}
-=
-500~\mathrm{Hz}.
+f_{c,d}=f_{c,q}=500~\mathrm{Hz}.
 \end{equation}
 
 El lazo de corriente se ejecuta a una frecuencia de muestreo de
 
 \begin{equation}
-f_{s,i}
-=
-10~\mathrm{kHz},
+f_{s,i}=10~\mathrm{kHz},
 \end{equation}
 
-correspondiente a un período de muestreo de
+correspondiente a
 
 \begin{equation}
-T_{s,i}
-=
-100~\mu\mathrm{s}.
+T_{s,i}=100~\mu\mathrm{s}.
 \end{equation}
+
+
+% ------------------------------------------------------------
+\subsubsection{Desacople de los ejes \texorpdfstring{$d$ y $q$}{d y q}}
+\label{subsubsec:desacople_dq}
+% ------------------------------------------------------------
+
+El modelo eléctrico en el marco rotatorio presenta términos de
+acoplamiento dependientes de la velocidad eléctrica. Las ecuaciones
+empleadas como base para la compensación son
+
+\begin{align}
+V_d
+&=
+RI_d
++
+L_d\frac{dI_d}{dt}
+-
+\omega_eL_qI_q,
+\\
+V_q
+&=
+RI_q
++
+L_q\frac{dI_q}{dt}
++
+\omega_eL_dI_d
++
+\omega_e\Psi.
+\end{align}
+
+En la implementación, los términos de desacople se calculan utilizando
+las referencias de corriente previamente limitadas. De esta forma,
+
+\begin{align}
+V_{\mathrm{ff},d}[k]
+&=
+-\omega_e[k]L_qI_q^{*}[k],
+\label{eq:desacople_d}
+\\
+V_{\mathrm{ff},q}[k]
+&=
+\omega_e[k]L_dI_d^{*}[k]
++
+\omega_e[k]\Psi.
+\label{eq:desacople_q}
+\end{align}
+
+Las tensiones solicitadas por el controlador, sin considerar por el
+momento las acciones resonantes adicionales, quedan dadas por
+
+\begin{align}
+V_{d,\mathrm{unsat}}[k]
+&=
+u_d[k]
++
+V_{\mathrm{ff},d}[k],
+\\
+V_{q,\mathrm{unsat}}[k]
+&=
+u_q[k]
++
+V_{\mathrm{ff},q}[k].
+\end{align}
+
+La utilización de las referencias de corriente en los términos de
+desacople permite anticipar las componentes de tensión asociadas al
+punto de operación solicitado.
 
 
 % ------------------------------------------------------------
@@ -796,94 +760,202 @@ T_{s,i}
 \label{subsubsec:saturacion_corriente}
 % ------------------------------------------------------------
 
-Las referencias de tensión generadas por el controlador se encuentran
-limitadas por la tensión disponible en el bus de continua. Por este
-motivo, se incorpora una saturación sobre la magnitud del vector de
-tensión.
-
-La magnitud de la referencia se calcula como
+La magnitud de la tensión solicitada se encuentra limitada por la
+tensión disponible en el bus de continua. Antes de aplicar las
+tensiones al modelo del motor se calcula
 
 \begin{equation}
-V_{dq}^{*}[k]
+V_{\mathrm{unsat}}[k]
 =
 \sqrt{
-\left(V_d^{*}[k]\right)^2
+V_{d,\mathrm{unsat}}^2[k]
 +
-\left(V_q^{*}[k]\right)^2
+V_{q,\mathrm{unsat}}^2[k]
 }.
-\label{eq:magnitud_tension_dq}
 \end{equation}
 
-Cuando la magnitud solicitada supera el límite disponible
-$V_{\max}$, ambas componentes son escaladas mediante
-
-\begin{equation}
-\begin{bmatrix}
-V_{d,\mathrm{sat}}^{*}[k]\\
-V_{q,\mathrm{sat}}^{*}[k]
-\end{bmatrix}
-=
-\alpha_V[k]
-\begin{bmatrix}
-V_d^{*}[k]\\
-V_q^{*}[k]
-\end{bmatrix},
-\label{eq:saturacion_vectorial}
-\end{equation}
-
-donde
+Cuando esta magnitud supera el límite disponible $V_{\max}$, las dos
+componentes se escalan mediante un mismo factor,
 
 \begin{equation}
 \alpha_V[k]
 =
-\min
-\left(
+\min\left(
 1,
-\frac{V_{\max}}{V_{dq}^{*}[k]}
-\right).
-\label{eq:factor_saturacion}
+\frac{V_{\max}}
+     {V_{\mathrm{unsat}}[k]}
+\right),
 \end{equation}
 
-De esta manera se limita la magnitud de la tensión solicitada
-manteniendo la dirección del vector en el marco $dq$.
+obteniéndose
 
-Adicionalmente, se incorpora una estrategia \textit{anti-windup} para
-evitar la acumulación excesiva del estado integral durante los
-intervalos en que el controlador se encuentra limitado por la
-saturación de tensión.
+\begin{align}
+V_d[k]
+&=
+\alpha_V[k]V_{d,\mathrm{unsat}}[k],
+\\
+V_q[k]
+&=
+\alpha_V[k]V_{q,\mathrm{unsat}}[k].
+\end{align}
 
+De esta manera se limita la magnitud de la tensión manteniendo la
+dirección del vector en el marco $dq$.
+
+La diferencia entre las tensiones saturadas y las solicitadas se
+utiliza además para implementar una estrategia de
+\textit{anti-windup} por retrocálculo. Los estados integrales se
+actualizan según
+
+\begin{align}
+v_{I,d}[k+1]
+&=
+v_{I,d}[k]
++
+T_{s,i}
+\left[
+K_{i,d}e_d[k]
++
+K_{aw,d}
+\left(
+V_d[k]-V_{d,\mathrm{unsat}}[k]
+\right)
+\right],
+\label{eq:antiwindup_d}
+\\
+v_{I,q}[k+1]
+&=
+v_{I,q}[k]
++
+T_{s,i}
+\left[
+K_{i,q}e_q[k]
++
+K_{aw,q}
+\left(
+V_q[k]-V_{q,\mathrm{unsat}}[k]
+\right)
+\right],
+\label{eq:antiwindup_q}
+\end{align}
+
+donde las ganancias de retrocálculo utilizadas se determinan mediante
+
+\begin{align}
+K_{aw,d}
+&=
+\frac{K_{i,d}}{K_{p,d}},
+\\
+K_{aw,q}
+&=
+\frac{K_{i,q}}{K_{p,q}}.
+\end{align}
+
+Cuando no existe saturación se cumple
+$V_i[k]=V_{i,\mathrm{unsat}}[k]$, por lo que el término de retrocálculo
+se anula y la actualización del integrador depende únicamente del
+error de corriente.
+
+% ============================================================
+% ============================================================
 
 \subsection{Lazo de control de velocidad}
 \label{subsec:control_velocidad}
 % ============================================================
 
-Una vez establecido el funcionamiento del lazo interno de corriente,
-se incorpora el lazo externo encargado de regular la velocidad
-mecánica del motor.
+El lazo externo de velocidad tiene como objetivo determinar la
+referencia de torque requerida para reducir el error entre la
+velocidad de referencia y la velocidad realimentada. Esta referencia
+es utilizada posteriormente para generar las referencias de corriente
+del lazo interno.
 
-La Figura~\ref{fig:lazo_control_velocidad} presenta la estructura del
-lazo de velocidad. A partir de la diferencia entre la velocidad de
-referencia y la velocidad realimentada, el controlador genera la acción
-necesaria para determinar las referencias requeridas por el lazo
-interno de corriente.
+La Figura~\ref{fig:lazo_control_velocidad} presenta la estructura
+general del controlador de velocidad.
 
 \begin{figure}[htbp]
     \centering
 
-    % INSERTAR AQUÍ EL ESQUEMA DEL LAZO DE VELOCIDAD
+    \begin{tikzpicture}[
+        auto,
+        node distance=1.8cm,
+        >=latex',
+        block/.style={
+            draw,
+            fill=blue!15,
+            rectangle,
+            minimum height=3em,
+            minimum width=5.5em,
+            align=center
+        },
+        sum/.style={
+            draw,
+            fill=blue!15,
+            circle,
+            inner sep=1pt,
+            minimum size=5mm
+        }
+    ]
 
-    \caption{Estructura del lazo de control de velocidad.}
+    % Referencia
+    \node (wref) {$\omega_m^{*}$};
+
+    % Sumador
+    \node [sum, right=1.2cm of wref] (sumw) {};
+
+    % PI de velocidad
+    \node [block, right=1.4cm of sumw] (PIw)
+        {$PI_{\omega}$};
+
+    % Referencia de torque
+    \node [right=1.4cm of PIw] (Tref)
+        {$T_{\mathrm{ref}}$};
+
+    % Camino directo
+    \draw [->]
+        (wref) -- (sumw);
+
+    \draw [->]
+        (sumw) --
+        node {$e_{\omega}$}
+        (PIw);
+
+    \draw [->]
+        (PIw) -- (Tref);
+
+    % Realimentación
+    \draw [<-]
+        (sumw) -- ++(0,-1.2)
+        node[below] {$\omega_{m,\mathrm{fb}}$};
+
+    % Signos
+    \node at ($(sumw)+(-0.18,0.20)$)
+        {\scriptsize $+$};
+
+    \node at ($(sumw)+(-0.18,-0.20)$)
+        {\scriptsize $-$};
+
+    \end{tikzpicture}
+
+    \caption{Estructura del controlador de velocidad para la generación
+    de la referencia de torque.}
     \label{fig:lazo_control_velocidad}
+
 \end{figure}
 
-El error de velocidad se define como
+
+% ------------------------------------------------------------
+\subsubsection{Realimentación de velocidad}
+\label{subsubsec:realimentacion_velocidad}
+% ------------------------------------------------------------
+
+El error de velocidad se calcula en cada instante de muestreo como
 
 \begin{equation}
-e_{\omega}
+e_{\omega}[k]
 =
-\omega_m^{*}
+\omega_m^{*}[k]
 -
-\omega_{m,\mathrm{fb}},
+\omega_{m,\mathrm{fb}}[k],
 \label{eq:error_velocidad}
 \end{equation}
 
@@ -891,79 +963,159 @@ donde $\omega_m^{*}$ corresponde a la referencia de velocidad y
 $\omega_{m,\mathrm{fb}}$ representa la velocidad utilizada para la
 realimentación.
 
-El controlador PI de velocidad se expresa como
+Para la validación inicial de la estrategia de control se utiliza la
+velocidad mecánica obtenida directamente desde la planta,
 
 \begin{equation}
-u_{\omega}
+\omega_{m,\mathrm{fb}}[k]
 =
-K_{p,\omega}e_{\omega}
+\omega_m[k].
+\label{eq:velocidad_feedback_real}
+\end{equation}
+
+En la operación \textit{sensorless}, esta señal se sustituye por la
+velocidad estimada,
+
+\begin{equation}
+\omega_{m,\mathrm{fb}}[k]
+=
+\hat{\omega}_m[k].
+\label{eq:velocidad_feedback_estimada}
+\end{equation}
+
+Esta separación permite evaluar inicialmente el comportamiento del
+controlador sin incorporar el error asociado al proceso de estimación
+y, posteriormente, analizar el efecto de la estimación sobre el
+desempeño del sistema en lazo cerrado.
+
+
+% ------------------------------------------------------------
+\subsubsection{Controlador PI de velocidad}
+\label{subsubsec:pi_velocidad}
+% ------------------------------------------------------------
+
+El controlador de velocidad se implementa en tiempo discreto y genera
+la referencia de torque a partir del error de velocidad. Su acción
+puede representarse mediante
+
+\begin{equation}
+T_{\mathrm{ref}}[k]
+=
+K_{p,\omega}e_{\omega}[k]
 +
-K_{i,\omega}
-\int e_{\omega}\,dt.
-\label{eq:pi_velocidad}
+\xi_{\omega}[k],
+\label{eq:pi_velocidad_discreto}
 \end{equation}
 
-La acción generada por el controlador se utiliza posteriormente para
-determinar las referencias de corriente requeridas por el lazo interno.
+donde $K_{p,\omega}$ corresponde a la ganancia proporcional y
+$\xi_{\omega}$ representa el estado asociado a la acción integral.
 
-Durante la validación inicial del sistema se utiliza como
-realimentación la velocidad obtenida directamente desde la planta,
+El controlador se ejecuta con un período de muestreo de
 
 \begin{equation}
-\omega_{m,\mathrm{fb}}
+T_{s,\omega}
 =
-\omega_m.
+1~\mathrm{ms},
 \end{equation}
 
-Posteriormente, durante la operación \textit{sensorless}, esta variable
-se sustituye por la velocidad estimada,
+equivalente a una frecuencia de
 
 \begin{equation}
-\omega_{m,\mathrm{fb}}
+f_{s,\omega}
 =
-\hat{\omega}_m.
+1~\mathrm{kHz}.
 \end{equation}
 
-El lazo de velocidad se ejecuta a una frecuencia de
+Esta frecuencia es inferior a la utilizada por el lazo interno de
+corriente, que se ejecuta a $10~\mathrm{kHz}$, manteniendo una
+separación temporal entre ambos niveles de control.
 
-\begin{equation}
-f_{s,\omega}=1~\mathrm{kHz},
-\qquad
-T_{s,\omega}=1~\mathrm{ms}.
-\end{equation}
+La referencia de torque obtenida, $T_{\mathrm{ref}}$, constituye la
+entrada de la estrategia de generación de referencias de corriente
+descrita en la sección siguiente.
+
+% ============================================================
+% ============================================================
+% ============================================================
 
 
 % ============================================================
+
 \subsection{Generación de las referencias de corriente}
 \label{subsec:referencias_corriente}
 % ============================================================
 
-La salida del controlador de velocidad debe transformarse en las
-referencias $I_d^{*}$ e $I_q^{*}$ utilizadas por el lazo interno de
-corriente.
+La referencia de torque $T_{\mathrm{ref}}$ generada por el controlador
+de velocidad debe transformarse en las referencias $I_d^{*}$ e
+$I_q^{*}$ requeridas por el lazo interno de corriente.
 
-Debido a la saliencia del motor, caracterizada por
+En la implementación desarrollada se utilizó, de forma auxiliar, un
+criterio de máximo torque por ampere (\textit{Maximum Torque per
+Ampere}, MTPA) para realizar esta conversión. Considerando la saliencia
+del motor, el torque electromagnético se expresa como
 
 \begin{equation}
-L_d\neq L_q,
+T_e
+=
+P\left[\Psi+(L_d-L_q)I_d\right]I_q.
+\label{eq:torque_referencias_corriente}
 \end{equation}
 
-el torque electromagnético depende tanto de la interacción con el flujo
-equivalente del rotor como del torque de reluctancia. En consecuencia,
-la distribución de las referencias $I_d^{*}$ e $I_q^{*}$ considera la
-estrategia adoptada para el accionamiento.
+A partir de esta relación, el algoritmo determina las referencias
+$I_d^{*}$ e $I_q^{*}$ buscando reducir la magnitud de corriente
+requerida para producir el torque solicitado.
 
-Las referencias se encuentran limitadas de acuerdo con
+El uso de MTPA no constituye, sin embargo, un elemento central de la
+estrategia de control propuesta, sino una forma auxiliar de generar las
+referencias de corriente considerando la saliencia del motor. Esta
+etapa puede sustituirse por una asignación convencional de las
+corrientes, fijando
+
+\begin{equation}
+I_d^{*}=0,
+\end{equation}
+
+y obteniendo la referencia del eje $q$ directamente a partir de la
+referencia de torque,
+
+\begin{equation}
+I_q^{*}
+=
+\frac{T_{\mathrm{ref}}}{K_T},
+\label{eq:Iq_ref_convencional}
+\end{equation}
+
+donde $K_T$ representa la constante efectiva que relaciona la corriente
+del eje $q$ con el torque electromagnético bajo la condición
+$I_d^{*}=0$. Para el modelo empleado, esta relación corresponde a
+
+\begin{equation}
+K_T=P\Psi.
+\end{equation}
+
+Por lo tanto, la utilización de MTPA en este trabajo no modifica la
+estructura fundamental de los lazos de control y estimación, sino que
+se emplea únicamente para distribuir la referencia de torque entre las
+componentes de corriente $d$ y $q$.
+
+
+% ------------------------------------------------------------
+\subsubsection{Limitación de las referencias de corriente}
+\label{subsubsec:limitacion_referencias_corriente}
+% ------------------------------------------------------------
+
+Independientemente del método utilizado para generar las referencias,
+su magnitud se limita de acuerdo con
 
 \begin{equation}
 \sqrt{
 \left(I_d^{*}\right)^2+
 \left(I_q^{*}\right)^2
 }
-\leq I_{\max},
+\leq I_{\max}.
 \end{equation}
 
-donde
+Para el motor utilizado se considera
 
 \begin{equation}
 I_{\max}
@@ -971,22 +1123,25 @@ I_{\max}
 \sqrt{2}\,I_{\mathrm{nom}}.
 \end{equation}
 
-Para $I_{\mathrm{nom}}=1.7~\mathrm{A}$ se obtiene
+Con $I_{\mathrm{nom}}=1.7~\mathrm{A}$ se obtiene
 
 \begin{equation}
-I_{\max}\approx2.40~\mathrm{A}.
+I_{\max}
+\approx
+2.40~\mathrm{A}.
 \end{equation}
 
+Cuando la magnitud calculada supera este límite, ambas componentes son
+escaladas mediante un mismo factor, conservando la dirección del vector
+de corriente.
 
-% ============================================================
 \subsection{Transformación de las tensiones de referencia}
 \label{subsec:transformacion_tensiones}
 % ============================================================
 
-Finalmente, las tensiones obtenidas en el marco rotatorio deben
-transformarse al sistema bifásico estacionario utilizado por la planta.
-
-De forma general,
+Las tensiones obtenidas por el controlador en el marco rotatorio $dq$
+deben transformarse al sistema bifásico estacionario utilizado por el
+modelo del motor. La transformación inversa empleada se expresa como
 
 \begin{equation}
 \begin{bmatrix}
@@ -994,7 +1149,10 @@ V_a\\
 V_b
 \end{bmatrix}
 =
-\mathcal{T}^{-1}(\theta_e)
+\begin{bmatrix}
+\cos\theta_e & -\sin\theta_e\\
+\sin\theta_e & \cos\theta_e
+\end{bmatrix}
 \begin{bmatrix}
 V_d\\
 V_q
@@ -1002,813 +1160,775 @@ V_q
 \label{eq:transformacion_inversa_control}
 \end{equation}
 
-Durante las simulaciones realizadas con información mecánica
-disponible se utiliza la posición eléctrica entregada por la planta.
-Posteriormente, durante la operación \textit{sensorless}, la
-transformación utiliza la posición estimada $\hat{\theta}_e$.
+Por lo tanto,
+
+\begin{align}
+V_a
+&=
+V_d\cos\theta_e
+-
+V_q\sin\theta_e,
+\\
+V_b
+&=
+V_d\sin\theta_e
++
+V_q\cos\theta_e.
+\end{align}
+
+Durante las simulaciones utilizadas para validar inicialmente la
+estrategia de control, la transformación se realiza empleando la
+posición eléctrica obtenida directamente desde la planta. En la
+operación \textit{sensorless}, esta información se sustituye por la
+posición eléctrica estimada $\hat{\theta}_e$.
 
 
-\section{Estrategia de operación sensorless}
+% ------------------------------------------------------------
+% DIAGRAMA GENERAL DEL CONTROL EN LAZO CERRADO
+% ------------------------------------------------------------
+
+\begin{figure}[htbp]
+    \centering
+
+    \begin{tikzpicture}[
+        >=latex',
+        block/.style={
+            draw,
+            rectangle,
+            minimum height=1.0cm,
+            minimum width=1.65cm,
+            align=center,
+            font=\small
+        },
+        sum/.style={
+            draw,
+            circle,
+            minimum size=0.52cm,
+            inner sep=0pt
+        },
+        line/.style={
+            draw,
+            -latex'
+        },
+        signal/.style={
+            font=\small,
+            fill=white,
+            inner sep=1.5pt
+        }
+    ]
+
+    % ========================================================
+    % BLOQUES PRINCIPALES
+    % ========================================================
+
+    \node (wref) {$\omega_m^{*}$};
+
+    \node[sum, right=0.65cm of wref] (sumw) {};
+
+    \node[block, right=0.75cm of sumw] (PIw)
+        {$PI_{\omega}$};
+
+    \node[block, right=0.95cm of PIw] (ref)
+        {Generación\\$I_d^{*},I_q^{*}$};
+
+    \node[block, right=1.05cm of ref] (PIdq)
+        {Control\\$dq$};
+
+    \node[block, right=1.05cm of PIdq] (invpark)
+        {Park inversa\\$dq\rightarrow ab$};
+
+    \node[block, right=1.05cm of invpark] (motor)
+        {Motor};
+
+
+    % ========================================================
+    % CAMINO DIRECTO
+    % ========================================================
+
+    \draw[line]
+        (wref) -- (sumw);
+
+    \draw[line]
+        (sumw) --
+        node[signal, above=3pt] {$e_{\omega}$}
+        (PIw);
+
+    \draw[line]
+        (PIw) --
+        node[signal, above=4pt] {$T_{\mathrm{ref}}$}
+        (ref);
+
+    \draw[line]
+        (ref) --
+        node[signal, above=4pt] {$I_d^{*},\,I_q^{*}$}
+        (PIdq);
+
+    \draw[line]
+        (PIdq) --
+        node[signal, above=4pt] {$V_d,\,V_q$}
+        (invpark);
+
+    \draw[line]
+        (invpark) --
+        node[signal, above=4pt] {$V_a,\,V_b$}
+        (motor);
+
+
+    % ========================================================
+    % SALIDAS MECÁNICAS DEL MOTOR
+    % ========================================================
+
+    \coordinate[right=1.05cm of motor] (mechout);
+
+    \draw[line]
+        (motor) -- (mechout);
+
+    \node[
+        signal,
+        right=0.05cm of mechout
+    ] {$\omega_m,\,\theta_e$};
+
+% ========================================================
+% TRANSFORMACIÓN DIRECTA DE PARK
+% ========================================================
+
+\node[
+    block,
+    below=1.65cm of PIdq
+] (park)
+    {Park directa\\$ab\rightarrow dq$};
+
+
+% ========================================================
+% CORRIENTES DEL MOTOR HACIA PARK DIRECTA
+% ========================================================
+
+% Punto de extracción de las corrientes
+\coordinate (itap) at ($(motor.south)+(0,-0.15cm)$);
+
+\draw[line]
+    (motor.south)
+    -- ++(0,-0.55cm)
+    -| (park.east);
+
+\node[
+    signal,
+    below=0.35cm of motor
+] {$I_a,\,I_b$};
+
+
+% ========================================================
+% SALIDA DE PARK DIRECTA HACIA CONTROL dq
+% ========================================================
+
+\draw[line]
+    (park.north)
+    -- (PIdq.south);
+
+\node[
+    signal,
+    right=0.05cm of PIdq.south,
+    anchor=west
+] {$I_d,\,I_q$};
+
+
+% ========================================================
+% REALIMENTACIÓN DE POSICIÓN
+% ========================================================
+
+\coordinate (thetaTap)
+    at ($(motor.east)+(0.45cm,0)$);
+
+\fill (thetaTap) circle (1.2pt);
+
+% Bajar theta_e
+\coordinate (thetaBus)
+    at ($(thetaTap)+(0,-2.75cm)$);
+
+\draw
+    (thetaTap) -- (thetaBus);
+
+\node[
+    signal,
+    right=0.08cm of thetaBus
+] {$\theta_e$};
+
+% Bus horizontal de theta
+\coordinate (thetaPark)
+    at ($(park.south)+(0,-0.40cm)$);
+
+\draw
+    (thetaBus)
+    -- (thetaBus -| thetaPark);
+
+% theta hacia Park directa
+\draw[line]
+    (thetaBus -| thetaPark)
+    -- (park.south);
+
+% theta hacia Park inversa
+\coordinate (thetaInv)
+    at ($(invpark.south)+(0,-0.40cm)$);
+
+\draw
+    (thetaBus -| thetaInv)
+    -- (thetaInv);
+
+\draw[line]
+    (thetaInv)
+    -- (invpark.south);
+
+% ========================================================
+% REALIMENTACIÓN DE VELOCIDAD
+% ========================================================
+
+\coordinate (wmTap)
+    at ($(motor.east)!0.75!(mechout)$);
+
+\fill (wmTap) circle (1.2pt);
+
+% Se hace bajar por el extremo derecho
+% y volver por una línea inferior separada
+\draw[line]
+    (wmTap)
+    -- ++(0,-3.65cm)
+    -| (sumw.south);
+
+\node[
+    signal,
+    below=3.35cm of ref
+] {$\omega_{m,\mathrm{fb}}$};
+
+    % ========================================================
+    % SIGNOS DEL SUMADOR
+    % ========================================================
+
+    \node at ($(sumw)+(-0.16,0.17)$)
+        {\scriptsize $+$};
+
+    \node at ($(sumw)+(-0.16,-0.17)$)
+        {\scriptsize $-$};
+
+    \end{tikzpicture}
+
+    \caption{Estructura general del sistema de control en lazo cerrado
+    utilizando información mecánica disponible.}
+    \label{fig:estructura_control_lazo_cerrado}
+
+\end{figure}
+
+% ============================================================
+
+\section{Estrategia de estimación \textit{sensorless}}
+\label{sec:estrategia_sensorless}
 % ============================================================
 
 La operación \textit{sensorless} requiere reconstruir las variables
-mecánicas necesarias para la realimentación sin utilizar directamente un
-sensor de posición o velocidad.
+mecánicas necesarias para la realimentación del sistema de control sin
+disponer de mediciones directas de posición o velocidad. En este
+trabajo, la estrategia de estimación se formula a partir del modelo
+dinámico del motor y de las mediciones eléctricas disponibles.
 
-En este trabajo, la estrategia de estimación se implementa sobre la
-arquitectura de control previamente descrita. Particularmente, la
-operación a baja velocidad requiere considerar la disminución de la
-información asociada al movimiento del rotor y utilizar información
-adicional disponible en la respuesta eléctrica de la máquina.
-
-
-% ------------------------------------------------------------
-\subsection{Inyección de señal de alta frecuencia}
-% ------------------------------------------------------------
-
-Debido a la presencia de saliencia magnética identificada durante la
-caracterización del motor, se incorpora una estrategia de inyección de
-señal de alta frecuencia (\textit{High Frequency Injection}, HFI).
-
-La señal de excitación se incorpora al sistema de control con el objetivo
-de producir una respuesta eléctrica dependiente de la orientación del
-rotor y utilizar dicha información dentro del sistema de estimación.
+La formulación del estimador se plantea de manera progresiva, de modo
+que el vector de estados pueda ampliarse posteriormente para incorporar
+variables destinadas a representar perturbaciones mecánicas. Esta
+estructura permite mantener un mismo marco de estimación al comparar
+diferentes configuraciones del observador.
 
 % ------------------------------------------------------------
-% COMPLETAR CON TU IMPLEMENTACIÓN REAL:
-%
-% - amplitud HFI;
-% - frecuencia HFI;
-% - eje donde se inyecta;
-% - señal utilizada;
-% - BPF;
-% - demodulación;
-% - señal angular obtenida.
-%
-% Aquí va el DIAGRAMA del sistema HFI.
-% Las gráficas de respuesta van en RESULTADOS.
-% ------------------------------------------------------------
+\subsection{Análisis de observabilidad}
+\label{subsec:analisis_observabilidad}
 
+La implementación de una estrategia \textit{sensorless} requiere determinar si las
+variables mecánicas no medidas pueden ser reconstruidas a partir de las entradas y
+salidas eléctricas disponibles. Esta condición adquiere especial relevancia a baja y
+nula velocidad, donde disminuye la información asociada a la fuerza
+contraelectromotriz y la estimación de la posición y velocidad del rotor pasa a
+depender de otras características del modelo y de las condiciones de excitación
+\cite{zaltniObservabilityAnalysisPMSM2009,vaclavekACDriveObservability2013}.
 
-% ------------------------------------------------------------
-\subsection{Extracción de información angular}
-% ------------------------------------------------------------
-
-La respuesta de corriente producida por la señal de alta frecuencia se
-procesa con el objetivo de extraer información asociada a la posición del
-rotor.
-
-% ------------------------------------------------------------
-% COMPLETAR posteriormente con:
-%
-% BPF -> demodulación -> LPF/PLL/etc.
-%
-% según la arquitectura definitiva.
-% ------------------------------------------------------------
-
-
-
-% ============================================================
-
-\section{Análisis de observabilidad}
-% ============================================================
-
-Con el objetivo de determinar la información disponible para la
-reconstrucción de los estados del sistema, se realiza un análisis de
-observabilidad sobre el modelo dinámico utilizado.
-
-El análisis se realiza inicialmente sobre el modelo base y posteriormente
-se extiende a las configuraciones que incorporan estados adicionales para
-la representación de perturbaciones.
-
-
-% ------------------------------------------------------------
-\subsection{Definición del sistema base}
-% ------------------------------------------------------------
-
-Para el análisis inicial se considera el vector de estados
+Debido al carácter no lineal del modelo electromecánico, el análisis se plantea a
+partir de un sistema de la forma
 
 \begin{equation}
-    x =
+    \dot{\mathbf{x}}
+    =
+    \mathbf{f}(\mathbf{x},\mathbf{u}),
+    \qquad
+    \mathbf{y}
+    =
+    \mathbf{h}(\mathbf{x}),
+\end{equation}
+
+donde $\mathbf{x}$ representa el vector de estados, $\mathbf{u}$ las entradas y
+$\mathbf{y}$ las variables medidas. Para el modelo electromecánico base considerado
+en este trabajo se define
+
+\begin{equation}
+    \mathbf{x}
+    =
     \begin{bmatrix}
         I_d &
         I_q &
         \omega_m &
         \theta_m
-    \end{bmatrix}^{T}.
-\end{equation}
-
-
-Las entradas del sistema corresponden a
-
-\begin{equation}
-    u =
-    \begin{bmatrix}
-        V_d &
-        V_q
     \end{bmatrix}^{T},
 \end{equation}
 
+mientras que las corrientes constituyen las variables eléctricas disponibles para
+la estimación.
 
-mientras que se consideran disponibles para medición las corrientes de
-los ejes $d$ y $q$:
+En sistemas no lineales, la observabilidad local puede analizarse mediante el
+criterio de rango asociado a las salidas y sus derivadas de Lie. Para una función
+de salida $h_i(\mathbf{x})$, su primera derivada de Lie respecto del campo vectorial
+$\mathbf{f}$ se define como
 
 \begin{equation}
-    y =
+    L_{\mathbf{f}}h_i
+    =
+    \frac{\partial h_i}{\partial \mathbf{x}}
+    \mathbf{f}(\mathbf{x},\mathbf{u}),
+\end{equation}
+
+mientras que las derivadas sucesivas se obtienen recursivamente a partir de
+
+\begin{equation}
+    L_{\mathbf{f}}^{k}h_i
+    =
+    \frac{\partial L_{\mathbf{f}}^{k-1}h_i}
+    {\partial \mathbf{x}}
+    \mathbf{f}(\mathbf{x},\mathbf{u}).
+\end{equation}
+
+A partir de los gradientes de las salidas y de sus derivadas de Lie puede
+construirse una matriz de observabilidad no lineal de la forma
+
+\begin{equation}
+    \mathcal{O}(\mathbf{x})
+    =
+    \begin{bmatrix}
+        d\mathbf{h} \\
+        dL_{\mathbf{f}}\mathbf{h} \\
+        dL_{\mathbf{f}}^{2}\mathbf{h} \\
+        \vdots
+    \end{bmatrix}.
+\end{equation}
+
+Si esta matriz posee rango igual al número de estados en el punto de operación
+considerado, se satisface localmente la condición de rango utilizada para estudiar
+la observabilidad débil local del sistema
+\cite{vaclavekACDriveObservability2013}.
+
+\subsubsection{Condición de observabilidad del PMSM}
+
+La observabilidad de una máquina síncrona de imanes permanentes depende no solo
+de la velocidad del rotor, sino también de la evolución de las variables eléctricas
+y de la saliencia de la máquina. A partir del análisis de observabilidad no lineal,
+Vaclavek et al. obtienen una condición dependiente de las corrientes, sus derivadas
+temporales y los parámetros electromagnéticos del PMSM
+\cite{vaclavekACDriveObservability2013}.
+
+Definiendo la diferencia de inductancias como
+
+\begin{equation}
+    \Delta L = L_d-L_q,
+\end{equation}
+
+para el caso de velocidad nula la condición de observabilidad puede expresarse
+como
+
+\begin{equation}
+    \frac{d I_q}{dt}
+    \left(\Delta L I_d + K_e\right)
+    -
+    \Delta L I_q
+    \frac{d I_d}{dt}
+    \neq 0.
+    \label{eq:condicion_observabilidad_velocidad_nula}
+\end{equation}
+
+Esta expresión muestra que, a velocidad nula, la observabilidad no requiere
+necesariamente que las corrientes permanezcan constantes ni depende únicamente
+de que sus derivadas sean distintas de cero. En cambio, depende de la relación
+entre la evolución temporal de $I_d$ e $I_q$, la saliencia $\Delta L$ y la
+constante $K_e$.
+
+En efecto, aun cuando
+
+\begin{equation}
+    \frac{d I_d}{dt}\neq0
+    \qquad \text{y} \qquad
+    \frac{d I_q}{dt}\neq0,
+\end{equation}
+
+el término de la ecuación
+\eqref{eq:condicion_observabilidad_velocidad_nula} puede anularse si ambas
+contribuciones se compensan. Por lo tanto, la sola variación de las corrientes
+no constituye una condición suficiente para garantizar la observabilidad.
+
+Este resultado es particularmente relevante en una máquina saliente, donde
+$L_d\neq L_q$, ya que una excitación eléctrica apropiada puede producir
+variaciones de corriente que contengan información asociada a la posición del
+rotor. Esta propiedad constituye la base para utilizar estrategias de excitación
+adicional, como la inyección de señales de alta frecuencia, durante la operación
+\textit{sensorless} a baja y nula velocidad.
+
+
+\subsubsection{Observabilidad a velocidad nula y efecto de la saliencia}
+
+La condición de la ecuación
+\eqref{eq:condicion_observabilidad_velocidad_nula} no requiere que las
+derivadas de ambas componentes de corriente sean simultáneamente distintas
+de cero. En efecto, la observabilidad depende de la relación entre
+$I_d$, $I_q$ y sus respectivas variaciones temporales.
+
+En el régimen de operación considerado en este trabajo, la componente
+$I_q$ se encuentra principalmente asociada a la producción de torque
+electromagnético y, consecuentemente, al control de la velocidad mecánica.
+Por esta razón, durante una condición de velocidad aproximadamente
+constante, puede considerarse que su valor varía lentamente, de modo que
+
+\begin{equation}
+    \frac{dI_q}{dt} \approx 0.
+    \label{eq:iq_regimen_estacionario}
+\end{equation}
+
+Bajo esta condición, la ecuación
+\eqref{eq:condicion_observabilidad_velocidad_nula} se reduce a
+
+\begin{equation}
+    -\Delta L I_q
+    \frac{dI_d}{dt}
+    \neq 0.
+    \label{eq:observabilidad_id_variable}
+\end{equation}
+
+Por lo tanto, para una máquina saliente, donde $\Delta L\neq0$, y una
+condición de operación con $I_q\neq0$, una variación temporal de la
+corriente $I_d$ permite satisfacer esta condición de observabilidad aun
+cuando $I_q$ permanezca aproximadamente constante.
+
+Este resultado resulta particularmente relevante para la estrategia de
+inyección de alta frecuencia considerada en este trabajo. La excitación
+aplicada sobre el eje $d$ introduce deliberadamente una componente
+variable en $I_d$, de manera que
+
+\begin{equation}
+    \frac{dI_d}{dt}\neq0,
+\end{equation}
+
+aportando información adicional asociada a la saliencia de la máquina.
+De esta forma, la inyección en el eje $d$ puede contribuir a mantener la
+observabilidad en condiciones donde la información asociada al movimiento
+del rotor resulta reducida.
+
+\subsection{Inyección de señal de alta frecuencia}
+\label{subsec:metodologia_hfi}
+
+Con el propósito de complementar la información disponible para la estimación de la posición del rotor en la región de baja velocidad, se implementó una estrategia de inyección de señal de alta frecuencia (\textit{High-Frequency Injection}, HFI). Esta técnica aprovecha la saliencia magnética de la máquina, caracterizada por la diferencia entre las inductancias de los ejes $d$ y $q$,
+
+\begin{equation}
+L_d \neq L_q,
+\end{equation}
+
+para generar una respuesta eléctrica dependiente de la orientación del rotor.
+
+La señal de alta frecuencia se incorpora como una componente adicional a la referencia de tensión del eje $d$. De esta forma, las tensiones aplicadas al modelo de la máquina se expresan como
+
+\begin{equation}
+v_d^{*}
+=
+v_{d,\mathrm{ctrl}}^{*}
++
+v_{\mathrm{HFI}},
+\label{eq:vd_hfi}
+\end{equation}
+
+\begin{equation}
+v_q^{*}
+=
+v_{q,\mathrm{ctrl}}^{*},
+\label{eq:vq_hfi}
+\end{equation}
+
+donde $v_{d,\mathrm{ctrl}}^{*}$ y $v_{q,\mathrm{ctrl}}^{*}$ corresponden a las tensiones generadas por el controlador de corriente y $v_{\mathrm{HFI}}$ corresponde a la señal utilizada para la excitación de alta frecuencia.
+
+En este trabajo se considera una señal sinusoidal de la forma
+
+\begin{equation}
+v_{\mathrm{HFI}}(t)
+=
+V_{\mathrm{HFI}}
+\sin\left(2\pi f_{\mathrm{HFI}}t\right),
+\label{eq:senal_hfi}
+\end{equation}
+
+donde $V_{\mathrm{HFI}}$ representa la amplitud de la tensión inyectada y $f_{\mathrm{HFI}}$ su frecuencia. Los valores de estos parámetros se seleccionan de manera que la frecuencia de excitación se encuentre suficientemente separada de la dinámica fundamental del sistema y permita distinguir la respuesta asociada a la inyección de alta frecuencia.
+
+\subsubsection{Extracción de la componente de alta frecuencia}
+\label{subsubsec:extraccion_hfi}
+
+La excitación introducida en la máquina produce una componente de alta frecuencia en las corrientes cuya respuesta depende de la saliencia magnética y, por tanto, de la posición eléctrica del rotor. Para separar esta respuesta de la componente fundamental, las corrientes medidas $I_a$ e $I_b$ son procesadas mediante filtros digitales pasa banda centrados en la frecuencia de inyección $f_{\mathrm{HFI}}$.
+
+En la implementación se emplea un filtro Butterworth pasa banda, cuya ecuación en diferencias puede expresarse como
+
+\begin{equation}
+I_{xh}[k]
+=
+b_0 I_x[k]
++
+b_1 I_x[k-1]
++
+b_2 I_x[k-2]
+-
+a_1 I_{xh}[k-1]
+-
+a_2 I_{xh}[k-2],
+\label{eq:bpf_hfi}
+\end{equation}
+
+donde $x\in{a,b}$, mientras que $I_{ah}$ e $I_{bh}$ corresponden a las componentes de alta frecuencia extraídas de las corrientes medidas.
+
+Posteriormente, estas componentes son proyectadas sobre el eje $q$ definido por la posición eléctrica predicha por el estimador,
+
+\begin{equation}
+I_{qh}
+=
+-I_{ah}\sin\left(\hat{\theta}*{e}^{-}\right)
++
+I*{bh}\cos\left(\hat{\theta}_{e}^{-}\right),
+\label{eq:iqh_hfi}
+\end{equation}
+
+donde $\hat{\theta}_{e}^{-}$ corresponde a la estimación \textit{a priori} de la posición eléctrica.
+
+\subsubsection{Demodulación síncrona y obtención del error HFI}
+\label{subsubsec:demodulacion_hfi}
+
+La componente $I_{qh}$ es demodulada de forma síncrona utilizando una señal de referencia a la frecuencia de inyección,
+
+\begin{equation}
+\varepsilon_{\mathrm{raw}}
+=
+-I_{qh}
+\cos\left(\omega_{\mathrm{HFI}}t\right),
+\label{eq:demod_hfi}
+\end{equation}
+
+con
+
+\begin{equation}
+\omega_{\mathrm{HFI}}
+=
+2\pi f_{\mathrm{HFI}}.
+\end{equation}
+
+El producto generado durante la demodulación contiene una componente de baja frecuencia relacionada con el desalineamiento entre el sistema de referencia estimado y la orientación de la anisotropía magnética de la máquina. Para extraer esta información se utiliza un filtro pasa bajos de primer orden,
+
+\begin{equation}
+\varepsilon_f[k]
+=
+\varepsilon_f[k-1]
++
+\alpha_{\mathrm{LPF}}
+\left(
+\varepsilon_{\mathrm{raw}}[k]
+-
+\varepsilon_f[k-1]
+\right),
+\label{eq:lpf_hfi}
+\end{equation}
+
+donde
+
+\begin{equation}
+\alpha_{\mathrm{LPF}}
+=
+\frac{T_s}
+{T_s+\tau_{\mathrm{LPF}}},
+\qquad
+\tau_{\mathrm{LPF}}
+=
+\frac{1}{2\pi f_{\mathrm{LPF}}}.
+\end{equation}
+
+En la implementación desarrollada se emplea una frecuencia de corte $f_{\mathrm{LPF}}=200~\mathrm{Hz}$.
+
+Debido a que la magnitud de la respuesta de alta frecuencia depende del grado de saliencia de la máquina, se define el factor
+
+\begin{equation}
+S_L
+=
+\frac{L_q-L_d}
+{\left(L_d+L_q\right)/2},
+\end{equation}
+
+y la señal utilizada por el estimador se normaliza según
+
+\begin{equation}
+\varepsilon_{\mathrm{HFI}}
+=
+\frac{\varepsilon_f}{|S_L|}.
+\label{eq:error_hfi_normalizado}
+\end{equation}
+
+Esta variable no se considera una medición directa de la posición eléctrica, sino una señal auxiliar asociada al desalineamiento entre la posición estimada y la orientación detectada a partir de la respuesta de alta frecuencia.
+
+\subsubsection{Integración de HFI con el EKF}
+\label{subsubsec:hfi_estimador}
+
+La información proporcionada por la HFI se incorpora directamente en la etapa de corrección del EKF, dando lugar a una estructura acoplada. Para ello, además de las corrientes $I_a$ e $I_b$, se introduce una tercera condición de medición cuyo objetivo es llevar el error obtenido mediante HFI hacia cero.
+
+El vector de medición se define como
+
+\begin{equation}
+\mathbf{y}
+=
+\begin{bmatrix}
+I_a\
+I_b\
+0
+\end{bmatrix},
+\end{equation}
+
+mientras que la salida predicha por el estimador corresponde a
+
+\begin{equation}
+\hat{\mathbf{y}}^{-}
+=
+\begin{bmatrix}
+\hat{I_a}\
+\hat{I_b}\
+\varepsilon_{\mathrm{HFI}}
+\end{bmatrix}.
+\end{equation}
+
+Por consiguiente, la innovación asociada a la información HFI queda determinada por
+
+\begin{equation}
+\nu_{\mathrm{HFI}}
+=
+-\varepsilon_{\mathrm{HFI}}.
+\end{equation}
+
+Para incorporar esta señal en la linealización local del modelo de medición, se adopta la aproximación
+
+\begin{equation}
+\frac{\partial \varepsilon_{\mathrm{HFI}}}
+{\partial \hat{\theta}_e}
+\simeq -1.
+\label{eq:jacobiano_hfi}
+\end{equation}
+
+Por lo tanto, la fila de la matriz de medición asociada a la información HFI se expresa como
+
+\begin{equation}
+\mathbf{C}_{\mathrm{HFI}}
+=
+\begin{bmatrix}
+0 & 0 & 0 & -1 & 0
+\end{bmatrix}.
+\label{eq:C_hfi}
+\end{equation}
+
+De esta manera, la HFI no genera una estimación independiente de posición que posteriormente sea fusionada con el observador. En cambio, la señal demodulada participa directamente en la innovación del EKF, proporcionando información adicional para la corrección del estado angular. El peso asignado a esta información se establece mediante la covarianza asociada a la medición HFI dentro de la matriz $\mathbf{R}$.
+
+Esta estructura permite complementar la información proporcionada por el modelo electromecánico en el rango de baja velocidad, donde disminuye la contribución de la fuerza contraelectromotriz a la estimación de los estados mecánicos.
+
+
+\subsubsection{Extensión del análisis al modelo con perturbación de torque}
+
+La condición anterior corresponde al modelo electromecánico base. Sin embargo,
+el estimador desarrollado en este trabajo incorpora adicionalmente una
+perturbación de torque equivalente como estado, dando lugar al vector aumentado
+
+\begin{equation}
+    \mathbf{x}_a
+    =
     \begin{bmatrix}
         I_d &
-        I_q
+        I_q &
+        \omega_m &
+        \theta_m &
+        T_x
     \end{bmatrix}^{T}.
+    \label{eq:vector_estado_aumentado_observabilidad}
 \end{equation}
 
+La incorporación de $T_x$ modifica el problema de observabilidad, debido a que
+este estado debe reconstruirse simultáneamente con las variables mecánicas a
+partir de la información contenida en las mediciones eléctricas. Por esta razón,
+la observabilidad del modelo aumentado no puede establecerse únicamente a partir
+de la condición obtenida para el modelo electromecánico base.
 
-Por lo tanto, la matriz de salida correspondiente al modelo linealizado
-es
-
-\begin{equation}
-\label{eq:C_observabilidad}
-C=
-\begin{bmatrix}
-    1&0&0&0\\
-    0&1&0&0
-\end{bmatrix}.
-\end{equation}
-
-
-
-% ------------------------------------------------------------
-\subsection{Linealización local}
-% ------------------------------------------------------------
-
-Debido a la naturaleza no lineal del modelo, se realiza una
-linealización local alrededor de diferentes puntos de operación.
-
-Las matrices del sistema se obtienen mediante:
+El torque perturbador interviene directamente en la dinámica mecánica,
 
 \begin{equation}
-\label{eq:matriz_A_B}
-\left\{
-\begin{aligned}
-A &=
-\left.
-\frac{\partial f}
-{\partial x}
-\right|_{x=x_0,u=u_0}
-\\
-B &=
-\left.
-\frac{\partial f}
-{\partial u}
-\right|_{x=x_0,u=u_0}.
-\end{aligned}
-\right.
-\end{equation}
-
-
-Donde $f$ representa las ecuaciones del sistema no lineal, $x$ es el
-vector de estados, $u$ es el vector de entradas, mientras que $x_0$ y
-$u_0$ corresponden al punto de operación alrededor del cual se realiza
-la linealización.
-
-
-% ------------------------------------------------------------
-\subsection{Matriz de observabilidad}
-% ------------------------------------------------------------
-
-Para una linealización de cuatro estados, la matriz de observabilidad
-puede expresarse inicialmente como
-
-\begin{equation}
-\label{eq:matriz_observabilidad}
-\mathcal{O}=
-\begin{bmatrix}
-    C\\
-    CA\\
-    CA^2\\
-    CA^3
-\end{bmatrix}.
-\end{equation}
-
-
-El rango de esta matriz permite determinar si existen direcciones del
-espacio de estados que no producen información distinguible en las
-salidas consideradas.
-
-
-% ------------------------------------------------------------
-\subsection{Análisis discreto de horizonte finito}
-% ------------------------------------------------------------
-
-Además del análisis de rango, se utiliza una representación discreta
-local del sistema para estudiar cuantitativamente la información
-disponible durante un horizonte de observación finito.
-
-La matriz dinámica discretizada se obtiene mediante
-
-\begin{equation}
-    A_d=e^{AT_s},
-\end{equation}
-
-donde $T_s$ corresponde al período de muestreo considerado para el
-análisis.
-
-Para un horizonte de $N$ muestras, se construye la matriz
-
-\begin{equation}
-\label{eq:observabilidad_finita}
-\mathcal{O}_N=
-\begin{bmatrix}
-    C\\
-    CA_d\\
-    CA_d^2\\
-    \vdots\\
-    CA_d^{N-1}
-\end{bmatrix}.
-\end{equation}
-
-
-% ------------------------------------------------------------
-\subsection{Escalamiento de los estados}
-% ------------------------------------------------------------
-
-Debido a que las variables consideradas poseen diferentes unidades y
-órdenes de magnitud, se incorpora un escalamiento previo al análisis
-cuantitativo.
-
-Se define
-
-\begin{equation}
-    x=S_xz,
-\end{equation}
-
-donde $S_x$ corresponde a una matriz diagonal formada por escalas
-características de cada estado y $z$ representa el vector de estados
-normalizados.
-
-De esta forma, las métricas cuantitativas utilizadas posteriormente no
-dependen únicamente de las diferencias de unidades existentes entre
-corriente, velocidad y posición.
-
-
-% ------------------------------------------------------------
-\subsection{Valores singulares y grado de observabilidad}
-% ------------------------------------------------------------
-
-La descomposición en valores singulares de la matriz de observabilidad
-se define como
-
-\begin{equation}
-    \mathcal{O}_N
+    J\dot{\omega}_m
     =
-    U\Sigma V^{T}.
+    T_e
+    -
+    B\omega_m
+    -
+    T_x,
 \end{equation}
 
-
-El menor valor singular,
-
-\begin{equation}
-    \sigma_{\min}(\mathcal{O}_N),
-\end{equation}
-
-se utiliza para caracterizar la sensibilidad correspondiente a la
-dirección menos observable del sistema.
-
-Adicionalmente, se considera el índice relativo
-
-\begin{equation}
-\label{eq:indice_observabilidad}
-    \eta_O=
-    \frac{\sigma_{\min}}
-    {\sigma_{\max}},
-\end{equation}
-
-como indicador complementario del condicionamiento de la matriz de
-observabilidad.
-
-
-% ------------------------------------------------------------
-\subsection{Gramiano de observabilidad}
-% ------------------------------------------------------------
-
-Para el horizonte considerado, se calcula además el Gramiano de
-observabilidad
-
-\begin{equation}
-\label{eq:gramiano_observabilidad}
-W_o
-=
-\sum_{k=0}^{N-1}
-(A_d^k)^T
-C^TC
-A_d^k.
-\end{equation}
-
-
-Equivalentemente,
-
-\begin{equation}
-    W_o=
-    \mathcal{O}_N^T
-    \mathcal{O}_N.
-\end{equation}
-
-
-Por lo tanto, los autovalores del Gramiano se encuentran relacionados con
-los valores singulares de la matriz de observabilidad mediante
-
-\begin{equation}
-    \lambda_i(W_o)
-    =
-    \sigma_i^2(\mathcal{O}_N).
-\end{equation}
-
-
-% ------------------------------------------------------------
-\subsection{Efecto de la velocidad y la saliencia}
-% ------------------------------------------------------------
-
-Para estudiar la observabilidad del sistema en condiciones de baja
-velocidad, se realiza un barrido de la velocidad mecánica sobre el rango
-de operación considerado.
-
-El procedimiento se aplica comparativamente a dos configuraciones:
-
-\begin{equation}
-    L_d\neq L_q,
-\end{equation}
-
-correspondiente al modelo con saliencia, y
-
-\begin{equation}
-    L_d=L_q,
-\end{equation}
-
-correspondiente a un modelo isotrópico utilizado como referencia.
-
-Para cada punto de operación se calculan el rango de la matriz de
-observabilidad, el menor valor singular, el índice relativo de
-observabilidad y el mínimo autovalor del Gramiano.
-
-% ------------------------------------------------------------
-% IMPORTANTE:
-%
-% AQUÍ NO VAN todavía tus gráficas.
-%
-% Las figuras:
-%
-% - rank vs velocidad
-% - sigma_min vs velocidad
-% - sigma_min/sigma_max
-% - lambda_min(Wo)
-%
-% van en RESULTADOS.
-% ------------------------------------------------------------
-
-
-
-% ============================================================
-
-\section{Filtro de Kalman Extendido}
-% ============================================================
-
-Para estimar los estados del sistema se implementó un Filtro de Kalman
-Extendido (\textit{Extended Kalman Filter}, EKF), debido a la naturaleza
-no lineal del modelo del motor paso a paso.
-
-El EKF utiliza el modelo dinámico de la planta y las mediciones
-disponibles para reconstruir los estados no medidos directamente. La
-estructura del estimador se implementa inicialmente sobre el modelo base
-y posteriormente se modifica mediante la incorporación de estados
-adicionales destinados a representar perturbaciones mecánicas.
-
-
-% ------------------------------------------------------------
-\subsection{Modelo de predicción}
-% ------------------------------------------------------------
-
-% ------------------------------------------------------------
-% COMPLETAR CON TU EKF REAL:
-%
-% x_hat(k|k-1) = ...
-% P(k|k-1) = ...
-%
-% e indicar:
-%
-% - vector de estados;
-% - tiempo de muestreo;
-% - integración;
-% - Jacobiano F.
-% ------------------------------------------------------------
-
-
-% ------------------------------------------------------------
-\subsection{Modelo de medición}
-% ------------------------------------------------------------
-
-Las mediciones disponibles para la corrección del estimador se definen
-de acuerdo con la arquitectura sensorless implementada.
-
-% ------------------------------------------------------------
-% COMPLETAR según la versión final:
-%
-% y = [Id Iq ...]'
-%
-% Si theta_HFI entra como medición/corrección, definirla aquí.
-% ------------------------------------------------------------
-
-
-% ------------------------------------------------------------
-\subsection{Matrices de covarianza}
-% ------------------------------------------------------------
-
-La configuración del EKF requiere definir las matrices de covarianza
-asociadas al ruido de proceso y al ruido de medición.
-
-% ------------------------------------------------------------
-% COMPLETAR:
-%
-% Q = ...
-% R = ...
-% P0 = ...
-%
-% y explicar CRITERIO de selección, no solo poner números.
-% ------------------------------------------------------------
-
-
-
-% ============================================================
-
-\section{Modelo de estados aumentados}
-% ============================================================
-
-Una vez establecida la configuración base del observador, se incorporan
-progresivamente estados adicionales destinados a representar las
-perturbaciones mecánicas que no se encuentran explícitamente descritas
-por el modelo nominal.
-
-El objetivo de esta ampliación es analizar si una representación más
-completa de las perturbaciones permite mejorar la reconstrucción de la
-velocidad mecánica instantánea, particularmente frente a componentes
-periódicas presentes a baja velocidad.
-
-
-% ------------------------------------------------------------
-\subsection{Modelo base}
-% ------------------------------------------------------------
-
-La configuración de referencia considera
-
-\begin{equation}
-x_0=
-\begin{bmatrix}
-I_d &
-I_q &
-\omega_m &
-\theta_m
-\end{bmatrix}^{T}.
-\end{equation}
-
-
-
-% ------------------------------------------------------------
-\subsection{Incorporación de un estado de perturbación equivalente}
-% ------------------------------------------------------------
-
-Como primera extensión se incorpora un estado adicional $T_x$ destinado
-a representar una perturbación de torque equivalente:
-
-\begin{equation}
-x_1=
-\begin{bmatrix}
-I_d &
-I_q &
-\omega_m &
-\theta_m &
-T_x
-\end{bmatrix}^{T}.
-\end{equation}
-
-
-% ------------------------------------------------------------
-% COMPLETAR con la dinámica definitiva de Tx.
-%
-% Por ejemplo, si corresponde:
-%
-% \dot T_x = 0 + w_T
-%
-% pero confirmar primero contra tu implementación.
-% ------------------------------------------------------------
-
-
-
-% ------------------------------------------------------------
-\subsection{Representación de perturbaciones periódicas}
-% ------------------------------------------------------------
-
-Posteriormente se incorporan estados destinados a representar
+por lo que su efecto se manifiesta inicialmente sobre la aceleración del rotor y
+posteriormente sobre la velocidad y posición. Finalmente, estas modificaciones
+se reflejan en las variables eléctricas a través del acoplamiento
+electromecánico del modelo.
+
+La estimación simultánea de posición, velocidad y torque de carga mediante un
+modelo aumentado ha sido estudiada previamente en accionamientos PMSM. Estos
+trabajos muestran que la incorporación del torque como estado requiere analizar
+nuevamente las condiciones de observabilidad y que pueden aparecer condiciones
+singulares, particularmente en situaciones de velocidad y aceleración nulas
+\cite{zgorskiSensorlessPositionControl2013}.
+
+Por este motivo, en este trabajo el análisis se realiza progresivamente. En
+primer lugar se considera el modelo electromecánico base de cuatro estados.
+Posteriormente se incorpora el estado $T_x$ y se evalúa la observabilidad del
+modelo aumentado de cinco estados. Finalmente, el mismo procedimiento se extiende
+a las configuraciones que incorporan estados adicionales destinados a representar
 componentes periódicas de la perturbación.
 
-Una configuración general puede expresarse como
+Para cada configuración se construye la matriz de observabilidad correspondiente
+a partir de las salidas y sus derivadas de Lie, evaluándose la condición
 
 \begin{equation}
-x_a=
-\begin{bmatrix}
-I_d &
-I_q &
-\omega_m &
-\theta_m &
-T_x &
-A_1 &
-B_1 &
-\cdots &
-A_n &
-B_n
-\end{bmatrix}^{T}.
+    \operatorname{rank}
+    \left(
+        \mathcal{O}_a
+    \right)
+    =
+    n_a,
 \end{equation}
 
+donde $n_a$ corresponde al número de estados del modelo aumentado considerado.
 
-La perturbación total representada por el observador puede escribirse de
-forma general como
+\subsubsection{Evaluación de la observabilidad en el rango de operación}
 
-\begin{equation}
-T_d=
-T_x+
-\sum_{n\in\mathcal{H}}
-T_{h,n},
-\end{equation}
+El análisis anterior permite establecer si el sistema satisface localmente la
+condición de rango para una determinada configuración y condición de operación.
+Sin embargo, el objetivo de este trabajo no se limita al modelo base, sino que
+busca determinar en qué medida es posible incorporar estados adicionales para
+reconstruir perturbaciones sin perder la capacidad de estimar las variables
+mecánicas.
 
-donde $\mathcal{H}$ representa el conjunto de componentes armónicas
-incorporadas en cada configuración.
+Por esta razón, la evaluación se realiza considerando diferentes condiciones de
+velocidad y diferentes dimensiones del vector de estados. Se compara
+progresivamente la configuración electromecánica base, el modelo aumentado con
+una perturbación de torque equivalente y las configuraciones que incorporan
+estados asociados a componentes periódicas.
 
-% ------------------------------------------------------------
-% COMPLETAR AQUÍ la formulación definitiva:
-%
-% Opción 1:
-% coeficientes A_n/B_n asociados a posición.
-%
-% Opción 2:
-% osciladores armónicos:
-%
-% dot{x}_{h1} = omega_h x_{h2}
-% dot{x}_{h2} = -omega_h x_{h1}
-%
-% Todavía no conviene mezclar ambas formulaciones.
-% ------------------------------------------------------------
+De esta manera, el análisis permite distinguir dos aspectos diferentes. Por una
+parte, se estudian las condiciones de observabilidad asociadas al PMSM saliente
+durante la operación a baja velocidad. Por otra, se analiza el efecto que produce
+la incorporación de perturbaciones como estados adicionales sobre la capacidad
+de reconstruir simultáneamente las variables mecánicas y las perturbaciones de
+torque.
 
+Este análisis constituye la base para seleccionar las configuraciones del
+observador que posteriormente son evaluadas mediante simulación.
 
 
-% ------------------------------------------------------------
-\subsection{Configuraciones evaluadas}
-% ------------------------------------------------------------
-
-Con el objetivo de estudiar el efecto de aumentar progresivamente la
-complejidad del observador, se consideran diferentes configuraciones del
-vector de estados.
-
-De forma general, estas configuraciones corresponden a:
-
-\begin{align}
-\mathcal{M}_0 &:\
-[I_d,I_q,\omega_m,\theta_m],
-\\
-\mathcal{M}_1 &:\
-[I_d,I_q,\omega_m,\theta_m,T_x],
-\\
-\mathcal{M}_2 &:\
-[I_d,I_q,\omega_m,\theta_m,T_x,A_1,B_1],
-\\
-\mathcal{M}_3 &:\
-[I_d,I_q,\omega_m,\theta_m,T_x,A_1,B_1,A_2,B_2].
-\end{align}
-
-% ------------------------------------------------------------
-% MODIFICAR esta lista cuando definas definitivamente:
-%
-% - cuántos armónicos;
-% - cuáles armónicos;
-% - si son 1,3,5,12, etc.
-% ------------------------------------------------------------
-
-
-Para cada configuración se repite el análisis de observabilidad descrito
-anteriormente, permitiendo estudiar cómo la incorporación de nuevos
-estados modifica la capacidad de distinguir los estados mecánicos y las
-perturbaciones representadas.
-
-
-
-% ============================================================
-
-\section{Escenarios de simulación}
-% ============================================================
-
-La evaluación de las diferentes configuraciones se realiza mediante un
-conjunto de escenarios de simulación diseñados para separar los efectos
-producidos por las distintas perturbaciones y estudiar su influencia
-sobre la reconstrucción de la velocidad mecánica.
-
-
-% ------------------------------------------------------------
-\subsection{Operación sin perturbaciones adicionales}
-% ------------------------------------------------------------
-
-Este escenario se utiliza como referencia para verificar el
-comportamiento de la planta, los controladores y el sistema de
-estimación en ausencia de perturbaciones mecánicas adicionales.
-
-% Aquí posteriormente puedes vincular:
-% - lazo abierto;
-% - lazo cerrado;
-% - seguimiento de referencia.
-
-
-% ------------------------------------------------------------
-\subsection{Operación con torque de carga}
-% ------------------------------------------------------------
-
-Se incorporan variaciones de torque de carga con el objetivo de evaluar
-la capacidad del estimador para reconstruir la velocidad frente a
-perturbaciones de evolución lenta o cambios externos de carga.
-
-% COMPLETAR:
-% magnitud;
-% instante de aplicación;
-% duración.
-
-
-% ------------------------------------------------------------
-\subsection{Operación con perturbación periódica}
-% ------------------------------------------------------------
-
-Se incorpora la perturbación periódica utilizada para representar el
-torque de detención o \textit{cogging} del motor.
-
-Este escenario permite analizar particularmente el comportamiento de la
-velocidad instantánea y determinar la capacidad del observador para
-reconstruir las oscilaciones producidas por dicha perturbación.
-
-% COMPLETAR con amplitud/frecuencia/modelo exacto.
-
-
-% ------------------------------------------------------------
-\subsection{Operación sensorless con HFI}
-% ------------------------------------------------------------
-
-Finalmente, las configuraciones seleccionadas se evalúan utilizando la
-estrategia sensorless con inyección de señal de alta frecuencia,
-permitiendo estudiar el comportamiento del observador en las condiciones
-de baja velocidad consideradas en este trabajo.
-
-
-
-% ============================================================
-
-\section{Métricas de evaluación}
-% ============================================================
-
-El desempeño de las diferentes configuraciones del observador se evalúa
-considerando como objetivo principal la reconstrucción de la velocidad
-mecánica instantánea.
-
-Adicionalmente, se analiza la capacidad de los estados aumentados para
-representar la perturbación mecánica aplicada.
-
-
-% ------------------------------------------------------------
-\subsection{Error de estimación de velocidad}
-% ------------------------------------------------------------
-
-Como primera métrica se utiliza el error cuadrático medio de la velocidad:
-
-\begin{equation}
-\label{eq:rmse_velocidad}
-RMSE_{\omega}
-=
-\sqrt{
-\frac{1}{N}
-\sum_{k=1}^{N}
-\left(
-\omega_m[k]
--
-\hat{\omega}_m[k]
-\right)^2
-}.
-\end{equation}
-
-
-
-% ------------------------------------------------------------
-\subsection{Reconstrucción de la componente periódica}
-% ------------------------------------------------------------
-
-Para analizar específicamente la capacidad del estimador para reconstruir
-las variaciones instantáneas de velocidad, se considera la relación entre
-la amplitud estimada y la amplitud real de la componente periódica:
-
-\begin{equation}
-\label{eq:ganancia_velocidad}
-G_{\omega}
-=
-\frac{\hat A_{\omega}}
-{A_{\omega}}.
-\end{equation}
-
-
-Adicionalmente, se considera la diferencia de fase
-
-\begin{equation}
-\label{eq:fase_velocidad}
-\Delta\phi_{\omega}
-=
-\hat{\phi}_{\omega}
--
-\phi_{\omega}.
-\end{equation}
-
-
-Estas métricas permiten distinguir entre un observador capaz de
-reconstruir correctamente la velocidad promedio y uno capaz de
-reproducir además las variaciones instantáneas asociadas a las
-perturbaciones periódicas.
-
-
-% ------------------------------------------------------------
-\subsection{Reconstrucción de la perturbación}
-% ------------------------------------------------------------
-
-Como análisis complementario, para las configuraciones que incorporan
-estados de perturbación se compara la perturbación equivalente estimada
-con el torque aplicado a la planta.
-
-Una métrica posible corresponde a
-
-\begin{equation}
-\label{eq:rmse_torque}
-RMSE_T
-=
-\sqrt{
-\frac{1}{N}
-\sum_{k=1}^{N}
-\left(
-T_d[k]
--
-\hat T_d[k]
-\right)^2
-}.
-\end{equation}
-
-
-Este análisis se utiliza de forma complementaria a la evaluación de
-velocidad, debido a que una mejora en la reconstrucción de los estados
-mecánicos no implica necesariamente una identificación individual de
-cada componente física de la perturbación.
-
-
-% ============================================================
-
-\section{Síntesis del procedimiento metodológico}
-% ============================================================
-
-A partir de las etapas descritas anteriormente, el procedimiento
-metodológico seguido en este trabajo puede resumirse mediante la
-siguiente secuencia:
-
-\begin{equation}
-\boxed{
-\begin{array}{c}
-\text{Caracterización del motor}
-\\
-\downarrow
-\\
-\text{Implementación del modelo electromecánico}
-\\
-\downarrow
-\\
-\text{Diseño de los lazos de control}
-\\
-\downarrow
-\\
-\text{Implementación de la estrategia sensorless}
-\\
-\downarrow
-\\
-\text{Análisis de observabilidad del modelo base}
-\\
-\downarrow
-\\
-\text{Incorporación progresiva de estados de perturbación}
-\\
-\downarrow
-\\
-\text{Evaluación de observabilidad}
-\\
-\downarrow
-\\
-\text{Evaluación de la reconstrucción de velocidad}
-\\
-\downarrow
-\\
-\text{Análisis de la perturbación estimada}
-\end{array}
-}
-\end{equation}

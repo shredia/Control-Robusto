@@ -1,41 +1,146 @@
 \chapter{Resultados y discusión}
 
-\section{Validación del modelo y estrategia de control}
-    \subsection{Comportamiento del motor en lazo abierto}
-    \subsection{Respuesta de los lazos de corriente}
-    \subsection{Respuesta del lazo de velocidad}
+% ============================================================
+\section{Condiciones de simulación y casos de estudio}
+% ============================================================
 
-\section{Efecto de las perturbaciones mecánicas}
-    \subsection{Respuesta frente a torque de carga}
-    \subsection{Efecto del cogging sobre la velocidad instantánea}
+\subsection{Condiciones generales de simulación}
 
-\section{Resultados de la estrategia sensorless}
-    \subsection{Respuesta de la inyección de alta frecuencia}
-    \subsection{Estimación de posición}
-    \subsection{Estimación de velocidad}
+\subsection{Escenarios de perturbación}
 
-\section{Análisis de observabilidad}
-    \subsection{Observabilidad del modelo base}
-    \subsection{Efecto de la velocidad}
-    \subsection{Efecto de la saliencia}
-    \subsection{Observabilidad de los modelos aumentados}
+Se consideran los siguientes escenarios:
 
+\begin{enumerate}
+    \item Sin torque de carga y sin cogging.
+    \item Con torque de carga y sin cogging.
+    \item Sin torque de carga y con cogging.
+    \item Con torque de carga y con cogging.
+\end{enumerate}
+
+\subsection{Configuraciones del observador}
+
+Se comparan las siguientes configuraciones:
+
+\begin{enumerate}
+    \item Observador base de cuatro estados.
+    \item Observador de cinco estados con torque equivalente.
+    \item Observador de estados aumentados con componentes armónicas.
+\end{enumerate}
+
+
+% ============================================================
+\section{Validación del sistema de control}
+% ============================================================
+
+\subsection{Respuesta de los lazos de corriente}
+
+\subsection{Respuesta del lazo de velocidad}
+
+\subsection{Efecto del torque de carga y del cogging}
+
+
+% ============================================================
+\section{Desempeño del observador base de cuatro estados}
+% ============================================================
+
+\subsection{Operación sin perturbaciones}
+
+\subsection{Respuesta frente a torque de carga}
+
+\subsection{Respuesta frente al cogging}
+
+\subsection{Respuesta frente a carga y cogging simultáneos}
+
+\subsection{Error de estimación de posición y velocidad}
+
+
+% ============================================================
+\section{Desempeño del observador de cinco estados}
+% ============================================================
+
+\subsection{Estimación del torque equivalente}
+
+\subsection{Respuesta frente a torque de carga}
+
+\subsection{Respuesta frente al cogging}
+
+\subsection{Respuesta frente a carga y cogging simultáneos}
+
+\subsection{Efecto sobre la estimación de posición y velocidad}
+
+
+% ============================================================
 \section{Desempeño del observador de estados aumentados}
-    \subsection{Observador base}
-    \subsection{Incorporación del torque equivalente}
-    \subsection{Incorporación de estados armónicos}
-    \subsection{Efecto del número de estados aumentados}
+% ============================================================
 
-\section{Reconstrucción de la velocidad mecánica instantánea}
-    \subsection{Error de estimación}
-    \subsection{Atenuación de las componentes periódicas}
-    \subsection{Desfase de la velocidad estimada}
+\subsection{Incorporación de componentes armónicas}
 
-\section{Reconstrucción de las perturbaciones}
-    \subsection{Torque equivalente estimado}
-    \subsection{Componentes armónicas estimadas}
-    \subsection{Correspondencia con la perturbación real}
+\subsection{Reconstrucción de las perturbaciones periódicas}
 
-\section{Comparación global de las configuraciones}
+\subsection{Respuesta frente a torque de carga}
 
+\subsection{Respuesta frente al cogging}
+
+\subsection{Respuesta frente a carga y cogging simultáneos}
+
+\subsection{Efecto del número de estados aumentados}
+
+
+% ============================================================
+\section{Comparación de las configuraciones del observador}
+% ============================================================
+
+\subsection{Error de estimación de posición}
+
+\subsection{Error de estimación de velocidad}
+
+\subsection{Reconstrucción del torque perturbador}
+
+\subsection{Atenuación y desfase de la velocidad estimada}
+
+\subsection{Síntesis comparativa}
+
+
+% ============================================================
+\section{Operación sensorless a baja velocidad}
+% ============================================================
+
+\subsection{Respuesta de la inyección de alta frecuencia}
+
+\subsection{Estimación sensorless de posición}
+
+\subsection{Estimación sensorless de velocidad}
+
+\subsection{Observador base en operación sensorless}
+
+\subsection{Observador de cinco estados en operación sensorless}
+
+\subsection{Observador de estados aumentados en operación sensorless}
+
+\subsection{Efecto del torque de carga y del cogging}
+
+
+% ============================================================
+\section{Análisis de observabilidad}
+% ============================================================
+
+\subsection{Observabilidad del modelo base}
+
+\subsection{Efecto de la velocidad y la saliencia}
+
+\subsection{Efecto de la inyección de alta frecuencia}
+
+\subsection{Observabilidad de los modelos aumentados}
+
+
+% ============================================================
 \section{Discusión de resultados}
+% ============================================================
+
+\subsection{Reconstrucción de los estados mecánicos}
+
+\subsection{Reconstrucción de las perturbaciones}
+
+\subsection{Compromiso entre complejidad y capacidad de estimación}
+
+\subsection{Limitaciones de la operación sensorless}
